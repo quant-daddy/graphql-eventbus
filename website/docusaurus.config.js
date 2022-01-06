@@ -8,13 +8,13 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 const config = {
   title: "GraphQL Eventbus",
   tagline: "GraphQL powered event hub for your organization",
-  url: "https://your-docusaurus-test-site.com",
+  url: "https://graphql-eventbus.vercel.app/",
   baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
-  organizationName: "facebook", // Usually your GitHub org/user name.
-  projectName: "docusaurus", // Usually your repo name.
+  organizationName: "skk2142", // Usually your GitHub org/user name.
+  projectName: "graphql-eventbus", // Usually your repo name.
 
   presets: [
     [
@@ -25,13 +25,13 @@ const config = {
           sidebarPath: require.resolve("./sidebars.js"),
           // Please change this to your repo.
           editUrl:
-            "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
+            "https://github.com/skk2142/graphql-eventbus/tree/master/website/",
         },
         blog: {
           showReadingTime: true,
           // Please change this to your repo.
           editUrl:
-            "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
+            "https://github.com/skk2142/graphql-eventbus/tree/master/website/",
         },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
@@ -107,7 +107,7 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} GraphQL Eventbus. Built with ☕ in NYC.`,
       },
       prism: {
         theme: lightCodeTheme,

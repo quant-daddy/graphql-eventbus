@@ -2,13 +2,13 @@
 sidebar_position: 1
 ---
 
-# Tutorial Intro
+# Introduction
 
-Let's discover **Docusaurus in less than 5 minutes**.
+GraphQL eventbus is an abstraction layer on top of graphql SDL to publish and consume messages in a type-safe way. It is message broker agnotic: you can pick Kafka, RabbitMQ, or even an EventEmitter and build your own event bus. With features like code generation, API evolution without breaking changes, plugin system for logging and monitoring, event registry with beautiful UI, and more, you can build a production quality event hub for your service architecture.
+
+Let's discover **GraphQL Eventbus in less than 5 minutes**.
 
 ## Getting Started
-
-Get started by **creating a new site**.
 
 Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
 

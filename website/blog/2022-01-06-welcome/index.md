@@ -1,8 +1,8 @@
 ---
-slug: welcome
-title: Welcome
-authors: [slorber, yangshun]
-tags: [facebook, hello, docusaurus]
+slug: story
+title: Story of GraphQL Eventbus
+authors: [suraj]
+tags: [startup]
 ---
 
 [Docusaurus blogging features](https://docusaurus.io/docs/blog) are powered by the [blog plugin](https://docusaurus.io/docs/api/plugins/@docusaurus/plugin-content-blog).
@@ -13,8 +13,8 @@ Regular blog authors can be added to `authors.yml`.
 
 The blog post date can be extracted from filenames, such as:
 
-- `2019-05-30-welcome.md`
-- `2019-05-30-welcome/index.md`
+- `2022-01-06-welcome.md`
+- `2022-01-06-welcome/index.md`
 
 A blog post folder can be convenient to co-locate blog post images:
 
