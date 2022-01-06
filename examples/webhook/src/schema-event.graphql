@@ -1,0 +1,14 @@
+type EventA {
+  id: ID!
+  name: String
+}
+
+type EventB {
+  color: String
+  id: ID!
+}
+
+type Query {
+  EventA: EventA!
+  EventB: EventB!
+}

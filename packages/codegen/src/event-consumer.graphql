@@ -1,0 +1,160 @@
+query MyDelete {
+  DeleteGroup {
+    groupId
+  }
+}
+
+query AnswerAccept {
+  AnswerAccept {
+    questionId
+    groupId
+    questionOwnerId
+    acceptedByUserId
+    answerId
+    timestamp
+    isQuestionAnonymous
+    id
+  }
+}
+
+query AnswerCreate {
+  AnswerCreate {
+    timestamp
+    answerId
+    questionId
+    groupId
+    createdByUserId
+    id
+  }
+}
+
+query AnswerEdit {
+  AnswerEdit {
+    timestamp
+    id
+    questionId
+    answerId
+    groupId
+    editedByUserId
+  }
+}
+
+query QuestionCreate {
+  QuestionCreate {
+    id
+    questionId
+    timestamp
+    groupId
+    createdByUserId
+    isQuestionAnonymous
+  }
+}
+
+query QuestionEdit {
+  QuestionEdit {
+    id
+    timestamp
+    questionId
+    groupId
+    editedByUserId
+    isQuestionAnonymous
+    questionOwnerId
+  }
+}
+
+query QuestionResolve {
+  QuestionResolve {
+    id
+    timestamp
+    questionId
+    groupId
+    resolvedByUserId
+    questionOwnerId
+    isQuestionAnonymous
+  }
+}
+
+query CommentCreate {
+  CommentCreate {
+    id
+    timestamp
+    commentOwnerId
+    commentId
+    groupId
+    entityId
+    entityType
+  }
+}
+
+query CommentReaction {
+  CommentReaction {
+    id
+    timestamp
+    groupId
+    commentOwnerId
+    commentId
+    undoEventId
+    entityType
+    entityId
+  }
+}
+
+query EntityReaction {
+  EntityReaction {
+    id
+    timestamp
+    groupId
+    reactionByUserId
+    undoEventId
+    entityType
+    entityId
+  }
+}
+
+query AnswerAcceptUndo {
+  AnswerAcceptUndo {
+    undoEventId
+  }
+}
+
+query QuestionResolveUndo {
+  QuestionResolveUndo {
+    undoEventId
+  }
+}
+
+query AnswerDelete {
+  AnswerDelete {
+    undoEventIds
+  }
+}
+
+query QuestionDelete {
+  QuestionDelete {
+    undoEventIds
+  }
+}
+
+query CommentReactionUndo {
+  CommentReactionUndo {
+    undoEventId
+  }
+}
+
+query EntityReactionUndo {
+  EntityReactionUndo {
+    undoEventId
+  }
+}
+
+query CommentsDelete {
+  CommentsDelete {
+    undoEventIds
+  }
+}
+
+query ReactionEntityDelete {
+  ReactionEntityDelete {
+    undoEventIds
+  }
+}

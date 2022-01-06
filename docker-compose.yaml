@@ -1,0 +1,20 @@
+version: "3"
+services:
+  rabbit:
+    image: rabbitmq:3-management
+    hostname: rabbit
+    environment:
+      RABBITMQ_ERLANG_COOKIE: "SWQOKSQALRPCLNMEQG"
+      RABBITMQ_DEFAULT_USER: "guest"
+      RABBITMQ_DEFAULT_PASS: "guest"
+      RABBITMQ_DEFAULT_VHOST: "/"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+  eventbus:
+    image: bigtruedata/gcloud-pubsub-emulator
+    networks:
+      - default
+    ports:
+      - "8538:8538"
+    command: "start --host-port 0.0.0.0:8538"

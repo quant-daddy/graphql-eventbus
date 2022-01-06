@@ -1,0 +1,16 @@
+query UserCreatedEvent {
+  UserCreatedEvent {
+    userId
+    createdAt
+    userEmail
+    userType
+  }
+}
+
+query UserDeletedEvent {
+  UserDeletedEvent {
+    eventId
+    deletedAt
+    userId
+  }
+}

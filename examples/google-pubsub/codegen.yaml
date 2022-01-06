@@ -1,0 +1,32 @@
+schema: ""
+generates:
+  ./src/generated/codegen-event-consumer.ts:
+    plugins:
+      - graphql-eventbus-codegen:
+          consumer:
+            eventSampler: true
+            contextType: "../types#MessageHandlerContext"
+            publisherSchemaPath: "src/schema-event.graphql"
+      - typescript
+      - typescript-operations:
+    documents:
+      - "./src/event-consumer.graphql"
+    schema: "src/schema-event.graphql"
+    config:
+      skipTypename: true
+  ./src/generated/codegen-server-event.ts:
+    plugins:
+      - "typescript"
+      - typescript-operations:
+      - graphql-eventbus-codegen:
+          publisher: true
+    schema:
+      - "src/schema-event.graphql"
+    config:
+      skipTypename: true
+      enumsAsTypes: true
+config:
+  avoidOptionals: true
+  scalars:
+    DateTime: string
+    UUID: string

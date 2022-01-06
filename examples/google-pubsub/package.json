@@ -1,0 +1,35 @@
+{
+  "name": "examples",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx ts-node src/index.ts",
+    "test": "PUBSUB_PROJECT_ID=123 PUBSUB_EMULATOR_HOST=localhost:8538 jest --runInBand --verbose --forceExit",
+    "test:watch": "PUBSUB_PROJECT_ID=123 PUBSUB_EMULATOR_HOST=localhost:8538 jest --runInBand --verbose --watch --forceExit",
+    "codegen": "npx graphql-codegen --config ./codegen.yaml"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.2",
+    "graphql": "^15.8.0",
+    "graphql-eventbus-google-pubsub": "0.0.10",
+    "graphql-scalars": "^1.14.1",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "^2.3.0",
+    "@graphql-codegen/typescript": "^2.4.1",
+    "@graphql-codegen/typescript-operations": "^2.2.1",
+    "@graphql-codegen/typescript-resolvers": "^2.4.2",
+    "@graphql-tools/mock": "^8.5.0",
+    "@types/express": "^4.17.13",
+    "@types/jest": "^27.0.3",
+    "graphql-eventbus-codegen": "0.0.5",
+    "jest": "^27.4.5",
+    "jest-watch-typeahead": "^0.6.5",
+    "waait": "^1.0.5"
+  }
+}

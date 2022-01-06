@@ -1,0 +1,22 @@
+schema: ""
+generates:
+  ./src/generated/codegen-event.ts:
+    plugins:
+      - graphql-eventbus-codegen:
+          consumer:
+            eventSampler: true
+            contextType: "../WebhookBus#MessageHandlerContext"
+            publisherSchemaPath: "src/schema-event.graphql"
+          publisher: true
+      - typescript
+      - typescript-operations:
+    documents:
+      - "./src/event-consumer.graphql"
+    schema: "src/schema-event.graphql"
+    config:
+      skipTypename: true
+config:
+  avoidOptionals: true
+  scalars:
+    EmailAddress: string
+    DateTime: string

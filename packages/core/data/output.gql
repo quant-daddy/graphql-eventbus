@@ -1,0 +1,71 @@
+query Complex {
+  Complex {
+    id
+    timestamp
+    groupId
+    status
+    b {
+      ... on B {
+        id
+        timestamp
+        name
+      }
+      ... on C {
+        id
+        timestamp
+        boo
+        name {
+          a
+        }
+      }
+    }
+    nested {
+      a
+    }
+  }
+}
+query A {
+  A {
+    ... on B {
+      id
+      timestamp
+      name
+    }
+    ... on C {
+      id
+      timestamp
+      boo
+      name {
+        a
+      }
+    }
+  }
+}
+query ClosedGroupJoinRequestResponseEvent {
+  ClosedGroupJoinRequestResponseEvent {
+    id
+    timestamp
+    requestId
+    groupId
+    requestedByUserId
+    status
+  }
+}
+query SignUpEvent {
+  SignUpEvent {
+    id
+    timestamp
+    userId
+  }
+}
+query EntityFlagEvent {
+  EntityFlagEvent {
+    id
+    timestamp
+    entityType
+    entityId
+    entityOwnerId
+    groupId
+    flaggedByUserId
+  }
+}

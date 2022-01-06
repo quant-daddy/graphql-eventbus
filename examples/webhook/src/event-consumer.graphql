@@ -1,0 +1,13 @@
+query EventA {
+  EventA {
+    id
+    name
+  }
+}
+
+query EventB {
+  EventB {
+    id
+    color
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "name": "eventbus",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kollate/eventbus.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Kollate/eventbus/issues"
+  },
+  "homepage": "https://github.com/Kollate/eventbus#readme",
+  "devDependencies": {
+    "@types/jest": "^27.0.3",
+    "@types/uuid": "^8.3.3",
+    "graphql-tag": "^2.12.6",
+    "jest": "^27.3.1",
+    "jest-watch-typeahead": "^1.0.0",
+    "ts-jest": "^27.0.7",
+    "typescript": "^4.5.2",
+    "uuid": "^8.3.2",
+    "waait": "^1.0.5"
+  },
+  "dependencies": {
+    "graphql": "^15.7.2"
+  }
+}

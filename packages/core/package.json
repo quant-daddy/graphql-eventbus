@@ -1,0 +1,82 @@
+{
+  "name": "graphql-eventbus-core",
+  "version": "0.0.27",
+  "description": "Eventbus powered by GraphQL",
+  "engines": {
+    "node": ">= 12.13 <13"
+  },
+  "_moduleAliases": {
+    "#root": "./build"
+  },
+  "main": "build/index.js",
+  "files": [
+    "build/**/*"
+  ],
+  "types": "./build/index.d.ts",
+  "np": {
+    "yarn": false,
+    "contents": "build",
+    "cleanup": false
+  },
+  "devDependencies": {
+    "@graphql-tools/mock": "^8.4.3",
+    "@types/faker": "^5.1.2",
+    "@types/jest": "^24.0.25",
+    "@types/node": "~12.12.22",
+    "@types/supertest": "^2.0.8",
+    "@types/uuid": "^8.3.0",
+    "@typescript-eslint/eslint-plugin": "^4.22.0",
+    "@typescript-eslint/parser": "^4.22.0",
+    "eslint": "~6.8.0",
+    "eslint-config-prettier": "~6.9.0",
+    "eslint-plugin-jest": "~23.2.0",
+    "faker": "^5.1.0",
+    "graphql": "^15.3.0",
+    "graphql-scalars": "^1.13.6",
+    "graphql-tag": "^2.12.4",
+    "husky": "^4.2.3",
+    "jest": "~24.9.0",
+    "jest-watch-typeahead": "^0.4.2",
+    "nock": "^11.8.2",
+    "nodemon": "^2.0.2",
+    "prettier": "^1.19.1",
+    "reflect-metadata": "^0.1.13",
+    "rimraf": "~3.0.0",
+    "supertest": "^4.0.2",
+    "ts-jest": "~24.2.0",
+    "ts-node": "^8.10.2",
+    "tsconfig-paths": "^3.9.0",
+    "tsutils": "~3.17.0",
+    "typescript": "^4.2.4",
+    "uuid": "^8.3.2",
+    "waait": "^1.0.5",
+    "wait-for-expect": "^3.0.2"
+  },
+  "scripts": {
+    "clean": "rimraf build",
+    "prebuild": "npm run clean",
+    "build": "tsc -p tsconfig.json",
+    "type:check": "tsc --noEmit",
+    "test": "jest --runInBand --coverage --verbose --forceExit",
+    "test:watch": "jest --watch --runInBand",
+    "build:watch": "tsc -w -p tsconfig.json",
+    "lint": "eslint . --ext .ts,.tsx",
+    "prepublishOnly": "npm run build && npm version patch"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm test"
+    }
+  },
+  "author": "Suraj Keshri",
+  "license": "MIT",
+  "dependencies": {
+    "@graphql-inspector/core": "^2.2.0",
+    "@graphql-tools/schema": "^7.1.5",
+    "module-alias": "^2.2.2",
+    "ts-is-present": "^1.2.2"
+  },
+  "peerDependencies": {
+    "graphql": "^15.3.0"
+  }
+}

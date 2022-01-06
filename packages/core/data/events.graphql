@@ -1,0 +1,82 @@
+scalar DateTime
+
+scalar EmailAddress
+
+scalar UUID
+
+enum ClosedGroupJoinRequestResponseStatus {
+  ACCEPTED
+  REJECTED
+}
+
+# enum MemberPermissionLevel {
+#   MEMBER
+#   MODERATOR
+#   ADMIN
+# }
+
+type ClosedGroupJoinRequestResponseEvent {
+  id: UUID!
+  timestamp: DateTime!
+  requestId: String!
+  groupId: String!
+  requestedByUserId: String!
+  status: ClosedGroupJoinRequestResponseStatus!
+    @deprecated(reason: "Figure out something else bro")
+}
+
+type Complex {
+  id: UUID!
+  timestamp: DateTime!
+  groupId: String! @deprecated(reason: "Do not use this")
+  status: ClosedGroupJoinRequestResponseStatus!
+  nested: Nested
+}
+
+type B {
+  id: UUID!
+  timestamp: DateTime!
+  name: String!
+  status: ClosedGroupJoinRequestResponseStatus!
+}
+
+type Nested {
+  a: Boolean
+}
+
+type C {
+  id: UUID!
+  timestamp: DateTime!
+  boo: String!
+  name: Nested!
+}
+
+enum ReactionEntityType {
+  QUESTION
+  ANSWER
+}
+
+type SignUpEvent {
+  id: UUID!
+  timestamp: DateTime!
+  userId: String!
+}
+
+type EntityFlagEvent {
+  id: UUID!
+  timestamp: DateTime!
+  entityType: ReactionEntityType!
+  entityId: UUID!
+  entityOwnerId: UUID!
+  groupId: UUID!
+  flaggedByUserId: UUID!
+}
+
+type Query {
+  Complex: Complex!
+  B: B!
+  C: C!
+  ClosedGroupJoinRequestResponseEvent: ClosedGroupJoinRequestResponseEvent!
+  SignUpEvent: SignUpEvent!
+  EntityFlagEvent: EntityFlagEvent!
+}

@@ -1,0 +1,28 @@
+scalar DateTime
+
+type Query {
+  UserCreatedEvent: UserCreatedEvent!
+  UserDeletedEvent: UserDeletedEvent!
+}
+
+scalar UUID
+
+type UserCreatedEvent {
+  createdAt: DateTime!
+  eventId: UUID!
+  userEmail: String
+  userId: ID!
+  userName: String
+  userType: UserType!
+}
+
+type UserDeletedEvent {
+  deletedAt: DateTime!
+  eventId: UUID!
+  userId: ID!
+}
+
+enum UserType {
+  ENTERPRISE
+  STARTUP
+}

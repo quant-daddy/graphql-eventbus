@@ -1,0 +1,36 @@
+{
+  "name": "graphql-eventbus-codegen",
+  "version": "0.0.7",
+  "description": "Codegen for eventbus",
+  "main": "build/index.js",
+  "files": [
+    "build/**/*"
+  ],
+  "scripts": {
+    "clean": "rimraf build",
+    "prebuild": "npm run clean",
+    "build": "tsc -p tsconfig.json",
+    "test": "jest --runInBand --verbose",
+    "test:watch": "jest --watch --runInBand",
+    "build:watch": "tsc -w -p tsconfig.json",
+    "lint": "eslint . --ext .ts,.tsx",
+    "prepublishOnly": "npm run build && npm version patch"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@graphql-codegen/plugin-helpers": "^2.3.1",
+    "@graphql-inspector/core": "^3.0.2"
+  },
+  "peerDependencies": {
+    "graphql": "15.x"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.0.3",
+    "graphql": "^15.8.0",
+    "jest": "^27.4.5",
+    "jest-watch-typeahead": "^1.0.0",
+    "ts-jest": "^27.1.2",
+    "typescript": "^4.5.4"
+  }
+}

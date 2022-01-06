@@ -1,0 +1,232 @@
+scalar Date
+
+scalar Time
+
+scalar DateTime
+
+scalar Timestamp
+
+scalar UtcOffset
+
+scalar EmailAddress
+
+scalar NegativeFloat
+
+scalar NegativeInt
+
+scalar NonNegativeFloat
+
+scalar NonNegativeInt
+
+scalar NonPositiveFloat
+
+scalar NonPositiveInt
+
+scalar PhoneNumber
+
+scalar PositiveFloat
+
+scalar PositiveInt
+
+scalar PostalCode
+
+scalar UnsignedFloat
+
+scalar UnsignedInt
+
+scalar URL
+
+scalar IBAN
+
+scalar Hexadecimal
+
+scalar ObjectID
+
+scalar BigInt
+
+scalar Long
+
+scalar SafeInt
+
+scalar GUID
+
+scalar HexColorCode
+
+scalar HSL
+
+scalar HSLA
+
+scalar IPv4
+
+scalar IPv6
+
+scalar ISBN
+
+scalar MAC
+
+scalar Port
+
+scalar RGB
+
+scalar RGBA
+
+scalar USCurrency
+
+scalar Currency
+
+scalar JSON
+
+scalar JSONObject
+
+scalar Byte
+
+scalar Void
+
+enum ReactionEntityType {
+  QUESTION
+  ANSWER
+}
+
+enum ReactionType {
+  THUMBS_UP
+  HEART
+  INSIGHTFUL
+  CELEBRATE
+  SAD
+}
+
+enum CommentReactionType {
+  THUMBS_UP
+  HEART
+  INSIGHTFUL
+  CELEBRATE
+  SAD
+}
+
+interface IEvent {
+  id: GUID!
+  timestamp: DateTime!
+}
+
+type Drury implements IEvent {
+  id: GUID!
+  timestamp: DateTime!
+  commentIds: [ID!]!
+  undoEventIds: [GUID!]!
+}
+
+type ParentComment {
+  ownerId: ID!
+  id: ID!
+}
+
+type CommentCreateEvent implements IEvent {
+  id: GUID!
+  timestamp: DateTime!
+  commentId: ID!
+  entityType: ReactionEntityType!
+  entityId: ID!
+  entityOwnerId: ID!
+  groupId: ID!
+  commentOwnerId: ID!
+  mentionedUserIds: [ID!]
+  parentComment: ParentComment
+}
+
+type CommentEditEvent implements IEvent {
+  id: GUID!
+  timestamp: DateTime!
+  commentId: ID!
+  entityType: ReactionEntityType!
+  entityId: ID!
+  entityOwnerId: ID!
+  groupId: ID!
+  commentOwnerId: ID!
+  undoEventIds: [GUID!]!
+  mentionedUserIds: [ID!]
+  parentComment: ParentComment
+}
+
+type CommentFlagEvent implements IEvent {
+  id: GUID!
+  timestamp: DateTime!
+  commentId: ID!
+  entityType: ReactionEntityType!
+  entityId: ID!
+  groupId: ID!
+  commentOwnerId: ID!
+  flaggedByUserId: ID!
+}
+
+type CommentReactionEvent implements IEvent {
+  id: GUID!
+  timestamp: DateTime!
+  commentId: ID!
+  entityType: ReactionEntityType!
+  entityId: ID!
+  reactionType: CommentReactionType!
+  parentCommentOwnerId: ID
+  commentOwnerId: ID!
+  groupId: ID!
+  reactionByUserId: ID!
+  mentionedUserIds: [ID!]
+  undoEventId: GUID
+}
+
+type CommentReactionUndoEvent implements IEvent {
+  id: GUID!
+  timestamp: DateTime!
+  commentId: ID!
+  undoEventId: GUID!
+}
+
+type EntityFlagEvent implements IEvent {
+  id: GUID!
+  timestamp: DateTime!
+  entityType: ReactionEntityType!
+  entityId: ID!
+  entityOwnerId: ID!
+  groupId: ID!
+  flaggedByUserId: ID!
+}
+
+type EntityReactionEvent implements IEvent {
+  id: GUID!
+  timestamp: DateTime!
+  reactionType: ReactionType!
+  entityType: ReactionEntityType!
+  entityId: ID!
+  entityOwnerId: ID!
+  groupId: ID!
+  reactionByUserId: ID!
+  undoEventId: GUID
+}
+
+type EntityReactionUndoEvent implements IEvent {
+  id: GUID!
+  timestamp: DateTime!
+  entityType: ReactionEntityType!
+  entityId: ID!
+  undoEventId: GUID!
+}
+
+type ReactionEntityDeleteEvent implements IEvent {
+  id: GUID!
+  timestamp: DateTime!
+  entityType: ReactionEntityType!
+  entityId: ID!
+  undoEventIds: [GUID!]!
+}
+
+type Query {
+  CommentsDeleteEvent: Drury!
+  CommentCreateEvent: CommentCreateEvent!
+  CommentEditEvent: CommentEditEvent!
+  CommentFlagEvent: CommentFlagEvent!
+  CommentReactionEvent: CommentReactionEvent!
+  CommentReactionUndoEvent: CommentReactionUndoEvent!
+  EntityFlagEvent: EntityFlagEvent!
+  EntityReactionEvent: EntityReactionEvent!
+  EntityReactionUndoEvent: EntityReactionUndoEvent!
+  ReactionEntityDeleteEvent: ReactionEntityDeleteEvent!
+}
