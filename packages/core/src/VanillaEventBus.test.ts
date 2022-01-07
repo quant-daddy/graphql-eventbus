@@ -8,8 +8,13 @@ const pubSchema = buildSchema(`
       id: ID!
       name: String
     }
+    type TestEvent2 {
+      id: ID!
+      address: String
+    }
     type Query {
       TestEvent: TestEvent!
+      TestEvent2: TestEvent2!
     }
   `);
 
@@ -116,7 +121,7 @@ test("valid events are consumed", async () => {
     ],
     subscriber: {
       cb: consumeCb,
-      getSubscription: (t, cb) => {
+      subscribe: async (t, cb) => {
         cbRef = cb;
       },
       queries: gql`
@@ -132,11 +137,14 @@ test("valid events are consumed", async () => {
   });
   await bus.init();
   await cbRef({
-    payload: {
-      id: "id",
-      name: "name",
+    topic: "TestEvent",
+    baggage: {
+      payload: {
+        id: "id",
+        name: "name",
+      },
+      metadata: {} as any,
     },
-    metadata: {} as any,
   });
   expect(consumeCb).toBeCalledTimes(1);
   expect(consumeCb.mock.calls[0][0]).toMatchObject({
@@ -156,10 +164,13 @@ test("valid events are consumed", async () => {
   try {
     // error in the payload
     await cbRef({
-      payload: {
-        name: "name",
+      topic: "TestEvent",
+      baggage: {
+        payload: {
+          name: "name",
+        },
+        metadata: {} as any,
       },
-      metadata: {} as any,
     });
   } catch (e) {}
   expect(consumeStartCb).toBeCalledTimes(1);

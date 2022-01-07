@@ -81,48 +81,55 @@ export class PubSubEventBus {
       subscriber: this.config.subscriber
         ? {
             cb: this.config.subscriber?.cb,
-            getSubscription: async (topicName, cb) => {
-              const [topic] = await this.pubsubClient
-                .topic(topicName)
-                .get({ autoCreate: true });
-              const subscriptionName = `${
-                this.config.serviceName
-              }-${topicName}${
-                this.config.isDarkRelease ? "-dark" : ""
-              }`;
-              let subscription = await topic.subscription(
-                subscriptionName,
-                {
-                  streamingOptions: {
-                    maxStreams: 1,
-                  },
-                }
-              );
-              const [exist] = await subscription.exists();
-              if (!exist) {
-                console.log(
-                  `Service ${this.config.serviceName}: Subscription created: ${subscriptionName}`
-                );
-                [subscription] = await subscription.create({
-                  filter: !this.config.isDarkRelease
-                    ? `NOT attributes:x-prop-${this.config.serviceName}-dark`
-                    : `attributes:x-prop-${this.config.serviceName}-dark`,
-                });
-              }
-              this.subscriptions.push(subscription);
-              subscription.on("message", async (msg: Message) => {
-                try {
-                  const baggage = getBaggage(msg);
-                  await cb({
-                    metadata: baggage.metadata,
-                    payload: baggage.payload,
+            subscribe: async (topics, cb) => {
+              await Promise.all(
+                topics.map(async (topicName) => {
+                  const [topic] = await this.pubsubClient
+                    .topic(topicName)
+                    .get({ autoCreate: true });
+                  const subscriptionName = `${
+                    this.config.serviceName
+                  }-${topicName}${
+                    this.config.isDarkRelease ? "-dark" : ""
+                  }`;
+                  let subscription = await topic.subscription(
+                    subscriptionName,
+                    {
+                      streamingOptions: {
+                        maxStreams: 1,
+                      },
+                    }
+                  );
+                  const [exist] = await subscription.exists();
+                  if (!exist) {
+                    console.log(
+                      `Service ${this.config.serviceName}: Subscription created: ${subscriptionName}`
+                    );
+                    [subscription] = await subscription.create({
+                      filter: !this.config.isDarkRelease
+                        ? `NOT attributes:x-prop-${this.config.serviceName}-dark`
+                        : `attributes:x-prop-${this.config.serviceName}-dark`,
+                    });
+                  }
+                  this.subscriptions.push(subscription);
+                  subscription.on("message", async (msg: Message) => {
+                    try {
+                      const baggage = getBaggage(msg);
+                      await cb({
+                        topic: topicName,
+                        baggage: {
+                          metadata: baggage.metadata,
+                          payload: baggage.payload,
+                        },
+                      });
+                      msg.ack();
+                    } catch (e) {
+                      msg.nack();
+                      throw e;
+                    }
                   });
-                  msg.ack();
-                } catch (e) {
-                  msg.nack();
-                  throw e;
-                }
-              });
+                })
+              );
             },
             queries: this.config.subscriber.queries,
             schema: this.config.subscriber.schema,

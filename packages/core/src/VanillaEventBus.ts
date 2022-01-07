@@ -6,13 +6,19 @@ import { InvalidPublishTopic } from ".";
 import { v4 } from "uuid";
 import { isPresent } from "ts-is-present";
 
-export type DataCb = (baggage: Baggage) => Promise<unknown>;
+export type DataCb = (args: {
+  baggage: Baggage;
+  topic: string;
+}) => Promise<unknown>;
 
 interface SubscriptionConfig {
   queries: DocumentNode;
   schema: GraphQLSchema;
   cb: EventBusSubscriberCb;
-  getSubscription: (topic: string, cb: DataCb) => void;
+  subscribe: (
+    topics: string[],
+    cb: DataCb
+  ) => Promise<unknown> | unknown | void;
 }
 
 export interface Baggage {
@@ -74,6 +80,7 @@ export interface Metadata {
 export class VanillaEventBus {
   private consumeValidator!: EventBusValidator | null;
   private publishValidator!: EventBusValidator | null;
+  public isInitialized: boolean = false;
   constructor(
     public config: {
       publisher?: {
@@ -109,98 +116,103 @@ export class VanillaEventBus {
       await this.config.publisher.publishInit(topicnames);
     }
     if (this.config.subscriber) {
-      await this.consume(this.config.subscriber);
+      await this.consume();
     }
+    this.isInitialized = true;
   };
 
-  private consume = async (args: SubscriptionConfig) => {
+  private consume = async () => {
+    if (!this.config.subscriber) {
+      return;
+    }
     if (!this.consumeValidator) {
-      throw new Error("Subscriber config not added");
+      return;
+    }
+    await this.consumeValidator
+      .validateConsumerQueries(this.config.subscriber.queries)
+      .then(async (topics) => {
+        await this.config.subscriber!.subscribe(
+          topics,
+          this.handleCb
+        );
+      });
+  };
+
+  private handleCb: DataCb = async ({ baggage, topic }) => {
+    if (!this.config.subscriber) {
+      return;
     }
     const consumeHooks =
       this.config.plugins
         ?.map((a) => a.consumeStartHook)
         .filter(isPresent) || [];
-    await this.consumeValidator
-      .validateConsumerQueries(args.queries)
-      .then((topics) => {
-        topics.forEach(async (topic) => {
-          await args.getSubscription(
+    let consumeEndHooks: ConsumeEndHook[] = [];
+    let consumeErrorHooks: ConsumeErrorHook[] = [];
+    let consumeSuccessHooks: ConsumeSuccessHook[] = [];
+    if (consumeHooks.length) {
+      await Promise.all(
+        consumeHooks.map(async (hook) => {
+          const foo = await hook({
             topic,
-            async ({ metadata, payload: fullData }: Baggage) => {
-              let consumeEndHooks: ConsumeEndHook[] = [];
-              let consumeErrorHooks: ConsumeErrorHook[] = [];
-              let consumeSuccessHooks: ConsumeSuccessHook[] = [];
-              if (consumeHooks.length) {
-                await Promise.all(
-                  consumeHooks.map(async (hook) => {
-                    const foo = await hook({
-                      topic,
-                      metadata,
-                      fullData,
-                      documentNode: this.consumeValidator!.getDocumentForTopic(
-                        topic
-                      ),
-                    });
-                    if (!foo) {
-                      return;
-                    }
-                    if (foo.consumeEndHook) {
-                      consumeEndHooks.push(foo.consumeEndHook);
-                    }
-                    if (foo.consumeSuccessHook) {
-                      consumeSuccessHooks.push(
-                        foo.consumeSuccessHook
-                      );
-                    }
-                    if (foo.consumeErrorHook) {
-                      consumeErrorHooks.push(foo.consumeErrorHook);
-                    }
-                  })
-                );
-              }
-              try {
-                const payload = await this.consumeValidator?.extractData(
-                  {
-                    topic,
-                    data: fullData,
-                  }
-                );
-                await args.cb({
-                  topic: topic,
-                  payload,
-                  metadata,
-                  fullData,
-                });
-                if (consumeSuccessHooks.length) {
-                  await Promise.all(
-                    consumeSuccessHooks.map((hook) => {
-                      return hook();
-                    })
-                  );
-                }
-              } catch (e) {
-                if (consumeErrorHooks.length) {
-                  await Promise.all(
-                    consumeErrorHooks.map((hook) => {
-                      return hook(e as Error);
-                    })
-                  );
-                }
-                throw e;
-              } finally {
-                if (consumeEndHooks.length) {
-                  await Promise.all(
-                    consumeEndHooks.map((hook) => {
-                      return hook();
-                    })
-                  );
-                }
-              }
-            }
-          );
-        });
+            metadata: baggage.metadata,
+            fullData: baggage.payload,
+            documentNode: this.consumeValidator!.getDocumentForTopic(
+              topic
+            ),
+          });
+          if (!foo) {
+            return;
+          }
+          if (foo.consumeEndHook) {
+            consumeEndHooks.push(foo.consumeEndHook);
+          }
+          if (foo.consumeSuccessHook) {
+            consumeSuccessHooks.push(foo.consumeSuccessHook);
+          }
+          if (foo.consumeErrorHook) {
+            consumeErrorHooks.push(foo.consumeErrorHook);
+          }
+        })
+      );
+    }
+    try {
+      const extractedPayload = await this.consumeValidator?.extractData(
+        {
+          topic,
+          data: baggage.payload,
+        }
+      );
+      await this.config.subscriber.cb({
+        topic: topic,
+        payload: extractedPayload,
+        metadata: baggage.metadata,
+        fullData: baggage.payload,
       });
+      if (consumeSuccessHooks.length) {
+        await Promise.all(
+          consumeSuccessHooks.map((hook) => {
+            return hook();
+          })
+        );
+      }
+    } catch (e) {
+      if (consumeErrorHooks.length) {
+        await Promise.all(
+          consumeErrorHooks.map((hook) => {
+            return hook(e as Error);
+          })
+        );
+      }
+      throw e;
+    } finally {
+      if (consumeEndHooks.length) {
+        await Promise.all(
+          consumeEndHooks.map((hook) => {
+            return hook();
+          })
+        );
+      }
+    }
   };
 
   publish = async (props: {

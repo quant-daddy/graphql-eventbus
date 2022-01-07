@@ -1,20 +1,20 @@
 {
-  "name": "graphql-eventbus-google-pubsub",
-  "version": "0.0.23",
-  "description": "Graphql eventbus for Google Pubsub",
+  "name": "graphql-eventbus-rabbitmq",
+  "version": "0.1.0",
+  "description": "Graphql eventbus for RabbitMQ",
   "main": "build/index.js",
   "types": "./build/index.d.ts",
   "scripts": {
-    "test": "PUBSUB_PROJECT_ID=123 PUBSUB_EMULATOR_HOST=localhost:8538 jest  --runInBand --verbose --forceExit",
+    "test": "jest  --runInBand --verbose --forceExit",
     "build": "rimraf build && tsc -p tsconfig.json",
     "prepublishOnly": "npm run build && npm version patch",
-    "test:watch": "PUBSUB_PROJECT_ID=123 PUBSUB_EMULATOR_HOST=localhost:8538 npm run test -- --watch"
+    "test:watch": "npm run test -- --watch"
   },
   "files": [
     "build/**/*"
   ],
   "dependencies": {
-    "@google-cloud/pubsub": "^2.18.3",
+    "amqplib": "^0.8.0",
     "graphql-eventbus-core": "^0.0.29",
     "module-alias": "^2.2.2",
     "uuid": "^8.3.2"
@@ -22,6 +22,7 @@
   "author": "Suraj Keshri",
   "license": "MIT",
   "devDependencies": {
+    "@types/amqplib": "^0.8.2",
     "@types/jest": "^27.0.3",
     "jest": "^27.3.1",
     "jest-watch-typeahead": "^0.6.5",

@@ -39,13 +39,18 @@ export class MemoryEventBus {
       subscriber: this.config.subscriber
         ? {
             cb: this.config.subscriber!.cb,
-            getSubscription: (topic, cb: DataCb) => {
-              this.eventEmitter.on(
-                `message-${topic}`,
-                async (baggage) => {
-                  await cb(JSON.parse(baggage));
-                }
-              );
+            subscribe: (topics, cb: DataCb) => {
+              topics.forEach((topic) => {
+                this.eventEmitter.on(
+                  `message-${topic}`,
+                  async (baggage) => {
+                    await cb({
+                      baggage: JSON.parse(baggage),
+                      topic,
+                    });
+                  }
+                );
+              });
             },
             queries: this.config.subscriber.queries,
             schema: this.config.schema,
