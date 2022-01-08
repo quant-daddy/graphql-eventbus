@@ -9,3 +9,13 @@
   height: 200px;
   width: 200px;
 }
+
+.h3 {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.text {
+  font-size: 16px;
+  font-weight: 400;
+}

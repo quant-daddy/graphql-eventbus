@@ -18,7 +18,7 @@ interface SubscriptionConfig {
   subscribe: (
     topics: string[],
     cb: DataCb
-  ) => Promise<unknown> | unknown | void;
+  ) => OptionalPromise<unknown>;
 }
 
 export interface Baggage {

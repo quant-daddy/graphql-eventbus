@@ -1,5 +1,5 @@
 import { buildSchema } from "graphql";
-import { PubSubEventBus } from "../../../examples/google-pubsub/src/PubSubEventBus";
+import { PubSubEventBus } from "./PubSubEventBus";
 import gql from "graphql-tag";
 import wait from "waait";
 

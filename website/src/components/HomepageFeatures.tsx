@@ -1,55 +1,89 @@
-import React from 'react';
-import clsx from 'clsx';
-import styles from './HomepageFeatures.module.css';
+import React from "react";
+import clsx from "clsx";
+import styles from "./HomepageFeatures.module.css";
 
 type FeatureItem = {
   title: string;
-  image: string;
   description: JSX.Element;
 };
 
 const FeatureList: FeatureItem[] = [
   {
-    title: 'Easy to Use',
-    image: '/img/undraw_docusaurus_mountain.svg',
+    title: "Schema Driven",
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        Define your events and their payloads in a GraphQL schema. Use
+        GraphQL documents to consume your events. If you love GraphQL,
+        you will fall in love with this library.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
-    image: '/img/undraw_docusaurus_tree.svg',
+    title: "Message Broker agnostic",
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        GraphQL Eventbus lets you use any message broker you want:
+        RabbitMQ, Kafka, NATS, Google PubSub. It just provides an
+        abstraction layer on top your broker using GraphQL SDL.
       </>
     ),
   },
   {
-    title: 'Powered by React',
-    image: '/img/undraw_docusaurus_react.svg',
+    title: "Code Generation",
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        We provide{" "}
+        <a href="https://www.graphql-code-generator.com/">
+          GraphQL Codegen
+        </a>{" "}
+        plugin to generate code for typescript. Never publish or
+        consume events without type safety.
+      </>
+    ),
+  },
+  {
+    title: "Schema Evolution",
+    description: (
+      <>
+        Since all the event consumers explicitly specify the fields
+        they want to consume for each event, you can remove or
+        deprecate fields without breaking any event consumers.
+      </>
+    ),
+  },
+  {
+    title: "Logging and monitoring",
+    description: (
+      <>
+        We provide plugins for logging and monitoring. One line of
+        code and you get prometheus metrics for all the events
+        published and consumed by your services. You can also build
+        your custom plugins.
+      </>
+    ),
+  },
+  {
+    title: "Testing utilities",
+    description: (
+      <>
+        The library comes with utilities to easyly sample payload for
+        your events and test your event handlers.
       </>
     ),
   },
 ];
 
-function Feature({title, image, description}: FeatureItem) {
+function Feature({ title, description }: FeatureItem) {
   return (
-    <div className={clsx('col col--4')}>
-      <div className="text--center">
-        <img className={styles.featureSvg} alt={title} src={image} />
-      </div>
+    <div
+      className={clsx("col col--4")}
+      style={{
+        marginBottom: 20,
+      }}
+    >
       <div className="text--center padding-horiz--md">
-        <h3>{title}</h3>
-        <p>{description}</p>
+        <h3 className={styles.h3}>{title}</h3>
+        <p className={styles.text}>{description}</p>
       </div>
     </div>
   );

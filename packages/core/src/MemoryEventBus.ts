@@ -27,11 +27,10 @@ export class MemoryEventBus {
       plugins: config.plugins,
       publisher: {
         schema: config.schema,
-        publish: async (args, ...rest) => {
+        publish: async (args) => {
           this.eventEmitter.emit(
             `message-${args.topic}`,
-            JSON.stringify(args.baggage),
-            ...rest
+            JSON.stringify(args.baggage)
           );
         },
         allowInvalidTopic: config.allowInvalidTopic,
