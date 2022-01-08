@@ -1,0 +1,7 @@
+query UserCreatedEvent {
+  UserCreatedEvent {
+    userEmail
+    userType
+    userName
+  }
+}

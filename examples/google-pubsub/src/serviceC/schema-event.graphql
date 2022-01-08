@@ -1,0 +1,13 @@
+scalar EmailAddress
+scalar UUID
+scalar DateTime
+
+type Query {
+  EmailOpenEvent: EmailOpenEvent!
+}
+
+type EmailOpenEvent {
+  eventId: UUID!
+  openedAt: DateTime!
+  emailAddress: EmailAddress!
+}

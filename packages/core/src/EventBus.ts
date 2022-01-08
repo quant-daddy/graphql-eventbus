@@ -1,11 +1,11 @@
 import { DocumentNode, GraphQLSchema } from "graphql";
-import { Metadata } from "./VanillaEventBus";
+import { GraphQLEventbusMetadata } from "./GraphQLEventbus";
 
 export type EventBusSubscriberCb = (props: {
   topic: string;
   payload: {};
   fullData: {};
-  metadata: Metadata;
+  metadata: GraphQLEventbusMetadata;
 }) => Promise<unknown>;
 
 export interface SubscriberConfig {

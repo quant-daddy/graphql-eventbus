@@ -1,7 +1,7 @@
 import { buildSchema } from "graphql";
 import gql from "graphql-tag";
-import { VanillaEventBus } from ".";
-import { DataCb } from "./VanillaEventBus";
+import { GraphQLEventbus } from "./GraphQLEventbus";
+import { DataCb } from "./GraphQLEventbus";
 
 const pubSchema = buildSchema(`
     type TestEvent {
@@ -22,7 +22,7 @@ test("valid event is published", async () => {
   const publishCb = jest.fn();
   const publishErrorCb = jest.fn();
   const publishStartCb = jest.fn();
-  const bus = new VanillaEventBus({
+  const bus = new GraphQLEventbus({
     plugins: [
       {
         publishStartHook: (a) => {
@@ -83,7 +83,7 @@ test("valid event is published", async () => {
 
 test("Allow invalid topic publishing", async () => {
   const publishCb = jest.fn();
-  const bus = new VanillaEventBus({
+  const bus = new GraphQLEventbus({
     publisher: {
       schema: pubSchema,
       publish: async (d) => {
@@ -105,7 +105,7 @@ test("valid events are consumed", async () => {
   const consumeErrCb = jest.fn();
   const consumeStartCb = jest.fn();
   const consumeEndCb = jest.fn();
-  const bus = new VanillaEventBus({
+  const bus = new GraphQLEventbus({
     plugins: [
       {
         consumeStartHook: (a) => {

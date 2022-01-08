@@ -1,5 +1,5 @@
 import { buildSchema } from "graphql";
-import { PubSubEventBus } from "./PubSubEventBus";
+import { PubSubEventBus } from "../../../examples/google-pubsub/src/PubSubEventBus";
 import gql from "graphql-tag";
 import wait from "waait";
 
@@ -41,7 +41,6 @@ describe("PubSubEventBus", () => {
     await bus.publish({
       topic: "TestEvent",
       payload: { id: "1", name: "coolio" },
-      metadata: { "x-prop-meta": "data", version: "v0" },
     });
     await wait(10000);
     await bus.closePublisher();
@@ -100,7 +99,6 @@ describe("PubSubEventBus", () => {
     await bus.publish({
       topic: "TestEvent",
       payload: { id: "1", name: "coolio" },
-      metadata: { "x-prop-meta": "data", version: "v1" },
     });
     await wait(10000);
     await bus.closePublisher();

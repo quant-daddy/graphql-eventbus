@@ -1,0 +1,6 @@
+query EmailOpenEvent {
+  EmailOpenEvent {
+    emailAddress
+    openedAt
+  }
+}

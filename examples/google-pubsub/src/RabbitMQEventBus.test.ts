@@ -2,7 +2,7 @@ import { buildSchema } from "graphql";
 import { RabbitMQEventBus } from "./RabbitMQEventBus";
 import gql from "graphql-tag";
 import wait from "waait";
-import { LoggingPlugin } from "graphql-eventbus-core";
+import { LoggingPlugin } from "graphql-eventbus";
 
 jest.setTimeout(30000);
 

@@ -1,0 +1,6 @@
+query SendEmailEvent {
+  SendEmailEvent {
+    content
+    emailAddress
+  }
+}

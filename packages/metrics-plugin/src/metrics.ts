@@ -1,4 +1,4 @@
-import { EventBusPlugin } from "graphql-eventbus-core/build/VanillaEventBus";
+import { EventBusPlugin } from "graphql-eventbus-core";
 import { register } from "prom-client";
 import { Counter, Histogram } from "prom-client";
 

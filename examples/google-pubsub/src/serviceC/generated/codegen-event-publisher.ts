@@ -11,38 +11,24 @@ export type Scalars = {
   Int: number;
   Float: number;
   DateTime: string;
-  UUID: any;
+  EmailAddress: string;
+  UUID: string;
+};
+
+export type EmailOpenEvent = {
+  emailAddress: Scalars['EmailAddress'];
+  eventId: Scalars['UUID'];
+  openedAt: Scalars['DateTime'];
 };
 
 export type Query = {
-  UserCreatedEvent: UserCreatedEvent;
-  UserDeletedEvent: UserDeletedEvent;
+  EmailOpenEvent: EmailOpenEvent;
 };
-
-export type UserCreatedEvent = {
-  createdAt: Scalars['DateTime'];
-  eventId: Scalars['UUID'];
-  userEmail: Maybe<Scalars['String']>;
-  userId: Scalars['ID'];
-  userName: Maybe<Scalars['String']>;
-  userType: UserType;
-};
-
-export type UserDeletedEvent = {
-  deletedAt: Scalars['DateTime'];
-  eventId: Scalars['UUID'];
-  userId: Scalars['ID'];
-};
-
-export type UserType =
-  | 'ENTERPRISE'
-  | 'STARTUP';
 
 
 function publish(
   data:
-    | { event: "UserCreatedEvent", payload: UserCreatedEvent }
-    | { event: "UserDeletedEvent", payload: UserDeletedEvent }
+    | { event: "EmailOpenEvent", payload: EmailOpenEvent }
 ): Promise<void>;
 function publish(): Promise<void>{
   return Promise.resolve();

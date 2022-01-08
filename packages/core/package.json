@@ -1,9 +1,9 @@
 {
-  "name": "graphql-eventbus-core",
-  "version": "0.0.29",
+  "name": "graphql-eventbus",
+  "version": "0.0.33",
   "description": "Eventbus powered by GraphQL",
   "engines": {
-    "node": ">= 12.13 <13"
+    "node": ">= 14 <17"
   },
   "_moduleAliases": {
     "#root": "./build"
@@ -56,7 +56,7 @@
     "clean": "rimraf build",
     "prebuild": "npm run clean",
     "build": "tsc -p tsconfig.json",
-    "type:check": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
     "test": "jest --runInBand --coverage --verbose --forceExit",
     "test:watch": "jest --watch --runInBand",
     "build:watch": "tsc -w -p tsconfig.json",

@@ -1,27 +1,86 @@
 schema: ""
 generates:
-  ./src/generated/codegen-event-consumer.ts:
+  ./src/serviceA/generated/codegen-event-consumer.ts:
     plugins:
       - graphql-eventbus-codegen:
           consumer:
             eventSampler: true
-            contextType: "../types#MessageHandlerContext"
-            publisherSchemaPath: "src/schema-event.graphql"
+            contextType: "../bus#MessageHandlerContext"
+            publisherSchemaPath: "./src/serviceA/generated/publisher.graphql"
       - typescript
-      - typescript-operations:
+      - typescript-operations
     documents:
-      - "./src/event-consumer.graphql"
-    schema: "src/schema-event.graphql"
+      - "./src/serviceA/event-consumer.graphql"
+    schema:
+      - "src/serviceA/schema-event.graphql"
+      - "src/serviceB/schema-event.graphql"
+      - "src/serviceC/schema-event.graphql"
     config:
       skipTypename: true
-  ./src/generated/codegen-server-event.ts:
+  ./src/serviceA/generated/codegen-event-publisher.ts:
     plugins:
-      - "typescript"
-      - typescript-operations:
+      - typescript
+      - typescript-operations
       - graphql-eventbus-codegen:
           publisher: true
     schema:
-      - "src/schema-event.graphql"
+      - "src/serviceA/schema-event.graphql"
+    config:
+      skipTypename: true
+      enumsAsTypes: true
+  ./src/serviceB/generated/codegen-event-consumer.ts:
+    plugins:
+      - graphql-eventbus-codegen:
+          consumer:
+            eventSampler: true
+            contextType: "../bus#MessageHandlerContext"
+            publisherSchemaPath: "./src/serviceB/generated/publisher.graphql"
+      - typescript
+      - typescript-operations
+    documents:
+      - "./src/serviceB/event-consumer.graphql"
+    schema:
+      - "src/serviceA/schema-event.graphql"
+      - "src/serviceB/schema-event.graphql"
+      - "src/serviceC/schema-event.graphql"
+    config:
+      skipTypename: true
+  ./src/serviceB/generated/codegen-event-publisher.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+      - graphql-eventbus-codegen:
+          publisher: true
+    schema:
+      - "src/serviceB/schema-event.graphql"
+    config:
+      skipTypename: true
+      enumsAsTypes: true
+  ./src/serviceC/generated/codegen-event-consumer.ts:
+    plugins:
+      - graphql-eventbus-codegen:
+          consumer:
+            eventSampler: true
+            contextType: "../bus#MessageHandlerContext"
+            publisherSchemaPath: "./src/serviceC/generated/publisher.graphql"
+      - typescript
+      - typescript-operations
+    documents:
+      - "./src/serviceC/event-consumer.graphql"
+    schema:
+      - "src/serviceA/schema-event.graphql"
+      - "src/serviceB/schema-event.graphql"
+      - "src/serviceC/schema-event.graphql"
+    config:
+      skipTypename: true
+  ./src/serviceC/generated/codegen-event-publisher.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+      - graphql-eventbus-codegen:
+          publisher: true
+    schema:
+      - "src/serviceC/schema-event.graphql"
     config:
       skipTypename: true
       enumsAsTypes: true
@@ -30,3 +89,4 @@ config:
   scalars:
     DateTime: string
     UUID: string
+    EmailAddress: string

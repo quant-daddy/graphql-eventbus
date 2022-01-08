@@ -1,22 +1,18 @@
 /* eslint-disable no-console */
-import { Validator } from "graphql-eventbus-google-pubsub";
+import { Validator } from "graphql-eventbus";
 import { addResolversToSchema } from "@graphql-tools/schema";
-import { consumerSchema } from "#root/src/eventbus";
-import { EventSampler } from "#root/src/generated/codegen-event-consumer";
 import { DateTimeResolver, mocks } from "graphql-scalars";
 import { addMocksToSchema, MockStore } from "@graphql-tools/mock";
-
-const schemaWithResolvers = addResolversToSchema(consumerSchema, {
-  DateTime: DateTimeResolver,
-});
+import { consumerSchema } from "../bus";
+import { EventSampler } from "../generated/codegen-event-consumer";
 
 const store = new MockStore({
-  schema: schemaWithResolvers,
+  schema: consumerSchema,
   mocks: mocks,
 });
 
 export const eventSchemaWithMocks = addMocksToSchema({
-  schema: schemaWithResolvers,
+  schema: consumerSchema,
   preserveResolvers: true,
   store,
 });

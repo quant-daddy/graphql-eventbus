@@ -1,6 +1,6 @@
 {
   "name": "graphql-eventbus-metrics-plugin",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "Metrics for graphql eventbus",
   "main": "build/index.js",
   "types": "./build/index.d.ts",
@@ -9,19 +9,19 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "prepublish": "npm run build && npm version patch"
+    "prepublishOnly": "npm run build && npm version patch"
   },
   "dependencies": {
+    "graphql-eventbus": "0.x",
     "module-alias": "^2.2.2"
   },
   "author": "Suraj Keshri",
   "license": "MIT",
   "peerDependencies": {
-    "graphql-eventbus-core": "0.x",
+    "graphql-eventbus": "0.x",
     "prom-client": "14.x"
   },
   "devDependencies": {
-    "graphql-eventbus-core": "0.0.22",
     "prom-client": "^14.0.1",
     "typescript": "^4.5.4"
   }

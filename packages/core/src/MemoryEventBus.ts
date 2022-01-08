@@ -4,9 +4,9 @@ import { EventBusSubscriberCb } from "./EventBus";
 import {
   DataCb,
   EventBusPlugin,
-  Metadata,
-  VanillaEventBus,
-} from "./VanillaEventBus";
+  GraphQLEventbusMetadata,
+  GraphQLEventbus,
+} from "./GraphQLEventbus";
 
 export type MemoryEventBusConfig = {
   schema: GraphQLSchema;
@@ -20,10 +20,10 @@ export type MemoryEventBusConfig = {
 
 export class MemoryEventBus {
   public eventEmitter = new EventEmitter();
-  private bus: VanillaEventBus;
+  private bus: GraphQLEventbus;
   constructor(public config: MemoryEventBusConfig) {
     this.eventEmitter.setMaxListeners(100000);
-    this.bus = new VanillaEventBus({
+    this.bus = new GraphQLEventbus({
       plugins: config.plugins,
       publisher: {
         schema: config.schema,
@@ -66,7 +66,7 @@ export class MemoryEventBus {
   publish = async (args: {
     topic: string;
     payload: {};
-    metadata?: Partial<Metadata>;
+    metadata?: Partial<GraphQLEventbusMetadata>;
   }) => {
     await this.bus.publish({
       topic: args.topic,

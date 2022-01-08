@@ -1,0 +1,13 @@
+scalar EmailAddress
+scalar UUID
+scalar DateTime
+
+type Query {
+  SendEmailEvent: SendEmailEvent!
+}
+
+type SendEmailEvent {
+  eventId: UUID!
+  content: String!
+  emailAddress: EmailAddress!
+}

@@ -23,7 +23,7 @@ interface SubscriptionConfig {
 
 export interface Baggage {
   payload: {};
-  metadata: Metadata;
+  metadata: GraphQLEventbusMetadata;
 }
 
 type OptionalPromise<T> = T | Promise<T> | undefined | null | void;
@@ -40,7 +40,7 @@ export type ConsumeStartHook = (args: {
   topic: string;
   fullData: {};
   documentNode: DocumentNode;
-  metadata: Metadata;
+  metadata: GraphQLEventbusMetadata;
 }) => OptionalPromise<{
   consumeEndHook?: ConsumeEndHook;
   consumeErrorHook?: ConsumeErrorHook;
@@ -58,7 +58,7 @@ export type PublishErrorHook = (
 export type PublishStartHook = (args: {
   topic: string;
   payload: {};
-  metadata: Metadata;
+  metadata: GraphQLEventbusMetadata;
 }) => OptionalPromise<{
   publishEndHook?: PublishEndHook;
   publishErrorHook?: PublishErrorHook;
@@ -70,14 +70,14 @@ export interface EventBusPlugin {
   publishStartHook?: PublishStartHook;
 }
 
-export interface Metadata {
+export interface GraphQLEventbusMetadata {
   "x-request-id": string;
   publishTime: string;
   messageId: string;
   [key: string]: string;
 }
 
-export class VanillaEventBus {
+export class GraphQLEventbus {
   private consumeValidator!: EventBusValidator | null;
   private publishValidator!: EventBusValidator | null;
   public isInitialized: boolean = false;
@@ -218,12 +218,12 @@ export class VanillaEventBus {
   publish = async (props: {
     topic: string;
     payload: {};
-    metadata?: Partial<Metadata>;
+    metadata?: Partial<GraphQLEventbusMetadata>;
   }) => {
     if (!this.publishValidator) {
       throw new Error("Publish config not added!");
     }
-    const metadata: Metadata = {
+    const metadata: GraphQLEventbusMetadata = {
       "x-request-id": v4(),
       ...props.metadata,
       messageId: v4(),

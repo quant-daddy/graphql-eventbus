@@ -1,25 +1,23 @@
+scalar EmailAddress
+scalar UUID
 scalar DateTime
 
 type Query {
   UserCreatedEvent: UserCreatedEvent!
-  UserDeletedEvent: UserDeletedEvent!
+  NoConsumerEvent: NoConsumerEvent!
 }
 
-scalar UUID
+type NoConsumerEvent {
+  eventId: UUID!
+}
 
 type UserCreatedEvent {
   createdAt: DateTime!
   eventId: UUID!
-  userEmail: String
+  userEmail: EmailAddress
   userId: ID!
   userName: String
   userType: UserType!
-}
-
-type UserDeletedEvent {
-  deletedAt: DateTime!
-  eventId: UUID!
-  userId: ID!
 }
 
 enum UserType {

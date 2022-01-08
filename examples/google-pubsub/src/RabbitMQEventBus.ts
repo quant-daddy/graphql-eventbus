@@ -3,8 +3,9 @@ import { DocumentNode, GraphQLSchema } from "graphql";
 import {
   EventBusPlugin,
   EventBusSubscriberCb,
-  VanillaEventBus,
-} from "graphql-eventbus-core";
+  GraphQLEventbus,
+  GraphQLEventbusMetadata,
+} from "graphql-eventbus";
 
 export type RabbitMQEventBusConfig = {
   publisher?: {
@@ -23,13 +24,13 @@ const EXCHANGE = "event-hub";
 const QUEUE_INITIALS = "graphql-eventbus-";
 
 export class RabbitMQEventBus {
-  bus!: VanillaEventBus;
+  bus!: GraphQLEventbus;
   connection!: amqp.Connection;
   consumeChannel?: amqp.Channel;
   publishChannel?: amqp.Channel;
   constructor(public config: RabbitMQEventBusConfig) {
     const queueName = `${QUEUE_INITIALS}-${config.serviceName}`;
-    this.bus = new VanillaEventBus({
+    this.bus = new GraphQLEventbus({
       plugins: config.plugins,
       publisher: config.publisher
         ? {
@@ -66,7 +67,6 @@ export class RabbitMQEventBus {
                       topic
                     );
                   });
-                  console.log(`queue initialized`);
                   this.consumeChannel?.consume(queueName, (msg) => {
                     if (msg?.content) {
                       dataCb({
@@ -109,10 +109,15 @@ export class RabbitMQEventBus {
     await this.bus.init();
   };
 
-  publish = (args: { payload: {}; topic: string }) => {
+  publish = (args: {
+    payload: {};
+    topic: string;
+    metadata?: Partial<GraphQLEventbusMetadata>;
+  }) => {
     return this.bus.publish({
       payload: args.payload,
       topic: args.topic,
+      metadata: args.metadata,
     });
   };
 

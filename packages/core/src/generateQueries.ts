@@ -22,16 +22,16 @@ const generateFieldName = (
   if (depth === 1) {
     return fieldName;
   }
-  let result = "";
-  const characters = "abcdefghijklmnopqrstuvwxyz";
-  const charactersLength = characters.length;
-  for (let i = 0; i < 26; i++) {
-    result += characters.charAt(
-      Math.floor(Math.random() * charactersLength)
-    );
-  }
-  // return fieldName;
-  return `${result}: ${fieldName}`;
+  // let result = "";
+  // const characters = "abcdefghijklmnopqrstuvwxyz";
+  // const charactersLength = characters.length;
+  // for (let i = 0; i < 26; i++) {
+  //   result += characters.charAt(
+  //     Math.floor(Math.random() * charactersLength)
+  //   );
+  // }
+  return fieldName;
+  // return `${result}: ${fieldName}`;
 };
 
 /**

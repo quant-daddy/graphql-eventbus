@@ -1,4 +1,4 @@
-import { EventBusPlugin } from "./VanillaEventBus";
+import { EventBusPlugin } from "./GraphQLEventbus";
 
 export const LoggingPlugin: EventBusPlugin = {
   consumeStartHook: (args) => {
@@ -21,7 +21,7 @@ export const LoggingPlugin: EventBusPlugin = {
   },
   publishStartHook: (args) => {
     console.log(
-      `Event ${args.topic} piublish start for requestId: ${args.metadata["x-request-id"]}`
+      `Event ${args.topic} publish start for requestId: ${args.metadata["x-request-id"]}`
     );
     return {
       publishEndHook: () => {
