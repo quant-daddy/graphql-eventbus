@@ -14,7 +14,7 @@ import {
 interface Config {
   consumer?: {
     contextType: string;
-    publisherSchemaPath: string;
+    schemaPrintPath?: string;
     eventSampler?: boolean;
   };
   publisher?: boolean;
@@ -67,9 +67,9 @@ export const plugin = (
       eventSamplerString = `${eventSamplerString}\n;function eventSampler(): {}{\n  return {};\n}\nexport type EventSampler = typeof eventSampler`;
       exportString = `${exportString}\n${eventSamplerString}\n`;
     }
-    if (config.consumer.publisherSchemaPath) {
+    if (config.consumer.schemaPrintPath) {
       fs.writeFileSync(
-        path.join(process.cwd(), config.consumer.publisherSchemaPath),
+        path.join(process.cwd(), config.consumer.schemaPrintPath),
         printSchema(schema)
       );
     }
@@ -109,7 +109,6 @@ export const plugin = (
       if (selection.kind !== "Field") {
         throw new Error(`Invalid query ${print(a)}`);
       }
-
       return [selection.name.value, a.name.value];
     });
     const eventHandlers = returnTypes.map(

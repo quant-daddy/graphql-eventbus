@@ -1,7 +1,6 @@
 import fs from "fs";
 import { plugin } from "./index";
-// import {  } from "@graphql-codegen/plugin-helpers";
-import { buildSchema, GraphQLSchema, Source } from "graphql";
+import { buildSchema } from "graphql";
 import gql from "graphql-tag";
 import path from "path";
 
@@ -28,7 +27,7 @@ test("plugin", () => {
     {
       consumer: {
         contextType: "../file#MyContext",
-        publisherSchemaPath: "./src/print.graphql",
+        schemaPrintPath: "./src/print.graphql",
         eventSampler: true,
       },
       publisher: true,

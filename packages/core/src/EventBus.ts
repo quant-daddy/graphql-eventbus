@@ -4,7 +4,7 @@ import { GraphQLEventbusMetadata } from "./GraphQLEventbus";
 export type EventBusSubscriberCb = (props: {
   topic: string;
   payload: {};
-  fullData: {};
+  _fullData: {};
   metadata: GraphQLEventbusMetadata;
 }) => Promise<unknown>;
 

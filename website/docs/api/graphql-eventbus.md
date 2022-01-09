@@ -6,7 +6,9 @@ sidebar_position: 1
 
 A class exported by `graphql-eventbus` that can be used to create your custom event bus with any message broker.
 
-## Constructor arguments
+## `constructor`
+
+`GraphQLEventbus` is a javascript class. The arguments to the constructor function are explained below.
 
 ### `publisher`
 
@@ -60,6 +62,8 @@ publish: (args: {
   baggage: Baggage;
 }) => Promise<unknown>;
 ```
+
+<div id="publish_example"></div>
 
 ```typescript
 # Using EventEmitter as the message broker
@@ -143,7 +147,12 @@ query NonExistingEvent {
 
 #### cb
 
-_Required field_.
+_Required field_. This function is the event handler that would be invoked by the event bus when an event arrives. The argument is an object with the following fields:
+
+- `topic`: the topic of the event
+- `payload`: the payload that the event consumer has queried for, as specified in the [queries](#queries) document.
+- `_fullData`: the full payload for this event, including fields that were not queried for. It is advisable to not use this field in the event handlers because the code generation plugin does not do any code generation for this property. We exposed this field for cases when the client might want to store or inspect the full payload received for the event.
+- `metadata`: Every time an event is publish, the bus adds some metadata to the baggage. This data is used for things like correlating multiple events as a part of a request, tracking publishing time of event. This is used in the [Metrics Plugin](/docs/plugins/metrics-plugins) to emit various metrics of interest. It is advisable to propagate this metadata through your event architecture.
 
 ```typescript
 interface GraphQLEventbusMetadata {
@@ -155,16 +164,19 @@ interface GraphQLEventbusMetadata {
 type EventBusSubscriberCb = (props: {
   topic: string;
   payload: {};
-  fullData: {};
+  _fullData: {};
   metadata: GraphQLEventbusMetadata;
 }) => Promise<unknown>;
 
 cb: EventBusSubscriberCb;
 ```
 
+This function is typically provided by the user of the event bus is passed through to the `GraphQLEventbus`. See the constructor argument of [MemoryEventBus](/docs/api/memory-eventbus)
+
 #### subscribe
 
 _Required field_.
+This function is responsible for triggering the data callback (`DataCb`) when an event arrives. The first argument, `topics: string[]` are the list of topics that the consumer has susbcribed to and the second argument `cb` is a callback function that should be invoked when an event arrives. The `cb` function is called with the `topic` and corresponding `Baggage`. Note that this is the `Baggage` that was published as shown [here](#publish_example).
 
 ```typescript
 interface Baggage {
@@ -180,4 +192,58 @@ subscribe: (
   topics: string[],
   cb: DataCb
 ) => OptionalPromise<unknown>;
+```
+
+As an example, for [MemoryEventBus](https://github.com/skk2142/graphql-eventbus/blob/b421905d07bd797a166a9bc10ac1581f9ed92686/packages/core/src/MemoryEventBus.ts#L42), we invoke `cb` when an event is emitted:
+
+```typescript
+{
+  cb: this.config.subscriber!.cb,
+  subscribe: (topics, cb: DataCb) => {
+    topics.forEach((topic) => {
+      this.eventEmitter.on(
+        `message-${topic}`,
+        async (baggageString) => {
+          await cb({
+            baggage: JSON.parse(baggageString) as Baggage,
+            topic,
+          });
+        }
+      );
+    });
+  },
+  queries: this.config.subscriber.queries,
+  schema: this.config.schema,
+}
+```
+
+### `plugins`
+
+We can provide plugins that provide us life cycle hooks to various parts of event publishing and consumption process. Please refer to the documention in the [plugin](/docs/api/plugin) section.
+
+## `init`
+
+This method is used to initialize the event bus and catch various error before the bus starts. For instance, it checks if all the events being consumed are presentin the schema. It also calls the [publishInit](#publishinit) and [subscribe](#subscribe) functions.This method must be called in the implemention of your bus. See [MemoryEventBus](https://github.com/skk2142/graphql-eventbus/blob/b421905d07bd797a166a9bc10ac1581f9ed92686/packages/core/src/MemoryEventBus.ts)
+
+## `publish`
+
+This method should be invoked by the implementation of the event bus to publish events. A publish method is typically exposed by the event bus implementation which in turns calls this method. `topic` is the name of the topic as defined in the schema, `payload` is the full payload for the event, and `metadata` is an optional object. This is propagated as part of the `Baggage`. All fields except See [MemoryEventBus publish method](https://github.com/skk2142/graphql-eventbus/blob/b421905d07bd797a166a9bc10ac1581f9ed92686/packages/core/src/MemoryEventBus.ts#L66) for instance.
+
+```typescript
+publish = async (props: {
+  topic: string;
+  payload: {};
+  metadata?: Partial<GraphQLEventbusMetadata>;
+}) => {};
+```
+
+The final `metadata` that is propagated when publishing an event is:
+
+```
+const metadata: GraphQLEventbusMetadata = {
+  "x-request-id": uuid(),
+  ...props.metadata,
+  messageId: uuid(),
+  publishTime: new Date().toISOString(),
+};
 ```

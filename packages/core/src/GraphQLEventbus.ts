@@ -38,7 +38,7 @@ export type ConsumeErrorHook = (
 
 export type ConsumeStartHook = (args: {
   topic: string;
-  fullData: {};
+  _fullData: {};
   documentNode: DocumentNode;
   metadata: GraphQLEventbusMetadata;
 }) => OptionalPromise<{
@@ -155,7 +155,7 @@ export class GraphQLEventbus {
           const foo = await hook({
             topic,
             metadata: baggage.metadata,
-            fullData: baggage.payload,
+            _fullData: baggage.payload,
             documentNode: this.consumeValidator!.getDocumentForTopic(
               topic
             ),
@@ -186,7 +186,7 @@ export class GraphQLEventbus {
         topic: topic,
         payload: extractedPayload,
         metadata: baggage.metadata,
-        fullData: baggage.payload,
+        _fullData: baggage.payload,
       });
       if (consumeSuccessHooks.length) {
         await Promise.all(

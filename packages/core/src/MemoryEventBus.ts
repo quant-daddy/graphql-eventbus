@@ -15,7 +15,7 @@ export type MemoryEventBusConfig = {
     queries: DocumentNode;
   };
   plugins?: EventBusPlugin[];
-  allowInvalidTopic?: boolean;
+  allowPublishNonExistingTopic?: boolean;
 };
 
 export class MemoryEventBus {
@@ -33,7 +33,7 @@ export class MemoryEventBus {
             JSON.stringify(args.baggage)
           );
         },
-        allowInvalidTopic: config.allowInvalidTopic,
+        allowInvalidTopic: config.allowPublishNonExistingTopic,
       },
       subscriber: this.config.subscriber
         ? {

@@ -11,7 +11,20 @@ function HomepageHeader() {
   return (
     <header className={clsx("hero hero--primary", styles.heroBanner)}>
       <div className="container">
-        <h1 className="hero__title">{siteConfig.title}</h1>
+        <img
+          src={"/img/logo-large.png"}
+          width={100}
+          height={100}
+          style={{
+            objectFit: "cover",
+            width: 100,
+            height: 100,
+            borderRadius: 20,
+          }}
+        />
+        <h1 className="hero__title" style={{ marginTop: 20 }}>
+          {siteConfig.title}
+        </h1>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
       </div>
     </header>
