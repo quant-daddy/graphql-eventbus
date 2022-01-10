@@ -4,7 +4,7 @@ sidebar_position: 2
 
 # Plugin
 
-GraphQL Eventbus provides access to various stages of the lifecycle of consuming and publishing an event.
+GraphQL Eventbus provides access to various stages of the lifecycle of consuming and publishing an event. It implements the `EventBusPlugin` interface.
 
 ```typescript
 type OptionalPromise<T> = T | Promise<T> | undefined | null | void;

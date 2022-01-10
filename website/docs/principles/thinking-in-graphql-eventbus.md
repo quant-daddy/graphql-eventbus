@@ -19,6 +19,10 @@ While for REST APIs there are standards like OpenAPI, we do not have a standad f
 > The lack of a common way of describing events means developers must constantly re-learn how to consume events. This also limits the potential for libraries, tooling and infrastructure to aide the delivery of event data across environments, like SDKs, event routers or tracing systems. The portability and productivity we can achieve from event data is hindered overall.
 > CloudEvents is a specification for describing event data in common formats to provide interoperability across services, platforms and systems.
 
-While cloudevents does have a promising specification, it does not provide any runtime guarantees. It's similar to OpenAPI: a specification that is hard to follow because nothing enforces runtime compliance with the specification.
+While cloudevents does have a promising specification, it does not provide any runtime guarantees. It's similar to OpenAPI: a specification that is hard to follow because nothing enforces runtime compliance with the specification. While this specification makes sense for public Event APIs, we believe that GraphQL Eventbus offers a lot more for building your enterprise event bus.
 
 With a succinct specification and SDL, runtime type safety, in-built documentations, tooling, and beautiful GraphQL schema explorer (graphiql), GraphQL Eventbus is a much promising alternative that has all the good parts of `CloudEvents`.
+
+## Subscribing to multiple topics using \*
+
+There are many message brokers that allow the consumer to subscribe to multiple topics at once. For instance, `user.*` would subscribe to `user.create`, `user.update`, and `user.delete` topics. This is not a good practice though: how does the consumer differentiate between the distinct payloads for each of these events? It's better to create `UserCreateEvent`, `UserDeleteEvent` and `UserUpdateEvent` with their own payload field and subscribe to each of them individual to take advantage of `GraphQLEventbus`.

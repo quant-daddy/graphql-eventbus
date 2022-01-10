@@ -1,4 +1,4 @@
-import { EventBusPlugin } from "graphql-eventbus-core";
+import { EventBusPlugin } from "graphql-eventbus";
 import { register } from "prom-client";
 import { Counter, Histogram } from "prom-client";
 
@@ -51,37 +51,40 @@ const publishTime = new Histogram({
   registers: [register],
 });
 
-export const metricsPlugin: EventBusPlugin = {
-  consumeStartHook: (a) => {
-    const startTime = new Date().getTime();
-    return {
-      consumeErrorHook: () =>
-        consumedErrorCount.inc({ name: a.topic }),
-      consumeSuccessHook: () => {
-        consumedCount.inc({ name: a.topic });
-        consumedTimeSincePublish.observe(
-          { name: a.topic },
-          new Date().getTime() - startTime
-        );
-        consumedTime.observe(
-          { name: a.topic },
-          new Date().getTime() - startTime
-        );
-      },
-    };
-  },
-  publishStartHook: (a) => {
-    const startTime = new Date().getTime();
-    return {
-      publishErrorHook: () =>
-        publishErrorCount.inc({ name: a.topic }),
-      publishSuccessHook: () => {
-        publishTime.observe(
-          { name: a.topic },
-          new Date().getTime() - startTime
-        );
-        publishCount.inc({ name: a.topic });
-      },
-    };
-  },
+export const MetricsPlugin = (): EventBusPlugin => {
+  const plugin: EventBusPlugin = {
+    consumeStartHook: (a) => {
+      const startTime = new Date().getTime();
+      return {
+        consumeErrorHook: () =>
+          consumedErrorCount.inc({ name: a.topic }),
+        consumeSuccessHook: () => {
+          consumedCount.inc({ name: a.topic });
+          consumedTimeSincePublish.observe(
+            { name: a.topic },
+            new Date().getTime() - startTime
+          );
+          consumedTime.observe(
+            { name: a.topic },
+            new Date().getTime() - startTime
+          );
+        },
+      };
+    },
+    publishStartHook: (a) => {
+      const startTime = new Date().getTime();
+      return {
+        publishErrorHook: () =>
+          publishErrorCount.inc({ name: a.topic }),
+        publishSuccessHook: () => {
+          publishTime.observe(
+            { name: a.topic },
+            new Date().getTime() - startTime
+          );
+          publishCount.inc({ name: a.topic });
+        },
+      };
+    },
+  };
+  return plugin;
 };

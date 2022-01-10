@@ -1,1 +1,1 @@
-export { metricsPlugin } from "./metrics";
+export { MetricsPlugin } from "./metrics";
