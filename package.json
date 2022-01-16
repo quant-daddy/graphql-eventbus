@@ -1,14 +1,11 @@
 {
-  "name": "eventbus",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "directories": {
-    "example": "examples"
-  },
+  "name": "graphql-eventbus",
+  "private": true,
   "scripts": {
     "test": "jest --runInBand --coverage --verbose --forceExit",
-    "build": "tsc"
+    "build": "tsc",
+    "type:check": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -16,9 +13,13 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
   "bugs": {
     "url": "https://github.com/skk2142/graphql-eventbus/issues"
+  },
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ]
   },
   "homepage": "https://github.com/skk2142/graphql-eventbus#readme",
   "devDependencies": {
@@ -29,6 +30,7 @@
     "husky": "^7.0.4",
     "jest": "^27.4.7",
     "jest-watch-typeahead": "^0.6.5",
+    "lerna": "^4.0.0",
     "nodemon": "^2.0.15",
     "rimraf": "^3.0.2",
     "ts-jest": "^27.1.3",

@@ -32,11 +32,6 @@
     "lint": "eslint . --ext .ts,.tsx",
     "prepublishOnly": "npm run build && npm version patch"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm test"
-    }
-  },
   "author": "Suraj Keshri",
   "license": "MIT",
   "dependencies": {

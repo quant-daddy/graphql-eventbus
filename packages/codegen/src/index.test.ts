@@ -5,12 +5,12 @@ import gql from "graphql-tag";
 import path from "path";
 
 const typeDef = fs.readFileSync(
-  path.join(__dirname, "./event-consumer.graphql"),
+  path.join(__dirname, "../data/event-consumer.graphql"),
   "utf-8"
 );
 
 const schemaTypeDef = fs.readFileSync(
-  path.join(__dirname, "./schema.graphql"),
+  path.join(__dirname, "../data/schema.graphql"),
   "utf-8"
 );
 
@@ -26,10 +26,13 @@ test("plugin", () => {
   const result = plugin(schema, rawDocs, {
     consumer: {
       contextType: "../file#MyContext",
-      schemaPrintPath: "./src/print.graphql",
+      schemaPrintPath: path.join(__dirname, "../data/print.graphql"),
       eventSampler: true,
     },
     publisher: true,
   });
-  fs.writeFileSync("./.tmp.ts", `// @ts-nocheck \n${result}`);
+  fs.writeFileSync(
+    path.join(__dirname, "../data/.output.ts"),
+    `// @ts-nocheck \n${result}`
+  );
 });

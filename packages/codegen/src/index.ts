@@ -7,10 +7,7 @@ import {
   print,
   printSchema,
 } from "graphql";
-/**
- * Context: ../filename#ContextType
- *
- */
+
 interface Config {
   consumer?: {
     contextType: string;
@@ -68,10 +65,16 @@ export const plugin = (
       exportString = `${exportString}\n${eventSamplerString}\n`;
     }
     if (config.consumer.schemaPrintPath) {
-      fs.writeFileSync(
-        path.join(process.cwd(), config.consumer.schemaPrintPath),
-        printSchema(schema)
-      );
+      let schemaPath: string;
+      if (path.isAbsolute(config.consumer.schemaPrintPath)) {
+        schemaPath = config.consumer.schemaPrintPath;
+      } else {
+        schemaPath = path.join(
+          process.cwd(),
+          config.consumer.schemaPrintPath
+        );
+      }
+      fs.writeFileSync(schemaPath, printSchema(schema));
     }
     const [contextFile, contextType] =
       config.consumer.contextType.split("#");
