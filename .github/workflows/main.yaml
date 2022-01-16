@@ -13,8 +13,6 @@ jobs:
     services:
       eventbus:
         image: bigtruedata/gcloud-pubsub-emulator
-        networks:
-          - default
         ports:
           - "8538:8538"
         command: "start --host-port 0.0.0.0:8538"
