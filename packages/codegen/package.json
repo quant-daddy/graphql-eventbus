@@ -13,8 +13,7 @@
     "test": "jest --runInBand --verbose",
     "test:watch": "jest --watch --runInBand",
     "build:watch": "tsc -w -p tsconfig.json",
-    "lint": "eslint . --ext .ts,.tsx",
-    "prepublishOnly": "npm run build && npm version patch"
+    "lint": "eslint . --ext .ts,.tsx"
   },
   "author": "",
   "license": "MIT",
@@ -25,5 +24,6 @@
   "devDependencies": {
     "@graphql-codegen/typescript": "^2.4.2",
     "@graphql-codegen/typescript-operations": "^2.2.2"
-  }
+  },
+  "gitHead": "8ebfba031afcf75eb5a0aa498ec3c2476bb8ec4f"
 }

@@ -6,7 +6,6 @@
   "types": "./build/index.d.ts",
   "scripts": {
     "build": "rimraf build && tsc -p tsconfig.json",
-    "prepublishOnly": "npm run build && npm version patch",
     "typecheck": "tsc --noEmit",
     "test": "PUBSUB_PROJECT_ID=123 PUBSUB_EMULATOR_HOST=localhost:8538 jest --runInBand --coverage --verbose --forceExit",
     "test:watch": "PUBSUB_PROJECT_ID=123 PUBSUB_EMULATOR_HOST=localhost:8538 jest --watch --runInBand"
@@ -21,5 +20,6 @@
     "uuid": "^8.3.2"
   },
   "author": "Suraj Keshri",
-  "license": "MIT"
+  "license": "MIT",
+  "gitHead": "8ebfba031afcf75eb5a0aa498ec3c2476bb8ec4f"
 }

@@ -1,0 +1,8 @@
+{
+  "version": "independent",
+  "npmClient": "npm",
+  "command": {
+    "publish": {}
+  },
+  "packages": ["packages/*"]
+}

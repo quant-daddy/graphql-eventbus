@@ -26,11 +26,11 @@
   "scripts": {
     "clean": "rimraf build",
     "prebuild": "npm run clean",
+    "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit",
     "test": "jest --runInBand --coverage --verbose --forceExit",
     "test:watch": "jest --watch --runInBand",
-    "lint": "eslint . --ext .ts,.tsx",
-    "prepublishOnly": "npm run build && npm version patch"
+    "lint": "eslint . --ext .ts,.tsx"
   },
   "author": "Suraj Keshri",
   "license": "MIT",
@@ -40,5 +40,6 @@
     "module-alias": "^2.2.2",
     "ts-is-present": "^1.2.2",
     "uuid": "^8.3.2"
-  }
+  },
+  "gitHead": "8ebfba031afcf75eb5a0aa498ec3c2476bb8ec4f"
 }
