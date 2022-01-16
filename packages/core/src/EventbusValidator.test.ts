@@ -1,93 +1,308 @@
 import { EventBusValidator } from "./EventBusValidator";
-import fs from "fs";
-import { buildSchema } from "graphql";
-import path from "path";
+import { buildSchema, print } from "graphql";
 import gql from "graphql-tag";
-import { EventEmitter } from "events";
-import { addMocksToSchema } from "@graphql-tools/mock";
-import { mocks } from "graphql-scalars";
-import { Validator } from "./validator";
 
-const typeDef = fs.readFileSync(
-  path.join(__dirname, "../data/events.graphql"),
-  "utf-8"
-);
+const typeDef = gql`
+  enum EventType {
+    CREATE
+    UPDATE
+  }
 
-const publisherSchema = buildSchema(typeDef);
+  type EventA {
+    id: ID!
+    name: String @deprecated(reason: "Do not use this field")
+    type: EventType
+  }
 
-const mockSchema = addMocksToSchema({
-  schema: publisherSchema,
-  mocks: mocks,
-});
+  type Query {
+    EventA: EventA!
+  }
+`;
 
-const validator = new Validator(mockSchema);
+const publisherSchema = buildSchema(print(typeDef));
 
 describe("EventBusValidator", () => {
-  test("consumer works as expected for accepted and rejected consumer message", async () => {
-    const publishCb = jest.fn();
-    const consumeCb = jest.fn().mockResolvedValue(null);
-    const subscribeCb = jest.fn();
-    const getTopicCb = jest.fn();
-    const signupEventEmitter = new EventEmitter();
-    const entityFlagEmitter = new EventEmitter();
+  test("consumer extracts data for queried field", async () => {
     const queries = gql`
-      query SignUpEvent {
-        SignUpEvent {
+      query EventA {
+        EventA {
           id
+          name
         }
       }
-      query EntityFlagEvent {
-        EntityFlagEvent {
+    `;
+    const validator = new EventBusValidator({
+      publisherSchema
+    });
+    await validator.validateConsumerQueries(queries);
+    const result = await validator.extractData({
+      topic: "EventA",
+      data: {
+        id: "123",
+        name: "Dan Schafer",
+        type: "CREATE"
+      }
+    });
+    expect(result.data).toMatchInlineSnapshot(`
+      Object {
+        "id": "123",
+        "name": "Dan Schafer",
+      }
+    `);
+  });
+  test("consumer does not throw error for missing field in payload if it is not queried", async () => {
+    const queries = gql`
+      query EventA {
+        EventA {
           id
-          groupId
+          name
+        }
+      }
+    `;
+    const validator = new EventBusValidator({
+      publisherSchema
+    });
+    await validator.validateConsumerQueries(queries);
+    const result = await validator.extractData({
+      topic: "EventA",
+      data: {
+        id: "123",
+        name: "Dan Schafer"
+      }
+    });
+    expect(result.data).toMatchInlineSnapshot(`
+      Object {
+        "id": "123",
+        "name": "Dan Schafer",
+      }
+    `);
+  });
+  test("consumer detects deprecated field", async () => {
+    const queries = gql`
+      query EventA {
+        EventA {
+          id
+          name
+        }
+      }
+    `;
+    const validator = new EventBusValidator({
+      publisherSchema
+    });
+    await validator.validateConsumerQueries(queries);
+    const result = await validator.extractData({
+      topic: "EventA",
+      data: {
+        id: "123",
+        name: "Dan Schafer"
+      }
+    });
+    expect(result.deprecated?.[0].message).toMatchInlineSnapshot(
+      `"The field 'EventA.name' is deprecated. Do not use this field"`
+    );
+  });
+  test("consumer throws error for required field if not present in payload", async () => {
+    const queries = gql`
+      query EventA {
+        EventA {
+          id
+          name
         }
       }
     `;
     const consumerEventBus = new EventBusValidator({
-      publisherSchema,
+      publisherSchema
     });
     await consumerEventBus.validateConsumerQueries(queries);
-    expect(
-      await consumerEventBus.extractData({
-        topic: "SignUpEvent",
-        data: validator.sample("SignUpEvent").data["SignUpEvent"],
-      })
-    ).toMatchObject({
-      id: expect.any(String),
+    const result = await consumerEventBus.extractData({
+      topic: "EventA",
+      data: {
+        name: "Dan Schafer"
+      }
     });
+    expect(result).toMatchObject({
+      data: null
+    });
+    expect(result.errors?.[0].message).toMatchInlineSnapshot(
+      `"Cannot return null for non-nullable field EventA.id."`
+    );
   });
-  test("publisher works as expected", async () => {
+  test("consumer set value null and returns error for non-valid field value of a not-required field", async () => {
+    const queries = gql`
+      query EventA {
+        EventA {
+          id
+          type
+        }
+      }
+    `;
+    const consumerEventBus = new EventBusValidator({
+      publisherSchema
+    });
+    await consumerEventBus.validateConsumerQueries(queries);
+    const result = await consumerEventBus.extractData({
+      topic: "EventA",
+      data: {
+        name: "Dan Schafer",
+        id: "123",
+        type: "INVALID"
+      }
+    });
+    expect(result).toMatchObject({
+      data: {
+        id: "123",
+        type: null
+      }
+    });
+    expect(result.errors?.[0].message).toMatchInlineSnapshot(
+      `"Enum \\"EventType\\" cannot represent value: \\"INVALID\\""`
+    );
+  });
+  test("consumer throws error for non-valid field value for a required field", async () => {
+    const consumerEventBus = new EventBusValidator({
+      publisherSchema: buildSchema(`
+        type EventB {
+          count: Int!
+          id: ID!
+        }
+        type Query {
+          EventB: EventB!
+        }
+      `)
+    });
+    await consumerEventBus.validateConsumerQueries(gql`
+      query EventB {
+        EventB {
+          id
+          count
+        }
+      }
+    `);
+    const result = await consumerEventBus.extractData({
+      topic: "EventB",
+      data: {
+        id: "123",
+        count: "INVALID"
+      }
+    });
+    expect(result).toMatchObject({
+      data: null
+    });
+    expect(result.errors?.[0].message).toMatchInlineSnapshot(
+      `"Int cannot represent non-integer value: \\"INVALID\\""`
+    );
+  });
+  test("consumer throws for consuming non existing topic", async () => {
+    const queries = gql`
+      query NonExisting {
+        NonExisting {
+          id
+          name
+        }
+      }
+    `;
+    const consumerEventBus = new EventBusValidator({
+      publisherSchema
+    });
+    const errCb = jest.fn();
+    try {
+      await consumerEventBus.validateConsumerQueries(queries);
+    } catch (e) {
+      errCb(e);
+    }
+    expect(errCb).toBeCalled();
+  });
+  test("publisher works for missing not-required field", async () => {
     const eventBusValidator = new EventBusValidator({
-      publisherSchema,
+      publisherSchema: buildSchema(`
+        type EventA {
+          id: ID!
+          name: String
+        }
+        type Query {
+          EventA: EventA!
+        }
+      `)
     });
     await expect(
       eventBusValidator.publishValidate({
-        topic: "SignUpEvent",
-        payload: validator.sample("SignUpEvent").data["SignUpEvent"],
+        topic: "EventA",
+        payload: {
+          id: "123"
+        }
       })
     ).resolves;
-    const errCb = jest.fn();
-    await eventBusValidator
-      .publishValidate({
-        topic: "UnknownEvent",
-        payload: validator.sample("SignUpEvent").data["SignUpEvent"],
-      })
-      .catch(() => {
-        errCb();
-      });
-    expect(errCb).toBeCalled();
-    errCb.mockClear();
-    // wrong payload
+  });
+  test("publisher works for full payload", async () => {
+    const eventBusValidator = new EventBusValidator({
+      publisherSchema: buildSchema(`
+      type EventA {
+        id: ID!
+        name: String
+      }
+      type Query {
+        EventA: EventA!
+      }
+    `)
+    });
     await expect(
-      eventBusValidator
-        .publishValidate({
-          topic: "SignUpEvent",
-          payload: { id: 5 },
-        })
-        .catch(() => {
-          errCb();
-        })
-    );
-    expect(errCb).toBeCalled();
+      eventBusValidator.publishValidate({
+        topic: "EventA",
+        payload: {
+          id: "123",
+          name: "Lee Byron"
+        }
+      })
+    ).resolves;
+  });
+  test("publisher throw for publishing non-existing event", async () => {
+    const eventBusValidator = new EventBusValidator({
+      publisherSchema: buildSchema(`
+      type EventA {
+        id: ID!
+        name: String
+      }
+      type Query {
+        EventA: EventA!
+      }
+    `)
+    });
+    const errCb = jest.fn();
+    try {
+      await eventBusValidator.publishValidate({
+        topic: "NonExinstingEvent",
+        payload: {
+          name: "Lee Byron"
+        }
+      });
+    } catch (e) {
+      errCb(e);
+    }
+    expect(errCb).toBeCalledTimes(1);
+  });
+  test("publisher throw for missing required field", async () => {
+    const eventBusValidator = new EventBusValidator({
+      publisherSchema: buildSchema(`
+      type EventA {
+        id: ID!
+        name: String
+      }
+      type Query {
+        EventA: EventA!
+      }
+    `)
+    });
+    const errCb = jest.fn();
+    try {
+      await eventBusValidator.publishValidate({
+        topic: "EventA",
+        payload: {
+          name: "Lee Byron"
+        }
+      });
+    } catch (e) {
+      errCb(e);
+    }
+    expect(errCb).toBeCalledTimes(1);
   });
 });

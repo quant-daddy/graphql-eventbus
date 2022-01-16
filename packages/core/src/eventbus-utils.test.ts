@@ -1,20 +1,10 @@
 import {
   getRootQueryFields,
   getTopicsFromDocument,
-  validateQueries,
+  validateQuery,
 } from "./eventbus-utils";
-
-import fs from "fs";
 import { buildSchema } from "graphql";
-import path from "path";
 import gql from "graphql-tag";
-
-const typeDef = fs.readFileSync(
-  path.join(__dirname, "../data/events.graphql"),
-  "utf-8"
-);
-
-const publisherSchema = buildSchema(typeDef);
 
 describe("getTopicsFromDocument", () => {
   test("works", () => {
@@ -40,7 +30,7 @@ describe("getTopicsFromDocument", () => {
       ]
     `);
   });
-  test("Disallow mutation", () => {
+  test("Mutation field is not allowed with a chema", () => {
     expect(() =>
       getTopicsFromDocument(gql`
         mutation whatver {
@@ -53,7 +43,7 @@ describe("getTopicsFromDocument", () => {
 }"
 `);
   });
-  test("Single query within a query", () => {
+  test("Only a single event can be queried within a query", () => {
     expect(() =>
       getTopicsFromDocument(gql`
         query whatver {
@@ -68,96 +58,98 @@ describe("getTopicsFromDocument", () => {
 describe("Query validation", () => {
   test("works 2", () => {
     expect(() =>
-      validateQueries(publisherSchema, [
+      validateQuery(
+        buildSchema(`
+          type EventA {
+            id: ID!
+          }
+          type EventB {
+            id: ID!
+          }
+          type Query {
+            EventA: EventA!
+            EventB: EventB!
+          }
+        `),
         gql`
-          query Complex {
-            Complex {
+          query EventA {
+            EventA {
               id
             }
           }
 
-          query ClosedGroupJoinRequestResponseEvent {
-            ClosedGroupJoinRequestResponseEvent {
+          query EventB {
+            EventB {
               id
             }
           }
-        `,
-      ])
+        `
+      )
     ).not.toThrow();
   });
-  test("works", () => {
+  test("renaming fields work", () => {
     expect(() =>
-      validateQueries(publisherSchema, [
+      validateQuery(
+        buildSchema(`
+          type EventA {
+            id: ID!
+          }
+          type EventB {
+            id: ID!
+          }
+          type Query {
+            EventA: EventA!
+            EventB: EventB!
+          }
+        `),
         gql`
-          query complex {
-            A: SignUpEvent {
+          query EventA {
+            A: EventA {
               id
             }
-            B: SignUpEvent {
-              id
-            }
           }
-        `,
-      ])
-    ).not.toThrow();
-  });
-  test("Invalid event query throws", () => {
-    expect(() =>
-      validateQueries(publisherSchema, [
-        gql`
-          query bad {
-            bad {
-              name
-            }
-          }
-        `,
-      ])
-    ).toThrow();
-  });
-  test("Deprecated field query logs warning", () => {
-    expect(() =>
-      validateQueries(publisherSchema, [
-        gql`
-          query complex {
-            Complex {
-              groupId
-            }
-          }
-        `,
-      ])
+        `
+      )
     ).not.toThrow();
   });
 });
 
 describe("getRootQueryNames", () => {
   test("works", () => {
-    const schema = buildSchema(typeDef);
-    const topicNames = getRootQueryFields(schema);
+    const topicNames = getRootQueryFields(
+      buildSchema(`
+        type EventA {
+          id: ID!
+        }
+        type EventB {
+          count: Int
+        }
+        type Query {
+          EventA: EventA!
+          EventB: EventB!
+        }
+      `)
+    );
     expect(topicNames).toMatchInlineSnapshot(`
       Array [
-        "Complex",
-        "B",
-        "C",
-        "ClosedGroupJoinRequestResponseEvent",
-        "SignUpEvent",
-        "EntityFlagEvent",
+        "EventA",
+        "EventB",
       ]
     `);
   });
-  // test("Each root return type has and id and timestamp", () => {
-  //   const badSchema =
-  // })
-  test("Nullable return type throws", () => {
+  test("Nullable event payload throws", () => {
     const badSchema = buildSchema(`
+      type EventA {
+        id: ID!
+      }
       type Query {
-        A: String!
-        B: String
+        EventA: EventA
       }
     `);
     expect(() =>
       getRootQueryFields(badSchema)
     ).toThrowErrorMatchingInlineSnapshot(
-      `"You must specify all queries with non null response type"`
+      `"All events must have a non null payload"`
     );
   });
 });

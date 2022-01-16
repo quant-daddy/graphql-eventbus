@@ -49,7 +49,7 @@ describe("MemoryEventBus", () => {
     const bus = new MemoryEventBus({
       schema: publisherSchema,
       subscriber: subscribeConfig,
-      plugins: [LoggingPlugin],
+      plugins: [LoggingPlugin()],
     });
     await bus.init();
     await bus.publish({
@@ -64,6 +64,7 @@ describe("MemoryEventBus", () => {
         id: expect.any(String),
       },
       topic: "SignUpEvent",
+      // metadata is propagated
       metadata: { test: "data" },
     });
     // not existing topic cannot be published

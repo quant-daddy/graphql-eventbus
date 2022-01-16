@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
 import { Validator } from "graphql-eventbus";
-import { addResolversToSchema } from "@graphql-tools/schema";
-import { DateTimeResolver, mocks } from "graphql-scalars";
+import { mocks } from "graphql-scalars";
 import { addMocksToSchema, MockStore } from "@graphql-tools/mock";
 import { consumerSchema } from "../bus";
 import { EventSampler } from "../generated/codegen-event-consumer";

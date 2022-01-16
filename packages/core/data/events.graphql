@@ -65,7 +65,7 @@ type SignUpEvent {
 type EntityFlagEvent {
   id: UUID!
   timestamp: DateTime!
-  entityType: ReactionEntityType!
+  entityType: ReactionEntityType
   entityId: UUID!
   entityOwnerId: UUID!
   groupId: UUID!

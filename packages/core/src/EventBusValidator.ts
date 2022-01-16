@@ -1,23 +1,13 @@
-// import { metrics } from "./eventbusMetrics";
-import { DocumentNode, GraphQLSchema, printSchema } from "graphql";
+import { DocumentNode, GraphQLError, GraphQLSchema } from "graphql";
 import { Validator } from "./validator";
 import {
   getRootQueryFields,
   getTopicsFromDocument,
-  validateQueries,
+  validateQuery,
 } from "./eventbus-utils";
-
-// interface Metrics {
-//   consume: (topicName: string) => any;
-//   consumeStart: (topicName: string) => () => any;
-//   consumeError: (topicName: string) => any;
-//   publish: (topicName: string) => any;
-//   publishError: (topicName: string) => any;
-// }
 
 export class InvalidPublishTopic extends Error {
   constructor(...params: any[]) {
-    // Pass remaining arguments (including vendor specific ones) to parent constructor
     super(...params);
   }
 }
@@ -45,30 +35,29 @@ export class EventBusValidator {
   };
 
   validateConsumerQueries = async (queries: DocumentNode) => {
-    try {
-      await validateQueries(this.publisherSchema, [queries]);
-      this.consumerTopics = getTopicsFromDocument(queries);
-      return Object.keys(this.consumerTopics);
-    } catch (e) {
-      const graphqlSchemaObj = printSchema(this.publisherSchema);
-      console.info(`Using schema`, graphqlSchemaObj);
-      throw e;
-    }
+    await validateQuery(this.publisherSchema, queries);
+    this.consumerTopics = getTopicsFromDocument(queries);
+    return Object.keys(this.consumerTopics);
   };
 
-  extractData = async (args: { topic: string; data: {} }) => {
+  extractData = async (args: {
+    topic: string;
+    data: {};
+  }): Promise<{
+    data: {} | null;
+    errors?: readonly GraphQLError[];
+    deprecated?: readonly GraphQLError[];
+  }> => {
     const queriedData = await this.validator.extract(
       this.consumerTopics[args.topic],
       args.topic,
       args.data
     );
-    if (queriedData.errors) {
-      throw new Error(JSON.stringify(queriedData.errors, null, 2));
-    }
-    if (!queriedData.data) {
-      throw new Error("Queried data is null");
-    }
-    return queriedData.data[args.topic];
+    return {
+      data: queriedData.payload.data?.[args.topic] || null,
+      errors: queriedData.errors,
+      deprecated: queriedData.deprecated,
+    };
   };
 
   publishValidate = async (props: { topic: string; payload: {} }) => {

@@ -66,7 +66,7 @@ const FeatureList: FeatureItem[] = [
     title: "Testing utilities",
     description: (
       <>
-        The library comes with utilities to easyly sample payload for
+        The library comes with utilities to easily sample payload for
         your events and test your event handlers.
       </>
     ),

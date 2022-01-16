@@ -5,13 +5,12 @@ import {
   Topic,
 } from "@google-cloud/pubsub";
 import { DocumentNode, GraphQLSchema } from "graphql";
-import { EventBusSubscriberCb } from "graphql-eventbus-core";
-import { VanillaEventBus } from "graphql-eventbus-core";
 import {
-  Baggage,
   EventBusPlugin,
-  Metadata,
-} from "graphql-eventbus-core/build/VanillaEventBus";
+  EventBusSubscriberCb,
+  GraphQLEventbus,
+  GraphQLEventbusMetadata,
+} from "graphql-eventbus";
 
 export type PubSubEventBusConfig = {
   publisher?: {
@@ -24,40 +23,15 @@ export type PubSubEventBusConfig = {
   };
   plugins?: EventBusPlugin[];
   serviceName: string;
-  isDarkRelease?: boolean;
-};
-
-const getBaggage = (msg: Message): Baggage => {
-  const a = JSON.parse(msg.data.toString()) as {};
-  if ("payload" in a && "metadata" in a) {
-    return {
-      metadata: (a as any).metadata,
-      payload: (a as any).payload,
-    };
-  }
-  return {
-    metadata: msg.attributes as any,
-    payload: a,
-  };
-};
-
-const encodeBaggage = (baggage: Baggage): string => {
-  if (baggage.metadata.version === "v1") {
-    return JSON.stringify({
-      payload: baggage.payload,
-      metadata: baggage.metadata,
-    });
-  }
-  return JSON.stringify(baggage.payload);
 };
 
 export class PubSubEventBus {
   public pubsubClient = new PubSub({});
   private publishTopics: { [topicName: string]: Topic } = {};
   private subscriptions: Subscription[] = [];
-  private bus: VanillaEventBus;
+  private bus: GraphQLEventbus;
   constructor(private config: PubSubEventBusConfig) {
-    this.bus = new VanillaEventBus({
+    this.bus = new GraphQLEventbus({
       plugins: config.plugins,
       publisher: this.config.publisher
         ? {
@@ -73,7 +47,7 @@ export class PubSubEventBus {
             schema: this.config.publisher?.schema,
             publish: async (a) => {
               await this.publishTopics[a.topic].publishMessage({
-                data: Buffer.from(encodeBaggage(a.baggage)),
+                data: Buffer.from(JSON.stringify(a.baggage)),
               });
             },
           }
@@ -87,11 +61,7 @@ export class PubSubEventBus {
                   const [topic] = await this.pubsubClient
                     .topic(topicName)
                     .get({ autoCreate: true });
-                  const subscriptionName = `${
-                    this.config.serviceName
-                  }-${topicName}${
-                    this.config.isDarkRelease ? "-dark" : ""
-                  }`;
+                  const subscriptionName = `${this.config.serviceName}-${topicName}`;
                   let subscription = await topic.subscription(
                     subscriptionName,
                     {
@@ -105,16 +75,12 @@ export class PubSubEventBus {
                     console.log(
                       `Service ${this.config.serviceName}: Subscription created: ${subscriptionName}`
                     );
-                    [subscription] = await subscription.create({
-                      filter: !this.config.isDarkRelease
-                        ? `NOT attributes:x-prop-${this.config.serviceName}-dark`
-                        : `attributes:x-prop-${this.config.serviceName}-dark`,
-                    });
+                    [subscription] = await subscription.create({});
                   }
                   this.subscriptions.push(subscription);
                   subscription.on("message", async (msg: Message) => {
                     try {
-                      const baggage = getBaggage(msg);
+                      const baggage = JSON.parse(msg.data.toString());
                       await cb({
                         topic: topicName,
                         baggage: {
@@ -153,9 +119,7 @@ export class PubSubEventBus {
   publish = async (a: {
     topic: string;
     payload: {};
-    metadata: Partial<Metadata> & {
-      version: "v0" | "v1";
-    };
+    metadata?: Partial<GraphQLEventbusMetadata>;
   }) => {
     await this.bus.publish({
       payload: a.payload,

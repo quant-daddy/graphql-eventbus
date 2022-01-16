@@ -1,7 +1,7 @@
 import { EventBusValidator } from "./EventBusValidator";
 import { EventBusSubscriberCb } from "./EventBus";
 import { getRootQueryFields } from "./eventbus-utils";
-import { DocumentNode, GraphQLSchema } from "graphql";
+import { DocumentNode, GraphQLError, GraphQLSchema } from "graphql";
 import { InvalidPublishTopic } from ".";
 import { v4 } from "uuid";
 import { isPresent } from "ts-is-present";
@@ -36,6 +36,14 @@ export type ConsumeErrorHook = (
   error: Error
 ) => OptionalPromise<unknown>;
 
+export type ConsumeGraphQLErrorsHook = (
+  errors: GraphQLError[]
+) => OptionalPromise<unknown>;
+
+export type ConsumeDeprecatedErrorsHook = (
+  errors: GraphQLError[]
+) => OptionalPromise<unknown>;
+
 export type ConsumeStartHook = (args: {
   topic: string;
   _fullData: {};
@@ -44,6 +52,8 @@ export type ConsumeStartHook = (args: {
 }) => OptionalPromise<{
   consumeEndHook?: ConsumeEndHook;
   consumeErrorHook?: ConsumeErrorHook;
+  consumeGraphQLErrorHooks?: ConsumeGraphQLErrorsHook;
+  consumeDeprecatedErrorHooks?: ConsumeDeprecatedErrorsHook;
   consumeSuccessHook?: ConsumeSuccessHook;
 }>;
 
@@ -72,8 +82,8 @@ export interface EventBusPlugin {
 
 export interface GraphQLEventbusMetadata {
   "x-request-id": string;
-  publishTime: string;
-  messageId: string;
+  publishedAt: string;
+  eventId: string;
   [key: string]: string;
 }
 
@@ -148,6 +158,8 @@ export class GraphQLEventbus {
         .filter(isPresent) || [];
     let consumeEndHooks: ConsumeEndHook[] = [];
     let consumeErrorHooks: ConsumeErrorHook[] = [];
+    let consumeGraphQLErrorHooks: ConsumeGraphQLErrorsHook[] = [];
+    let consumeDeprecatedErrorsHooks: ConsumeDeprecatedErrorsHook[] = [];
     let consumeSuccessHooks: ConsumeSuccessHook[] = [];
     if (consumeHooks.length) {
       await Promise.all(
@@ -172,19 +184,56 @@ export class GraphQLEventbus {
           if (foo.consumeErrorHook) {
             consumeErrorHooks.push(foo.consumeErrorHook);
           }
+          if (foo.consumeGraphQLErrorHooks) {
+            consumeGraphQLErrorHooks.push(
+              foo.consumeGraphQLErrorHooks
+            );
+          }
+          if (foo.consumeDeprecatedErrorHooks) {
+            consumeDeprecatedErrorsHooks.push(
+              foo.consumeDeprecatedErrorHooks
+            );
+          }
         })
       );
     }
     try {
-      const extractedPayload = await this.consumeValidator?.extractData(
+      const extractedPayload = await this.consumeValidator!.extractData(
         {
           topic,
           data: baggage.payload,
         }
       );
+      if (!extractedPayload.data) {
+        throw new Error(
+          `Payload error: Received ${JSON.stringify(
+            extractedPayload.data
+          )}`
+        );
+      }
+      if (
+        extractedPayload.deprecated &&
+        consumeDeprecatedErrorsHooks.length
+      ) {
+        await Promise.all(
+          consumeDeprecatedErrorsHooks.map((hook) => {
+            return hook(extractedPayload.errors! as GraphQLError[]);
+          })
+        );
+      }
+      if (
+        extractedPayload.errors &&
+        consumeGraphQLErrorHooks.length
+      ) {
+        await Promise.all(
+          consumeGraphQLErrorHooks.map((hook) => {
+            return hook(extractedPayload.errors! as GraphQLError[]);
+          })
+        );
+      }
       await this.config.subscriber.cb({
         topic: topic,
-        payload: extractedPayload,
+        payload: extractedPayload?.data,
         metadata: baggage.metadata,
         _fullData: baggage.payload,
       });
@@ -226,8 +275,8 @@ export class GraphQLEventbus {
     const metadata: GraphQLEventbusMetadata = {
       "x-request-id": v4(),
       ...props.metadata,
-      messageId: v4(),
-      publishTime: new Date().toISOString(),
+      eventId: v4(),
+      publishedAt: new Date().toISOString(),
     };
     const publishHooks =
       this.config.plugins

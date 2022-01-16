@@ -85,10 +85,32 @@ describe("decodeData", () => {
       }
     `;
     const result = validator.extract(query, key, data);
-    expect(result.data).toMatchObject({
+    expect(result.payload.data).toMatchObject({
       boom: {
         renameId: data.id,
         requestedByUserId: data.requestedByUserId,
+      },
+    });
+  });
+  test("invalid enum throws", async () => {
+    const key = "EntityFlagEvent";
+    const data = validator.sample(key).data[key];
+    const query = gql`
+      query {
+        EntityFlagEvent {
+          entityType
+          timestamp
+        }
+      }
+    `;
+    const result = validator.extract(query, key, {
+      ...data,
+      entityType: "INVALID",
+    });
+    expect(result.payload.data).toMatchObject({
+      EntityFlagEvent: {
+        entityType: null,
+        timestamp: expect.any(Date),
       },
     });
   });

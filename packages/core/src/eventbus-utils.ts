@@ -46,29 +46,6 @@ export const getTopicsFromDocument = (
   }, {});
 };
 
-// const validateObject = (type: GraphQLNamedType) => {
-//   if (!isObjectType(type)) {
-//     throw new Error("Return type must be an object");
-//   }
-//   // const fieldNames = Object.keys(type.getFields());
-//   // if (fieldNames.indexOf("id") === -1) {
-//   //   throw new Error("You must specify an id field for event payload");
-//   // }
-//   // if (fieldNames.indexOf("timestamp") === -1) {
-//   //   throw new Error(
-//   //     "You must specify an timestamp field for event payload"
-//   //   );
-//   // }
-//   // Object.values(type.getFields()).forEach((a) => {
-//   //   if (a.name === "id" && a.type.inspect() !== "UUID!") {
-//   //     throw new Error("id field must be of type UUID!");
-//   //   }
-//   //   if (a.name === "timestamp" && a.type.inspect() !== "DateTime!") {
-//   //     throw new Error("timestamp field must be of type DateTime!");
-//   //   }
-//   // });
-// };
-
 export const getRootQueryFields = (
   schema: GraphQLSchema
 ): string[] => {
@@ -77,15 +54,13 @@ export const getRootQueryFields = (
     throw new Error("Root query not found");
   }
   const queryFields = queryType.getFields();
-  // console.log(queryFields);
+  // We enforce non null payload to use graphql typescript code generation fields.
   if (
     !Object.values(queryFields).every((a) =>
       a.type.inspect().endsWith("!")
     )
   ) {
-    throw new Error(
-      "You must specify all queries with non null response type"
-    );
+    throw new Error("All events must have a non null payload");
   }
   const returnTypes = Object.values(queryFields).map((a) =>
     a.type.toString()
@@ -95,34 +70,18 @@ export const getRootQueryFields = (
     if (!isObjectType(type)) {
       throw new Error("You must return objects for events");
     }
-    // console.log(JSON.stringify(type?.astNode, null, 2));
   }
   return Object.keys(queryFields);
 };
 
-export const validateQueries = (
+export const validateQuery = (
   schema: GraphQLSchema,
-  queries: DocumentNode[]
+  query: DocumentNode
 ) => {
-  const result = validate(
-    schema,
-    queries.map((a) => new Source(print(a)))
-  );
+  const result = validate(schema, [new Source(print(query))]);
   if (result.length > 0 && result.find((a) => a.errors.length > 0)) {
     throw new Error(
       `Invalid queries found: ${JSON.stringify(result, null, 2)}`
-    );
-  }
-  if (
-    result.length > 0 &&
-    result.find((a) => a.deprecated.length > 0)
-  ) {
-    console.warn(
-      `Deprecated fields found: ${JSON.stringify(
-        result.map((a) => a.deprecated),
-        null,
-        2
-      )}`
     );
   }
 };

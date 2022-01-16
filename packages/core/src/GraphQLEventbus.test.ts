@@ -10,7 +10,8 @@ const pubSchema = buildSchema(`
     }
     type TestEvent2 {
       id: ID!
-      address: String
+      address: String @deprecated(reason: "Please do not use")
+      count: Int
     }
     type Query {
       TestEvent: TestEvent!
@@ -99,12 +100,14 @@ test("Allow invalid topic publishing", async () => {
   });
 });
 
-test("valid events are consumed", async () => {
+test("valid events are consumed and hooks are called", async () => {
   const consumeCb = jest.fn();
   let cbRef!: DataCb;
   const consumeErrCb = jest.fn();
   const consumeStartCb = jest.fn();
   const consumeEndCb = jest.fn();
+  const consumeDeprecatedErrorCb = jest.fn();
+  const consumeGraphQLErrorCb = jest.fn();
   const bus = new GraphQLEventbus({
     plugins: [
       {
@@ -114,6 +117,12 @@ test("valid events are consumed", async () => {
             consumeErrorHook: (e) => consumeErrCb(a.topic, e.message),
             consumeEndHook: () => {
               consumeEndCb(a.topic);
+            },
+            consumeDeprecatedErrorHooks: (e) => {
+              consumeDeprecatedErrorCb(e);
+            },
+            consumeGraphQLErrorHooks: (e) => {
+              consumeGraphQLErrorCb(e);
             },
           };
         },
@@ -131,17 +140,24 @@ test("valid events are consumed", async () => {
             name
           }
         }
+        query TestEvent2 {
+          TestEvent2 {
+            id
+            address
+            count
+          }
+        }
       `,
       schema: pubSchema,
     },
   });
   await bus.init();
   await cbRef({
-    topic: "TestEvent",
+    topic: "TestEvent2",
     baggage: {
       payload: {
         id: "id",
-        name: "name",
+        address: "address",
       },
       metadata: {} as any,
     },
@@ -151,23 +167,26 @@ test("valid events are consumed", async () => {
     metadata: {},
     payload: {
       id: "id",
-      name: "name",
+      address: "address",
     },
-    topic: "TestEvent",
+    topic: "TestEvent2",
   });
   expect(consumeStartCb).toBeCalledTimes(1);
   expect(consumeErrCb).toBeCalledTimes(0);
   expect(consumeEndCb).toBeCalledTimes(1);
+  expect(consumeDeprecatedErrorCb).toBeCalledTimes(1);
   consumeErrCb.mockClear();
   consumeEndCb.mockClear();
   consumeStartCb.mockClear();
+  consumeDeprecatedErrorCb.mockClear();
   try {
     // error in the payload
     await cbRef({
-      topic: "TestEvent",
+      topic: "TestEvent2",
       baggage: {
         payload: {
-          name: "name",
+          id: "123",
+          count: "NOT_A_NUMBER",
         },
         metadata: {} as any,
       },
@@ -175,5 +194,6 @@ test("valid events are consumed", async () => {
   } catch (e) {}
   expect(consumeStartCb).toBeCalledTimes(1);
   expect(consumeEndCb).toBeCalledTimes(1);
-  expect(consumeErrCb).toBeCalledTimes(1);
+  expect(consumeErrCb).toBeCalledTimes(0);
+  expect(consumeGraphQLErrorCb).toBeCalledTimes(1);
 });

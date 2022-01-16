@@ -15,23 +15,21 @@ const schemaTypeDef = fs.readFileSync(
 );
 
 test("plugin", () => {
-  const result = plugin(
-    buildSchema(schemaTypeDef),
-    [
-      {
-        document: gql`
-          ${typeDef}
-        `,
-      },
-    ],
+  const schema = buildSchema(schemaTypeDef);
+  const rawDocs = [
     {
-      consumer: {
-        contextType: "../file#MyContext",
-        schemaPrintPath: "./src/print.graphql",
-        eventSampler: true,
-      },
-      publisher: true,
-    }
-  );
-  fs.writeFileSync("./.tmp.ts", result);
+      document: gql`
+        ${typeDef}
+      `,
+    },
+  ];
+  const result = plugin(schema, rawDocs, {
+    consumer: {
+      contextType: "../file#MyContext",
+      schemaPrintPath: "./src/print.graphql",
+      eventSampler: true,
+    },
+    publisher: true,
+  });
+  fs.writeFileSync("./.tmp.ts", `// @ts-nocheck \n${result}`);
 });

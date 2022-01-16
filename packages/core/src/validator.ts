@@ -1,4 +1,5 @@
 import { print } from "graphql/language/printer";
+// import { validate } from "@graphql-inspector/core";
 import { validate } from "@graphql-inspector/core";
 import {
   DocumentNode,
@@ -45,7 +46,6 @@ export class Validator {
       }
     );
     if (result.errors) {
-      console.log(JSON.stringify(result.errors));
       throw new Error(JSON.stringify(result.errors, null, 2));
     }
     return result;
@@ -64,20 +64,21 @@ export class Validator {
     data: {}
   ) => {
     const printedQuery = print(query);
-    const vResult = validate(this.schema, [new Source(printedQuery)]);
-    if (
-      vResult.length > 0 &&
-      vResult.find((a) => a.deprecated.length > 0)
-    ) {
-      console.warn({
-        title: `Deprecated field consumed in event ${topic}`,
-        message: vResult.map((a) => a.deprecated),
-      });
-    }
+    const deprecatedFields = validate(
+      this.schema,
+      [new Source(printedQuery)],
+      {
+        strictDeprecated: true,
+      }
+    )[0];
     const payload = graphqlSync(this.schema, printedQuery, {
       [topic]: data,
     });
-    return payload;
+    return {
+      payload,
+      errors: payload.errors,
+      deprecated: deprecatedFields?.deprecated,
+    };
   };
 
   /**

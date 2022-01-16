@@ -36,6 +36,7 @@ export class RabbitMQEventBus {
         ? {
             schema: config.publisher?.schema,
             publish: async (args) => {
+              // Step 1
               this.publishChannel?.publish(
                 EXCHANGE,
                 args.topic,
@@ -55,6 +56,7 @@ export class RabbitMQEventBus {
             queries: config.subscriber.queries,
             cb: config.subscriber.cb,
             subscribe: (topics, dataCb) => {
+              // Step 2
               this.consumeChannel
                 ?.assertQueue(queueName, {
                   exclusive: false,
@@ -78,8 +80,9 @@ export class RabbitMQEventBus {
                         .then(() => {
                           this.consumeChannel?.ack(msg);
                         })
-                        .catch(() => {
+                        .catch((e) => {
                           this.consumeChannel?.nack(msg);
+                          throw e;
                         });
                     }
                   });
@@ -89,6 +92,7 @@ export class RabbitMQEventBus {
         : undefined,
     });
   }
+  // Step 3: Startup logic
   init = async () => {
     const connection = await amqp.connect("amqp://localhost");
     if (this.config.publisher) {
@@ -121,18 +125,21 @@ export class RabbitMQEventBus {
     });
   };
 
+  // Step 3: Close consumer logic
   closeConsumer = async () => {
     if (this.consumeChannel) {
       await this.consumeChannel.close();
     }
   };
 
+  // Step 3: Close publisher logic
   closePublisher = async () => {
     if (this.publishChannel) {
       await this.publishChannel.close();
     }
   };
 
+  // Step 3: Close the connection
   close = async () => {
     this.connection.close();
   };

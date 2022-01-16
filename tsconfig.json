@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "lib": ["es2018", "dom", "esnext"],
     "target": "es6",
     "module": "commonjs",
     "moduleResolution": "node",
@@ -20,15 +21,8 @@
     "baseUrl": ".",
     "declaration": true,
     "skipLibCheck": true,
-    "paths": {
-      "#root/*": ["./*"]
-    }
+    "paths": {}
   },
-  "include": [
-    "src/**/*",
-    "__tests__/**/*",
-    "config/**/*",
-    "publish.pact.ts"
-  ],
-  "exclude": ["**/*.test.ts"]
+  "include": ["packages/"],
+  "exclude": ["node_modules/"]
 }
