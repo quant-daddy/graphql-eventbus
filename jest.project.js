@@ -14,6 +14,8 @@ module.exports = ({ dirname }) => ({
   ],
   moduleNameMapper: {
     "^#root/(.*)": "<rootDir>/$1",
+    "^graphql-eventbus$": "<rootDir>/../core/src/index.ts",
+    "^graphql-eventbus/(.*)$": "<rootDir>/../core/src/$1",
   },
   watchPlugins: [
     "jest-watch-typeahead/filename",

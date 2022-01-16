@@ -48,7 +48,7 @@ describe("PubSubEventBus", () => {
     // console.log(cb.mock.calls);
     expect(cb).toBeCalledTimes(1);
     expect(cb.mock.calls[0][0]).toMatchObject({
-      fullData: {
+      _fullData: {
         id: "1",
         name: "coolio",
       },
