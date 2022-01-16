@@ -5,7 +5,8 @@
     "test": "jest --runInBand --coverage --verbose --forceExit",
     "build": "tsc",
     "type:check": "tsc --noEmit",
-    "prepublishOnly": "npm run build"
+    "prerelease": "npm run build",
+    "release": "changeset publish"
   },
   "repository": {
     "type": "git",
