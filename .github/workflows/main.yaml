@@ -15,8 +15,7 @@ jobs:
         image: bigtruedata/gcloud-pubsub-emulator
         ports:
           - "8538:8538"
-        command: "start --host-port 0.0.0.0:8538"
-    strategy:
+     strategy:
       matrix:
         os: [ubuntu-latest]
         node_version: [16]
