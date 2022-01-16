@@ -10,12 +10,6 @@ jobs:
   test:
     name: Unit Test on Node ${{matrix.node_version}} (${{matrix.os}}) and GraphQL v${{matrix.graphql_version}}
     runs-on: ubuntu-latest
-    services:
-      eventbus:
-        image: bigtruedata/gcloud-pubsub-emulator
-        ports:
-          - "8538:8538"
-        command: "start --host-port 0.0.0.0:8538"
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -32,9 +26,11 @@ jobs:
           node-version: ${{ matrix.node_version }}
           cache: "npm"
           cache-dependency-path: "**/package-lock.json"
-      - run: npm install
+      - run: npm ci
       - name: Build
-        run: npm build
+        run: npm run build
+      - name: Start eventbus
+        run: docker-compose up -d eventbus
       - run: npm test
         env:
           CI: true

@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/skk2142/graphql-eventbus#readme",
   "devDependencies": {
+    "@changesets/cli": "^2.19.0",
     "@types/jest": "^27.4.0",
     "@types/node": "^17.0.8",
     "graphql": "^15.8.0",
