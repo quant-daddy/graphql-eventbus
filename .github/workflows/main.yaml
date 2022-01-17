@@ -30,7 +30,7 @@ jobs:
       - name: Build
         run: npm run build
       - name: Start eventbus
-        run: docker-compose up -d eventbus
+        run: docker-compose up -d eventbus rabbit
       - run: npm test
         env:
           CI: true
