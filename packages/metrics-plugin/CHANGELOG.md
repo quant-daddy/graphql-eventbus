@@ -1,13 +1,11 @@
-# graphql-eventbus
+# graphql-eventbus-metrics-plugin
 
 ## 0.1.0
-
 ### Minor Changes
 
 - 77a9be8: Fixing build files not included in previous release
 
-## 0.0.36
-
 ### Patch Changes
 
-- 227021b: Just testing a minor bump
+- Updated dependencies [77a9be8]
+  - graphql-eventbus@0.1.0

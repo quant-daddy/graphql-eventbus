@@ -1,13 +1,6 @@
-# graphql-eventbus
+# graphql-eventbus-codegen
 
 ## 0.1.0
-
 ### Minor Changes
 
 - 77a9be8: Fixing build files not included in previous release
-
-## 0.0.36
-
-### Patch Changes
-
-- 227021b: Just testing a minor bump
