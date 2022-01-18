@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "test": "jest --runInBand --coverage --verbose --forceExit",
-    "build": "tsc",
+    "build": "npm run build -ws",
     "type:check": "tsc --noEmit",
     "prerelease": "npm run build",
     "release": "changeset publish"
@@ -17,22 +17,21 @@
   "bugs": {
     "url": "https://github.com/skk2142/graphql-eventbus/issues"
   },
-  "workspaces": {
-    "packages": [
-      "packages/*"
-    ]
-  },
+  "workspaces": [
+    "./packages/*"
+  ],
   "homepage": "https://github.com/skk2142/graphql-eventbus#readme",
   "devDependencies": {
     "@changesets/cli": "^2.19.0",
     "@types/jest": "^27.4.0",
     "@types/node": "^17.0.8",
+    "chalk": "^5.0.0",
+    "execa": "^6.0.0",
     "graphql": "^15.8.0",
     "graphql-tag": "^2.12.6",
     "husky": "^7.0.4",
     "jest": "^27.4.7",
     "jest-watch-typeahead": "^0.6.5",
-    "lerna": "^4.0.0",
     "nodemon": "^2.0.15",
     "rimraf": "^3.0.2",
     "ts-jest": "^27.1.3",

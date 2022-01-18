@@ -24,7 +24,7 @@
     "paths": {
       "graphql-eventbus": ["packages/core/src/index.ts"]
     }
-  },
-  "include": ["packages/"],
-  "exclude": ["node_modules/", "packages/codegen/data/.output.ts"]
+  }
+  // "include": ["packages/"],
+  // "exclude": ["node_modules/", "packages/codegen/data/.output.ts"]
 }
