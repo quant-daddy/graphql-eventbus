@@ -21,6 +21,5 @@
   },
   "devDependencies": {
     "prom-client": "^14.0.1"
-  },
-  "gitHead": "8ebfba031afcf75eb5a0aa498ec3c2476bb8ec4f"
+  }
 }
