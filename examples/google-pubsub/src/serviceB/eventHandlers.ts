@@ -3,11 +3,6 @@ import { EventHandlers } from "./generated/codegen-event-consumer";
 
 export const eventHandlers: EventHandlers = {
   UserCreatedEvent: async (msg, ctx) => {
-    console.log(
-      `serviceB received UserCreatedEvent message ${JSON.stringify(
-        msg
-      )}`
-    );
     if (!msg.userEmail) {
       return;
     }

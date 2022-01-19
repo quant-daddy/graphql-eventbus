@@ -5,21 +5,21 @@ import {
   MemoryEventBus,
   MemoryEventBusConfig,
   LoggingPlugin,
-} from "graphql-eventbus-core";
+} from "graphql-eventbus";
 import { EventHandlers, Publish } from "./generated/codegen-event";
 import gql from "graphql-tag";
 import { sesEventHandlers } from "./eventHandlers";
-import { metricsPlugin } from "graphql-eventbus-metrics-plugin";
+import { MetricsPlugin } from "graphql-eventbus-metrics-plugin";
 
 export const sesEventConsumerTypedefs = fs.readFileSync(
   path.join(__dirname, "./event-consumer.graphql"),
-  "utf-8"
+  "utf-8",
 );
 
 export const sesPublisherSchema = buildSchema(
   fs.readFileSync(path.join(__dirname, "./schema-event.graphql"), {
     encoding: "utf-8",
-  })
+  }),
 );
 
 export type MessageHandlerContext = {
@@ -29,10 +29,9 @@ export type MessageHandlerContext = {
 export const sesEventBusConfig: MemoryEventBusConfig = {
   schema: sesPublisherSchema,
   subscriber: {
-    cb: async ({ key, data }) => {
-      const handler =
-        sesEventHandlers[key as unknown as keyof EventHandlers];
-      await handler(data as any, {
+    cb: async ({ topic, payload }) => {
+      const handler = sesEventHandlers[topic as unknown as keyof EventHandlers];
+      await handler(payload as any, {
         logger: console.log,
       });
     },
@@ -40,15 +39,14 @@ export const sesEventBusConfig: MemoryEventBusConfig = {
       ${sesEventConsumerTypedefs}
     `,
   },
-  plugins: [metricsPlugin, LoggingPlugin],
-  allowInvalidTopic: true,
+  plugins: [MetricsPlugin(), LoggingPlugin()],
 };
 
 const webhookBus = new MemoryEventBus(sesEventBusConfig);
 export const publish: Publish = async (a, ...rest: any[]) => {
   await webhookBus.publish({
-    data: a.payload,
-    topicName: a.event,
+    payload: a.payload,
+    topic: a.topic,
   });
 };
 

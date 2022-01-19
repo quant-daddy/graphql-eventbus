@@ -13,7 +13,7 @@ import { v4 } from "uuid";
 
 const typeDef = fs.readFileSync(
   path.join(__dirname, "../data/events.graphql"),
-  "utf-8"
+  "utf-8",
 );
 
 const publisherSchema = buildSchema(typeDef);
@@ -75,13 +75,11 @@ describe("MemoryEventBus", () => {
           id: v4(),
           timestamp: new Date().toISOString(),
         },
-      })
+      }),
     ).rejects.toThrow();
     await bus.publish({
       topic: "EntityFlagEvent",
-      payload: validator.sample("EntityFlagEvent").data[
-        "EntityFlagEvent"
-      ],
+      payload: validator.sample("EntityFlagEvent").data["EntityFlagEvent"],
       metadata: { "x-request-id": "123" },
     });
     await wait(0);

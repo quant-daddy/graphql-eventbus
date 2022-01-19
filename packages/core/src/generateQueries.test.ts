@@ -7,7 +7,7 @@ import { buildSchema } from "graphql";
 
 const typeDef = fs.readFileSync(
   path.join(__dirname, "../data/events.graphql"),
-  "utf-8"
+  "utf-8",
 );
 
 describe("generateQuery", () => {

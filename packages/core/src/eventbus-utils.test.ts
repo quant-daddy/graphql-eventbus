@@ -36,7 +36,7 @@ describe("getTopicsFromDocument", () => {
         mutation whatver {
           cool
         }
-      `)
+      `),
     ).toThrowErrorMatchingInlineSnapshot(`
 "Event query must be of query type: mutation whatver {
   cool
@@ -50,7 +50,7 @@ describe("getTopicsFromDocument", () => {
           cool
           cool
         }
-      `)
+      `),
     ).toThrow();
   });
 });
@@ -83,8 +83,8 @@ describe("Query validation", () => {
               id
             }
           }
-        `
-      )
+        `,
+      ),
     ).not.toThrow();
   });
   test("renaming fields work", () => {
@@ -108,8 +108,8 @@ describe("Query validation", () => {
               id
             }
           }
-        `
-      )
+        `,
+      ),
     ).not.toThrow();
   });
 });
@@ -128,7 +128,7 @@ describe("getRootQueryNames", () => {
           EventA: EventA!
           EventB: EventB!
         }
-      `)
+      `),
     );
     expect(topicNames).toMatchInlineSnapshot(`
       Array [
@@ -147,9 +147,9 @@ describe("getRootQueryNames", () => {
       }
     `);
     expect(() =>
-      getRootQueryFields(badSchema)
+      getRootQueryFields(badSchema),
     ).toThrowErrorMatchingInlineSnapshot(
-      `"All events must have a non null payload"`
+      `"All events must have a non null payload"`,
     );
   });
 });

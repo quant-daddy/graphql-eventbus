@@ -16,7 +16,7 @@ app.post("/webhook", async (req, res) => {
         payload: req.body.payload,
       },
       // @ts-ignore
-      req.body
+      req.body,
     );
     res.sendStatus(201);
     return;

@@ -15,10 +15,7 @@ interface SubscriptionConfig {
   queries: DocumentNode;
   schema: GraphQLSchema;
   cb: EventBusSubscriberCb;
-  subscribe: (
-    topics: string[],
-    cb: DataCb
-  ) => OptionalPromise<unknown>;
+  subscribe: (topics: string[], cb: DataCb) => OptionalPromise<unknown>;
 }
 
 export interface Baggage {
@@ -32,16 +29,14 @@ export type ConsumeEndHook = () => OptionalPromise<unknown>;
 
 export type ConsumeSuccessHook = () => OptionalPromise<unknown>;
 
-export type ConsumeErrorHook = (
-  error: Error
-) => OptionalPromise<unknown>;
+export type ConsumeErrorHook = (error: Error) => OptionalPromise<unknown>;
 
 export type ConsumeGraphQLErrorsHook = (
-  errors: GraphQLError[]
+  errors: GraphQLError[],
 ) => OptionalPromise<unknown>;
 
 export type ConsumeDeprecatedErrorsHook = (
-  errors: GraphQLError[]
+  errors: GraphQLError[],
 ) => OptionalPromise<unknown>;
 
 export type ConsumeStartHook = (args: {
@@ -61,9 +56,7 @@ export type PublishEndHook = () => OptionalPromise<unknown>;
 
 export type PublishSuccessHook = () => OptionalPromise<unknown>;
 
-export type PublishErrorHook = (
-  error: Error
-) => OptionalPromise<unknown>;
+export type PublishErrorHook = (error: Error) => OptionalPromise<unknown>;
 
 export type PublishStartHook = (args: {
   topic: string;
@@ -90,7 +83,7 @@ export interface GraphQLEventbusMetadata {
 export class GraphQLEventbus {
   private consumeValidator!: EventBusValidator | null;
   private publishValidator!: EventBusValidator | null;
-  public isInitialized: boolean = false;
+  public isInitialized = false;
   constructor(
     public config: {
       publisher?: {
@@ -104,7 +97,7 @@ export class GraphQLEventbus {
       };
       subscriber?: SubscriptionConfig;
       plugins?: EventBusPlugin[];
-    }
+    },
   ) {
     if (config.publisher) {
       this.publishValidator = new EventBusValidator({
@@ -120,9 +113,7 @@ export class GraphQLEventbus {
 
   init = async () => {
     if (this.config.publisher && this.config.publisher.publishInit) {
-      const topicnames = getRootQueryFields(
-        this.config.publisher.schema
-      );
+      const topicnames = getRootQueryFields(this.config.publisher.schema);
       await this.config.publisher.publishInit(topicnames);
     }
     if (this.config.subscriber) {
@@ -141,10 +132,7 @@ export class GraphQLEventbus {
     await this.consumeValidator
       .validateConsumerQueries(this.config.subscriber.queries)
       .then(async (topics) => {
-        await this.config.subscriber!.subscribe(
-          topics,
-          this.handleCb
-        );
+        await this.config.subscriber?.subscribe(topics, this.handleCb);
       });
   };
 
@@ -152,15 +140,17 @@ export class GraphQLEventbus {
     if (!this.config.subscriber) {
       return;
     }
+    if (!this.consumeValidator) {
+      return;
+    }
     const consumeHooks =
-      this.config.plugins
-        ?.map((a) => a.consumeStartHook)
-        .filter(isPresent) || [];
-    let consumeEndHooks: ConsumeEndHook[] = [];
-    let consumeErrorHooks: ConsumeErrorHook[] = [];
-    let consumeGraphQLErrorHooks: ConsumeGraphQLErrorsHook[] = [];
-    let consumeDeprecatedErrorsHooks: ConsumeDeprecatedErrorsHook[] = [];
-    let consumeSuccessHooks: ConsumeSuccessHook[] = [];
+      this.config.plugins?.map((a) => a.consumeStartHook).filter(isPresent) ||
+      [];
+    const consumeEndHooks: ConsumeEndHook[] = [];
+    const consumeErrorHooks: ConsumeErrorHook[] = [];
+    const consumeGraphQLErrorHooks: ConsumeGraphQLErrorsHook[] = [];
+    const consumeDeprecatedErrorsHooks: ConsumeDeprecatedErrorsHook[] = [];
+    const consumeSuccessHooks: ConsumeSuccessHook[] = [];
     if (consumeHooks.length) {
       await Promise.all(
         consumeHooks.map(async (hook) => {
@@ -168,9 +158,8 @@ export class GraphQLEventbus {
             topic,
             metadata: baggage.metadata,
             _fullData: baggage.payload,
-            documentNode: this.consumeValidator!.getDocumentForTopic(
-              topic
-            ),
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            documentNode: this.consumeValidator!.getDocumentForTopic(topic),
           });
           if (!foo) {
             return;
@@ -185,50 +174,36 @@ export class GraphQLEventbus {
             consumeErrorHooks.push(foo.consumeErrorHook);
           }
           if (foo.consumeGraphQLErrorHooks) {
-            consumeGraphQLErrorHooks.push(
-              foo.consumeGraphQLErrorHooks
-            );
+            consumeGraphQLErrorHooks.push(foo.consumeGraphQLErrorHooks);
           }
           if (foo.consumeDeprecatedErrorHooks) {
-            consumeDeprecatedErrorsHooks.push(
-              foo.consumeDeprecatedErrorHooks
-            );
+            consumeDeprecatedErrorsHooks.push(foo.consumeDeprecatedErrorHooks);
           }
-        })
+        }),
       );
     }
     try {
-      const extractedPayload = await this.consumeValidator!.extractData(
-        {
-          topic,
-          data: baggage.payload,
-        }
-      );
+      const extractedPayload = await this.consumeValidator.extractData({
+        topic,
+        data: baggage.payload,
+      });
       if (!extractedPayload.data) {
         throw new Error(
-          `Payload error: Received ${JSON.stringify(
-            extractedPayload.data
-          )}`
+          `Payload error: Received ${JSON.stringify(extractedPayload.data)}`,
         );
       }
-      if (
-        extractedPayload.deprecated &&
-        consumeDeprecatedErrorsHooks.length
-      ) {
+      if (extractedPayload.deprecated && consumeDeprecatedErrorsHooks.length) {
         await Promise.all(
           consumeDeprecatedErrorsHooks.map((hook) => {
-            return hook(extractedPayload.errors! as GraphQLError[]);
-          })
+            return hook(extractedPayload.errors as GraphQLError[]);
+          }),
         );
       }
-      if (
-        extractedPayload.errors &&
-        consumeGraphQLErrorHooks.length
-      ) {
+      if (extractedPayload.errors && consumeGraphQLErrorHooks.length) {
         await Promise.all(
           consumeGraphQLErrorHooks.map((hook) => {
-            return hook(extractedPayload.errors! as GraphQLError[]);
-          })
+            return hook(extractedPayload.errors as GraphQLError[]);
+          }),
         );
       }
       await this.config.subscriber.cb({
@@ -241,7 +216,7 @@ export class GraphQLEventbus {
         await Promise.all(
           consumeSuccessHooks.map((hook) => {
             return hook();
-          })
+          }),
         );
       }
     } catch (e) {
@@ -249,7 +224,7 @@ export class GraphQLEventbus {
         await Promise.all(
           consumeErrorHooks.map((hook) => {
             return hook(e as Error);
-          })
+          }),
         );
       }
       throw e;
@@ -258,7 +233,7 @@ export class GraphQLEventbus {
         await Promise.all(
           consumeEndHooks.map((hook) => {
             return hook();
-          })
+          }),
         );
       }
     }
@@ -279,12 +254,11 @@ export class GraphQLEventbus {
       publishedAt: new Date().toISOString(),
     };
     const publishHooks =
-      this.config.plugins
-        ?.map((a) => a.publishStartHook)
-        .filter(isPresent) || [];
-    let publishEndHooks: PublishEndHook[] = [];
-    let publishErrorHooks: PublishErrorHook[] = [];
-    let publishSuccessHooks: PublishSuccessHook[] = [];
+      this.config.plugins?.map((a) => a.publishStartHook).filter(isPresent) ||
+      [];
+    const publishEndHooks: PublishEndHook[] = [];
+    const publishErrorHooks: PublishErrorHook[] = [];
+    const publishSuccessHooks: PublishSuccessHook[] = [];
     if (publishHooks.length) {
       await publishHooks.map(async (hook) => {
         const r = await hook({
@@ -319,7 +293,7 @@ export class GraphQLEventbus {
         await Promise.all(
           publishSuccessHooks.map((hook) => {
             return hook();
-          })
+          }),
         );
       }
     } catch (e) {
@@ -327,7 +301,7 @@ export class GraphQLEventbus {
         await Promise.all(
           publishErrorHooks.map((hook) => {
             return hook(e as Error);
-          })
+          }),
         );
       }
       if (
@@ -342,7 +316,7 @@ export class GraphQLEventbus {
         await Promise.all(
           publishEndHooks.map((hook) => {
             return hook();
-          })
+          }),
         );
       }
     }

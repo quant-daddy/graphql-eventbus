@@ -22,10 +22,10 @@ describe("EventHandlers", () => {
     await wait(100);
     expect(publishCb).toBeCalledTimes(1);
     expect(publishCb.mock.calls[0][0].event).toMatchInlineSnapshot(
-      `"SendEmailEvent"`
+      `"SendEmailEvent"`,
     );
     expect(publishCb.mock.calls[0][0].payload.emailAddress).toBe(
-      payload.userEmail
+      payload.userEmail,
     );
     publishCb.mockClear();
     await bus.publish({

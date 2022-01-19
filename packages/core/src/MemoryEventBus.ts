@@ -30,25 +30,22 @@ export class MemoryEventBus {
         publish: async (args) => {
           this.eventEmitter.emit(
             `message-${args.topic}`,
-            JSON.stringify(args.baggage)
+            JSON.stringify(args.baggage),
           );
         },
         allowInvalidTopic: config.allowPublishNonExistingTopic,
       },
       subscriber: this.config.subscriber
         ? {
-            cb: this.config.subscriber!.cb,
+            cb: this.config.subscriber.cb,
             subscribe: (topics, cb: DataCb) => {
               topics.forEach((topic) => {
-                this.eventEmitter.on(
-                  `message-${topic}`,
-                  async (baggage) => {
-                    await cb({
-                      baggage: JSON.parse(baggage),
-                      topic,
-                    });
-                  }
-                );
+                this.eventEmitter.on(`message-${topic}`, async (baggage) => {
+                  await cb({
+                    baggage: JSON.parse(baggage),
+                    topic,
+                  });
+                });
               });
             },
             queries: this.config.subscriber.queries,

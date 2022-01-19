@@ -7,8 +7,8 @@ import { MessageHandlerContext } from '../WebhookBus'
 
 function publish(
   data:
-    | { event: "EventA", payload: EventA }
-    | { event: "EventB", payload: EventB }
+    | { topic: "EventA", payload: EventA }
+    | { topic: "EventB", payload: EventB }
 ): Promise<void>;
 function publish(): Promise<void>{
   return Promise.resolve();
@@ -16,8 +16,8 @@ function publish(): Promise<void>{
 
 export type Publish = typeof publish
 
-function eventSampler(args: { event: "EventA", override?: Partial<EventA> }): EventA
-function eventSampler(args: { event: "EventB", override?: Partial<EventB> }): EventB
+function eventSampler(args: { topic: "EventA", override?: Partial<EventA> }): EventA
+function eventSampler(args: { topic: "EventB", override?: Partial<EventB> }): EventB
 ;function eventSampler(): {}{
   return {};
 }
@@ -25,8 +25,8 @@ export type EventSampler = typeof eventSampler
 
 
 export interface EventHandlers {
-  EventA: (msg: EventAQuery["EventA"], ctx: MessageHandlerContext) => Promise<any>,
-  EventB: (msg: EventBQuery["EventB"], ctx: MessageHandlerContext) => Promise<any>
+  EventA: (msg: EventAQuery["EventA"], ctx: MessageHandlerContext) => Promise<unknown>,
+  EventB: (msg: EventBQuery["EventB"], ctx: MessageHandlerContext) => Promise<unknown>
 }
 export enum Events {
   EventA = "EventA",

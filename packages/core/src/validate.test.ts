@@ -16,7 +16,7 @@ const typeDefs = fs.readFileSync(
   path.join(__dirname, "../data/events.graphql"),
   {
     encoding: "utf-8",
-  }
+  },
 );
 
 const builtSchema = makeExecutableSchema({
@@ -38,9 +38,7 @@ const validator = new Validator(mockSchema);
 describe("validate", () => {
   test("correct data does not throw", async () => {
     const key = "ClosedGroupJoinRequestResponseEvent";
-    const data = validator.sample(
-      "ClosedGroupJoinRequestResponseEvent"
-    );
+    const data = validator.sample("ClosedGroupJoinRequestResponseEvent");
     validator.validate(key, data.data[key]);
   });
   test("incorrect data throws", async () => {
@@ -132,7 +130,7 @@ describe("sample", () => {
     store.reset();
     const result2 = mockValidator.sample("EntityFlagEvent");
     expect(result.data?.["EntityFlagEvent"].id).not.toEqual(
-      result2.data?.["EntityFlagEvent"].id
+      result2.data?.["EntityFlagEvent"].id,
     );
   });
 });

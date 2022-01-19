@@ -1,9 +1,4 @@
-import {
-  Message,
-  PubSub,
-  Subscription,
-  Topic,
-} from "@google-cloud/pubsub";
+import { Message, PubSub, Subscription, Topic } from "@google-cloud/pubsub";
 import { DocumentNode, GraphQLSchema } from "graphql";
 import {
   EventBusPlugin,
@@ -68,12 +63,12 @@ export class PubSubEventBus {
                       streamingOptions: {
                         maxStreams: 1,
                       },
-                    }
+                    },
                   );
                   const [exist] = await subscription.exists();
                   if (!exist) {
                     console.log(
-                      `Service ${this.config.serviceName}: Subscription created: ${subscriptionName}`
+                      `Service ${this.config.serviceName}: Subscription created: ${subscriptionName}`,
                     );
                     [subscription] = await subscription.create({});
                   }
@@ -94,7 +89,7 @@ export class PubSubEventBus {
                       throw e;
                     }
                   });
-                })
+                }),
               );
             },
             queries: this.config.subscriber.queries,

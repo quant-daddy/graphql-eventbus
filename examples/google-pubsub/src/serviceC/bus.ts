@@ -4,16 +4,12 @@ import { eventHandlers } from "./eventHandlers";
 import { EventHandlers } from "./generated/codegen-event-consumer";
 import gql from "graphql-tag";
 import { Publish } from "./generated/codegen-event-publisher";
-import {
-  PubSubEventBus,
-  PubSubEventBusConfig,
-} from "../PubSubEventBus";
-import { EventBusSubscriberCb } from "graphql-eventbus-core";
+import { EventBusSubscriberCb, LoggingPlugin } from "graphql-eventbus";
 import { getSchema } from "../utils";
 import {
   RabbitMQEventBus,
   RabbitMQEventBusConfig,
-} from "../RabbitMQEventBus";
+} from "graphql-eventbus-rabbitmq";
 
 export type MessageHandlerContext = {
   publish: Publish;
@@ -42,10 +38,11 @@ export const getPublish = () => {
 
 export const eventConsumerTypeDef = fs.readFileSync(
   path.join(__dirname, "./event-consumer.graphql"),
-  "utf-8"
+  "utf-8",
 );
 
 export const eventbusConfig: RabbitMQEventBusConfig = {
+  plugins: [LoggingPlugin()],
   serviceName: "serviceC",
   publisher: {
     // same service is the publisher for the schema
@@ -56,9 +53,7 @@ export const eventbusConfig: RabbitMQEventBusConfig = {
     queries: gql`
       ${eventConsumerTypeDef}
     `,
-    schema: getSchema(
-      path.join(__dirname, "generated/publisher.graphql")
-    ),
+    schema: getSchema(path.join(__dirname, "generated/publisher.graphql")),
   },
 };
 

@@ -19,7 +19,7 @@
     "amqplib": "^0.8.0",
     "express": "^4.17.2",
     "graphql": "^15.8.0",
-    "graphql-eventbus-rabbitmq": "^0.1.1",
+    "graphql-eventbus-rabbitmq": "^0.1.5",
     "graphql-scalars": "^1.14.1",
     "uuid": "^8.3.2"
   },

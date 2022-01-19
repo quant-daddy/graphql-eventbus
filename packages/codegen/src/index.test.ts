@@ -6,12 +6,12 @@ import path from "path";
 
 const typeDef = fs.readFileSync(
   path.join(__dirname, "../data/event-consumer.graphql"),
-  "utf-8"
+  "utf-8",
 );
 
 const schemaTypeDef = fs.readFileSync(
   path.join(__dirname, "../data/schema.graphql"),
-  "utf-8"
+  "utf-8",
 );
 
 test("plugin", () => {
@@ -33,6 +33,6 @@ test("plugin", () => {
   });
   fs.writeFileSync(
     path.join(__dirname, "../data/.output.ts"),
-    `// @ts-nocheck \n${result}`
+    `// @ts-nocheck \n${result}`,
   );
 });

@@ -7,12 +7,13 @@ import { Publish } from "./generated/codegen-event-publisher";
 import {
   EventBusSubscriberCb,
   GraphQLEventbusMetadata,
+  LoggingPlugin,
 } from "graphql-eventbus";
 import { getSchema } from "../utils";
 import {
   RabbitMQEventBus,
   RabbitMQEventBusConfig,
-} from "../RabbitMQEventBus";
+} from "graphql-eventbus-rabbitmq";
 
 export type MessageHandlerContext = {
   publish: Publish;
@@ -42,18 +43,19 @@ export const getPublish = (metadata?: GraphQLEventbusMetadata) => {
 
 export const eventConsumerTypeDef = fs.readFileSync(
   path.join(__dirname, "./event-consumer.graphql"),
-  "utf-8"
+  "utf-8",
 );
 
 export const publisherSchema = getSchema(
-  path.join(__dirname, "schema-event.graphql")
+  path.join(__dirname, "schema-event.graphql"),
 );
 
 export const consumerSchema = getSchema(
-  path.join(__dirname, "generated/publisher.graphql")
+  path.join(__dirname, "generated/publisher.graphql"),
 );
 
 export const eventbusConfig: RabbitMQEventBusConfig = {
+  plugins: [LoggingPlugin()],
   serviceName: "serviceB",
   publisher: {
     // same service is the publisher for the schema

@@ -56,17 +56,16 @@ export const MetricsPlugin = (): EventBusPlugin => {
     consumeStartHook: (a) => {
       const startTime = new Date().getTime();
       return {
-        consumeErrorHook: () =>
-          consumedErrorCount.inc({ name: a.topic }),
+        consumeErrorHook: () => consumedErrorCount.inc({ name: a.topic }),
         consumeSuccessHook: () => {
           consumedCount.inc({ name: a.topic });
           consumedTimeSincePublish.observe(
             { name: a.topic },
-            new Date().getTime() - startTime
+            new Date().getTime() - startTime,
           );
           consumedTime.observe(
             { name: a.topic },
-            new Date().getTime() - startTime
+            new Date().getTime() - startTime,
           );
         },
       };
@@ -74,12 +73,11 @@ export const MetricsPlugin = (): EventBusPlugin => {
     publishStartHook: (a) => {
       const startTime = new Date().getTime();
       return {
-        publishErrorHook: () =>
-          publishErrorCount.inc({ name: a.topic }),
+        publishErrorHook: () => publishErrorCount.inc({ name: a.topic }),
         publishSuccessHook: () => {
           publishTime.observe(
             { name: a.topic },
-            new Date().getTime() - startTime
+            new Date().getTime() - startTime,
           );
           publishCount.inc({ name: a.topic });
         },

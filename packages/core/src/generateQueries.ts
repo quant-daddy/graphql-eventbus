@@ -14,7 +14,7 @@ import {
 const generateFieldName = (
   fieldName: string,
   depth: number,
-  randomKey: boolean
+  randomKey: boolean,
 ) => {
   if (!randomKey) {
     return fieldName;
@@ -70,20 +70,16 @@ const generateQuery = ({
   let queryStr = "";
   let childQuery = "";
   if (isAbstractType(curType)) {
-    throw new Error(
-      `abstract types are not supported in event schema`
-    );
+    throw new Error(`abstract types are not supported in event schema`);
   }
   if (isInputObjectType(curType)) {
-    throw new Error(
-      `input object types are not supported in event schema`
-    );
+    throw new Error(`input object types are not supported in event schema`);
   }
   if (!isObjectType(curType)) {
     queryStr = `${"  ".repeat(depth)}${generateFieldName(
       field.name,
       depth,
-      !!randomFieldName
+      !!randomFieldName,
     )}`;
   } else {
     const childKeys = Object.keys(curType.getFields());
@@ -109,7 +105,7 @@ const generateQuery = ({
     queryStr = `${"  ".repeat(depth)}${generateFieldName(
       field.name,
       depth,
-      !!randomFieldName
+      !!randomFieldName,
     )} {\n${childQuery}\n${"  ".repeat(depth)}}`;
   }
   return queryStr;
@@ -145,7 +141,7 @@ export const generateQueries = ({
   if (print) {
     fs.writeFileSync(
       path.join(__dirname, `./data/output.gql`),
-      Object.values(result).join("\n")
+      Object.values(result).join("\n"),
     );
   }
   return result;

@@ -35,7 +35,7 @@ export class RabbitMQEventBus {
       publisher: config.publisher
         ? {
             schema: config.publisher?.schema,
-            publish: async (args) => {
+            publish: async args => {
               this.publishChannel?.publish(
                 EXCHANGE,
                 args.topic,
@@ -43,8 +43,8 @@ export class RabbitMQEventBus {
                   JSON.stringify({
                     payload: args.baggage.payload,
                     metadata: args.baggage.metadata,
-                  })
-                )
+                  }),
+                ),
               );
             },
           }
@@ -59,26 +59,20 @@ export class RabbitMQEventBus {
                 ?.assertQueue(queueName, {
                   exclusive: false,
                 })
-                .then((q) => {
-                  topics.forEach((topic) => {
-                    this.consumeChannel?.bindQueue(
-                      queueName,
-                      EXCHANGE,
-                      topic
-                    );
+                .then(() => {
+                  topics.forEach(topic => {
+                    this.consumeChannel?.bindQueue(queueName, EXCHANGE, topic);
                   });
-                  this.consumeChannel?.consume(queueName, (msg) => {
+                  this.consumeChannel?.consume(queueName, msg => {
                     if (msg?.content) {
                       dataCb({
-                        baggage: JSON.parse(
-                          msg!.content.toString("utf-8")
-                        ),
-                        topic: msg?.fields.routingKey!,
+                        baggage: JSON.parse(msg.content.toString("utf-8")),
+                        topic: msg?.fields.routingKey,
                       })
                         .then(() => {
                           this.consumeChannel?.ack(msg);
                         })
-                        .catch((e) => {
+                        .catch(e => {
                           this.consumeChannel?.nack(msg);
                           throw e;
                         });

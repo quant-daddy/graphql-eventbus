@@ -51,7 +51,7 @@ export class EventBusValidator {
     const queriedData = await this.validator.extract(
       this.consumerTopics[args.topic],
       args.topic,
-      args.data
+      args.data,
     );
     return {
       data: queriedData.payload.data?.[args.topic] || null,
@@ -62,13 +62,11 @@ export class EventBusValidator {
 
   publishValidate = async (props: { topic: string; payload: {} }) => {
     if (!this.validator || !this.publishTopicNames) {
-      throw new Error(
-        "You must specify publishSchema in the constructor"
-      );
+      throw new Error("You must specify publishSchema in the constructor");
     }
     if (this.publishTopicNames.indexOf(props.topic) === -1) {
       throw new InvalidPublishTopic(
-        `Publish topic ${props.topic} has not been defined in the publishSchema ${this.publishTopicNames}`
+        `Publish topic ${props.topic} has not been defined in the publishSchema ${this.publishTopicNames}`,
       );
     }
     this.validator.validate(props.topic, props.payload);

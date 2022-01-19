@@ -1,7 +1,4 @@
-import {
-  EventBusSubscriberCb,
-  MemoryEventBus,
-} from "graphql-eventbus";
+import { EventBusSubscriberCb, MemoryEventBus } from "graphql-eventbus";
 // /* eslint-disable @typescript-eslint/ban-types */
 import {
   consumerSchema,
@@ -13,7 +10,7 @@ import gql from "graphql-tag";
 import { eventHandlers } from "../eventHandlers";
 
 export const getConsumerTestEventBus = async (
-  ctx?: Partial<MessageHandlerContext>
+  ctx?: Partial<MessageHandlerContext>,
 ) => {
   const messageHandlers: EventBusSubscriberCb = async (args) => {
     const handler = eventHandlers[args.topic as keyof EventHandlers];
@@ -35,10 +32,7 @@ export const getConsumerTestEventBus = async (
     },
   });
   await bus.init();
-  const publish = (args: {
-    event: keyof EventHandlers;
-    payload: {};
-  }) =>
+  const publish = (args: { event: keyof EventHandlers; payload: {} }) =>
     bus.publish({
       payload: args.payload,
       topic: args.event,

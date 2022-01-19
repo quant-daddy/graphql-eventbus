@@ -3,11 +3,6 @@ import { EventHandlers } from "./generated/codegen-event-consumer";
 
 export const eventHandlers: EventHandlers = {
   SendEmailEvent: async (msg, ctx) => {
-    console.log(
-      `ServiceC received SendEmailEvent message ${JSON.stringify(
-        msg
-      )}`
-    );
     setTimeout(() => {
       ctx.publish({
         event: "EmailOpenEvent",

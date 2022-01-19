@@ -16,32 +16,30 @@ export const LoggingPlugin = (): EventBusPlugin => {
         errorStatus: "OK",
         durationInMs: 0,
       };
-      let logStr = () =>
+      const logStr = () =>
         `[${new Date().toISOString()}] CONSUME ${args.topic} ${
           values.errorStatus
-        } ${values.durationInMs} "${
-          args.metadata["x-request-id"]
-        }" "${args.metadata.eventId}"`;
+        } ${values.durationInMs} "${args.metadata["x-request-id"]}" "${
+          args.metadata.eventId
+        }"`;
       return {
         consumeEndHook: () => {
           console.log(logStr());
         },
         consumeErrorHook: (err) => {
           values.errorStatus = "ERROR";
-          values.durationInMs =
-            new Date().getTime() - currentDate.getTime();
+          values.durationInMs = new Date().getTime() - currentDate.getTime();
           console.error(err);
         },
-        consumeGraphQLErrorHooks: (errors) => {
+        consumeGraphQLErrorHooks: () => {
           values.errorStatus = "GRAPHQL_ERROR";
         },
-        consumeDeprecatedErrorHooks: (errors) => {
+        consumeDeprecatedErrorHooks: () => {
           values.errorStatus = "DEPRECATED";
         },
       };
     },
     publishStartHook: (args) => {
-      const currentDate = new Date();
       const values: {
         errorStatus: "OK" | "DEPRECATED" | "ERROR" | "GRAPHQL_ERROR";
         durationInMs: number;
@@ -49,12 +47,12 @@ export const LoggingPlugin = (): EventBusPlugin => {
         errorStatus: "OK",
         durationInMs: 0,
       };
-      let logStr = () =>
+      const logStr = () =>
         `[${new Date().toISOString()}] PUBLISH ${args.topic} ${
           values.errorStatus
-        } ${values.durationInMs} "${
-          args.metadata["x-request-id"]
-        }" "${args.metadata.eventId}"`;
+        } ${values.durationInMs} "${args.metadata["x-request-id"]}" "${
+          args.metadata.eventId
+        }"`;
       return {
         publishEndHook: () => {
           console.log(logStr());

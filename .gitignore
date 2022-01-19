@@ -4,3 +4,4 @@ build/*
 dist
 # Coverage
 coverage
+tsconfig.tsbuildinfo
