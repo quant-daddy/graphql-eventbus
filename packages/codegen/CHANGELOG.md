@@ -1,5 +1,11 @@
 # graphql-eventbus-codegen
 
+## 0.1.4
+
+### Patch Changes
+
+- 580c5bd: fixing dist
+
 ## 0.1.3
 
 ### Patch Changes
