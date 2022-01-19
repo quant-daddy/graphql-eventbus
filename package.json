@@ -2,7 +2,7 @@
   "name": "graphql-eventbus",
   "private": true,
   "scripts": {
-    "test": "jest --runInBand --coverage --verbose --forceExit",
+    "test": "jest --runInBand --verbose --forceExit",
     "build": "npm run build -ws",
     "type:check": "tsc --noEmit",
     "prerelease": "npm run build",

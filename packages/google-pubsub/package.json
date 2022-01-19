@@ -7,7 +7,7 @@
   "scripts": {
     "build": "rimraf dist && tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit",
-    "test": "PUBSUB_PROJECT_ID=123 PUBSUB_EMULATOR_HOST=localhost:8538 jest --runInBand --coverage --verbose --forceExit",
+    "test": "PUBSUB_PROJECT_ID=123 PUBSUB_EMULATOR_HOST=localhost:8538 jest --runInBand --verbose --forceExit",
     "test:watch": "PUBSUB_PROJECT_ID=123 PUBSUB_EMULATOR_HOST=localhost:8538 jest --watch --runInBand"
   },
   "files": [
@@ -15,7 +15,7 @@
   ],
   "dependencies": {
     "@google-cloud/pubsub": "^2.18.3",
-    "graphql-eventbus": "^0.1.2",
+    "graphql-eventbus": "^0.1.4",
     "module-alias": "^2.2.2",
     "uuid": "^8.3.2"
   },
