@@ -2,10 +2,10 @@
   "name": "graphql-eventbus-rabbitmq",
   "version": "0.1.1",
   "description": "Graphql eventbus for RabbitMQ",
-  "main": "build/index.js",
-  "types": "./build/index.d.ts",
+  "main": "dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "rimraf build && tsc -p tsconfig.json",
+    "build": "rimraf dist && tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit",
     "test": "jest --runInBand --coverage --verbose --forceExit",
     "test:watch": "jest --watch --runInBand"

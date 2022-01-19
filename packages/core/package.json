@@ -6,16 +6,16 @@
     "node": ">= 14 <17"
   },
   "_moduleAliases": {
-    "#root": "./build"
+    "#root": "./dist"
   },
-  "main": "build/index.js",
+  "main": "dist/index.js",
   "files": [
     "dist/**/*"
   ],
-  "types": "./build/index.d.ts",
+  "types": "./dist/index.d.ts",
   "np": {
     "yarn": false,
-    "contents": "build",
+    "contents": "dist",
     "cleanup": false
   },
   "devDependencies": {
@@ -24,7 +24,7 @@
     "graphql-scalars": "^1.13.6"
   },
   "scripts": {
-    "clean": "rimraf build",
+    "clean": "rimraf dist",
     "prebuild": "npm run clean",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit",
