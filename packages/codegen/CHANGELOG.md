@@ -1,5 +1,11 @@
 # graphql-eventbus-codegen
 
+## 0.1.2
+
+### Patch Changes
+
+- 076e4be: fix
+
 ## 0.1.1
 
 ### Patch Changes
