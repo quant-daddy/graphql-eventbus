@@ -1,5 +1,11 @@
 # graphql-eventbus
 
+## 0.1.5
+
+### Patch Changes
+
+- 367bf5b: fix
+
 ## 0.1.4
 
 ### Patch Changes
