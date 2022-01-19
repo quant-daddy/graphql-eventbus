@@ -15,7 +15,7 @@
   ],
   "dependencies": {
     "@google-cloud/pubsub": "^2.18.3",
-    "graphql-eventbus": "^0.1.1",
+    "graphql-eventbus": "^0.1.0",
     "module-alias": "^2.2.2",
     "uuid": "^8.3.2"
   },
