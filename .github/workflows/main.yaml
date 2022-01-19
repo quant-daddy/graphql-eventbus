@@ -6,6 +6,7 @@ on:
   pull_request:
     branches:
       - master
+  workflow_dispatch:
 jobs:
   test:
     name: Unit Test on Node ${{matrix.node_version}} (${{matrix.os}}) and GraphQL v${{matrix.graphql_version}}
