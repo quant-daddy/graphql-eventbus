@@ -1,5 +1,13 @@
 # graphql-eventbus-rabbitmq
 
+## 0.1.1
+
+### Patch Changes
+
+- 4610e87: fixing last publish: build was not included
+- Updated dependencies [4610e87]
+  - graphql-eventbus@0.1.1
+
 ## 0.1.0
 
 ### Minor Changes
