@@ -8,6 +8,10 @@ jest.setTimeout(20000);
 
 describe("RabbitMQEventBus", () => {
   test("works", async () => {
+    if (process.env.CI !== "true") {
+      console.log("skipping RabbitMQEventBus test");
+      return;
+    }
     const schema = buildSchema(`
     type TestEvent {
       id: ID!

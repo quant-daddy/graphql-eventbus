@@ -24,9 +24,7 @@
     "graphql-scalars": "^1.13.6"
   },
   "scripts": {
-    "clean": "rimraf dist",
-    "prebuild": "npm run clean",
-    "build": "tsc -p tsconfig.json",
+    "build": "rimraf dist && tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit",
     "test": "jest --runInBand --verbose --forceExit",
     "test:watch": "jest --watch --runInBand",

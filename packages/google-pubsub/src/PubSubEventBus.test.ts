@@ -7,6 +7,10 @@ jest.setTimeout(20000);
 
 describe("PubSubEventBus", () => {
   test("works", async () => {
+    if (process.env.CI !== "true") {
+      console.log("skipping PubSubEventBus test");
+      return;
+    }
     const schema = buildSchema(`
     type TestEvent {
       id: ID!

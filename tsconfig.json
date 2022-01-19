@@ -13,17 +13,13 @@
     "alwaysStrict": true,
     "sourceMap": false,
     "strict": true,
-    "outDir": "build",
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "typeRoots": ["./node_modules/@types", "./typings"],
     "baseUrl": ".",
     "declaration": true,
-    "skipLibCheck": true,
-    "paths": {
-      "graphql-eventbus": ["packages/core/src/index.ts"]
-    }
+    "skipLibCheck": true
   }
   // "include": ["packages/"],
   // "exclude": ["node_modules/", "packages/codegen/data/.output.ts"]
