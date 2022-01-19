@@ -1,0 +1,5 @@
+---
+"graphql-eventbus": patch
+---
+
+fixes

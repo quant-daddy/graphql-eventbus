@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "npx ts-node src/index.ts",
+    "type:check": "tsc --noEmit",
     "test": "PUBSUB_PROJECT_ID=123 PUBSUB_EMULATOR_HOST=localhost:8538 jest --runInBand --verbose --forceExit",
     "test:watch": "PUBSUB_PROJECT_ID=123 PUBSUB_EMULATOR_HOST=localhost:8538 jest --runInBand --verbose --watch --forceExit",
     "codegen": "npx graphql-codegen --config ./codegen.yaml"
@@ -18,7 +19,7 @@
     "amqplib": "^0.8.0",
     "express": "^4.17.2",
     "graphql": "^15.8.0",
-    "graphql-eventbus": "^0.0.33",
+    "graphql-eventbus-rabbitmq": "^0.1.1",
     "graphql-scalars": "^1.14.1",
     "uuid": "^8.3.2"
   },

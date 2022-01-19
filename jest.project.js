@@ -21,5 +21,5 @@ module.exports = ({ dirname }) => ({
     "jest-watch-typeahead/filename",
     "jest-watch-typeahead/testname",
   ],
-  testPathIgnorePatterns: ["build/"],
+  testPathIgnorePatterns: ["dist/"],
 });
