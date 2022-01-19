@@ -1,5 +1,11 @@
 # graphql-eventbus-google-pubsub
 
+## 0.1.3
+
+### Patch Changes
+
+- 227c0dd: fix core dependency
+
 ## 0.1.2
 
 ### Patch Changes

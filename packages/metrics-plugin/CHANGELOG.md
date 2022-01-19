@@ -1,5 +1,11 @@
 # graphql-eventbus-metrics-plugin
 
+## 0.1.3
+
+### Patch Changes
+
+- 227c0dd: fix core dependency
+
 ## 0.1.2
 
 ### Patch Changes
