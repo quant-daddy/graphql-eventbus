@@ -15,7 +15,7 @@
   ],
   "dependencies": {
     "amqplib": "^0.8.0",
-    "graphql-eventbus": "^0.0.35",
+    "graphql-eventbus": "^0.0.36",
     "module-alias": "^2.2.2"
   },
   "author": "Suraj Keshri",

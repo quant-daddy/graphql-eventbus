@@ -11,7 +11,7 @@
     "build": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "graphql-eventbus": "^0.0.35",
+    "graphql-eventbus": "^0.0.36",
     "module-alias": "^2.2.2"
   },
   "author": "Suraj Keshri",
