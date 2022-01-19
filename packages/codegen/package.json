@@ -7,7 +7,7 @@
     "dist/**/*"
   ],
   "scripts": {
-    "build": "rimraf dist && tsc -p tsconfig.json",
+    "build": "rimraf dist && tsc -p tsconfig.build.json",
     "test": "jest --runInBand --verbose",
     "test:watch": "jest --watch --runInBand",
     "build:watch": "tsc -w -p tsconfig.json",

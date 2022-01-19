@@ -19,7 +19,10 @@
     "typeRoots": ["./node_modules/@types", "./typings"],
     "baseUrl": ".",
     "declaration": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "graphql-eventbus": ["packages/core/src/index.ts"]
+    }
   }
   // "include": ["packages/"],
   // "exclude": ["node_modules/", "packages/codegen/data/.output.ts"]
