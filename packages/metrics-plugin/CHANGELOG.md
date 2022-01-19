@@ -1,5 +1,11 @@
 # graphql-eventbus-metrics-plugin
 
+## 0.1.5
+
+### Patch Changes
+
+- 580c5bd: fixing dist
+
 ## 0.1.4
 
 ### Patch Changes
