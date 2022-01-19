@@ -1,5 +1,13 @@
 # graphql-eventbus-metrics-plugin
 
+## 0.1.4
+
+### Patch Changes
+
+- 367bf5b: fix
+- Updated dependencies [367bf5b]
+  - graphql-eventbus@0.1.5
+
 ## 0.1.3
 
 ### Patch Changes
