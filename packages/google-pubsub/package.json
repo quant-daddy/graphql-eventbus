@@ -11,7 +11,7 @@
     "test:watch": "PUBSUB_PROJECT_ID=123 PUBSUB_EMULATOR_HOST=localhost:8538 jest --watch --runInBand"
   },
   "files": [
-    "build/**/*"
+    "dist/**/*"
   ],
   "dependencies": {
     "@google-cloud/pubsub": "^2.18.3",
