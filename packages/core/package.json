@@ -1,6 +1,6 @@
 {
   "name": "graphql-eventbus",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Eventbus powered by GraphQL",
   "engines": {
     "node": ">= 14 <17"
