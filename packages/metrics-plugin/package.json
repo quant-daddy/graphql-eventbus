@@ -5,13 +5,13 @@
   "main": "build/index.js",
   "types": "./build/index.d.ts",
   "files": [
-    "build/**/*"
+    "dist/**/*"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "graphql-eventbus": "^0.0.36",
+    "graphql-eventbus": "^0.1.0",
     "module-alias": "^2.2.2"
   },
   "author": "Suraj Keshri",

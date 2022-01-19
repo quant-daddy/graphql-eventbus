@@ -11,11 +11,11 @@
     "test:watch": "jest --watch --runInBand"
   },
   "files": [
-    "build/**/*"
+    "dist/**/*"
   ],
   "dependencies": {
     "amqplib": "^0.8.0",
-    "graphql-eventbus": "^0.0.36",
+    "graphql-eventbus": "^0.1.0",
     "module-alias": "^2.2.2"
   },
   "author": "Suraj Keshri",

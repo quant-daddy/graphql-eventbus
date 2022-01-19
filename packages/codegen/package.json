@@ -4,7 +4,7 @@
   "description": "Codegen for eventbus",
   "main": "build/index.js",
   "files": [
-    "build/**/*"
+    "dist/**/*"
   ],
   "scripts": {
     "clean": "rimraf build",

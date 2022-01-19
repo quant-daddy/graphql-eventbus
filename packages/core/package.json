@@ -10,7 +10,7 @@
   },
   "main": "build/index.js",
   "files": [
-    "build/**/*"
+    "dist/**/*"
   ],
   "types": "./build/index.d.ts",
   "np": {
