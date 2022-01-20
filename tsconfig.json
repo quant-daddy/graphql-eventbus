@@ -24,6 +24,7 @@
       "graphql-eventbus": ["packages/core/src/index.ts"]
     }
   },
-  "include": ["packages/"]
+  "include": ["packages/"],
+  "exclude": ["website/", "examples/"]
   // "exclude": ["node_modules/", "packages/codegen/data/.output.ts"]
 }

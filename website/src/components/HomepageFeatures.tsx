@@ -12,9 +12,9 @@ const FeatureList: FeatureItem[] = [
     title: "Schema Driven",
     description: (
       <>
-        Define your events and their payloads in a GraphQL schema. Use
-        GraphQL documents to consume your events. If you love GraphQL,
-        you will fall in love with this library.
+        Define your events and their payloads in a GraphQL schema. Use GraphQL
+        documents to consume your events. If you love GraphQL, you will fall in
+        love with this library.
       </>
     ),
   },
@@ -22,9 +22,9 @@ const FeatureList: FeatureItem[] = [
     title: "Message Broker agnostic",
     description: (
       <>
-        GraphQL Eventbus lets you use any message broker you want:
-        RabbitMQ, Kafka, NATS, Google PubSub. It just provides an
-        abstraction layer on top your broker using GraphQL SDL.
+        GraphQL Eventbus lets you use any message broker you want: RabbitMQ,
+        Kafka, NATS, Google PubSub. It just provides an abstraction layer on top
+        your broker using GraphQL SDL.
       </>
     ),
   },
@@ -33,11 +33,9 @@ const FeatureList: FeatureItem[] = [
     description: (
       <>
         We provide{" "}
-        <a href="https://www.graphql-code-generator.com/">
-          GraphQL Codegen
-        </a>{" "}
-        plugin to generate code for typescript. Never publish or
-        consume events without type safety.
+        <a href="https://www.graphql-code-generator.com/">GraphQL Codegen</a>{" "}
+        plugin to generate code for typescript. Never publish or consume events
+        without type safety.
       </>
     ),
   },
@@ -45,20 +43,19 @@ const FeatureList: FeatureItem[] = [
     title: "Schema Evolution",
     description: (
       <>
-        Since all the event consumers explicitly specify the fields
-        they want to consume for each event, you can remove or
-        deprecate fields without breaking any event consumers.
+        Since all the event consumers explicitly specify the fields they want to
+        consume for each event, you can remove or deprecate fields without
+        breaking any event consumers.
       </>
     ),
   },
   {
-    title: "Logging and monitoring",
+    title: "Plugins",
     description: (
       <>
-        We provide plugins for logging and monitoring. One line of
-        code and you get prometheus metrics for all the events
-        published and consumed by your services. You can also build
-        your custom plugins.
+        We provide plugins for logging and monitoring. One line of code and you
+        get prometheus metrics for all the events published and consumed by your
+        services. You can also build your custom plugins.
       </>
     ),
   },
@@ -66,8 +63,8 @@ const FeatureList: FeatureItem[] = [
     title: "Testing utilities",
     description: (
       <>
-        The library comes with utilities to easily sample payload for
-        your events and test your event handlers.
+        The library comes with utilities to easily sample payload for your
+        events and test your event handlers.
       </>
     ),
   },

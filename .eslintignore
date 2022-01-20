@@ -2,3 +2,4 @@
 *.test.ts
 dist/*
 **/build/*
+website/
