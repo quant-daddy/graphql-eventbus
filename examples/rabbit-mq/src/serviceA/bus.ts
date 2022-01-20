@@ -12,7 +12,7 @@ import {
 } from "graphql-eventbus-rabbitmq";
 
 export type MessageHandlerContext = {
-  publish: Publish;
+  logger: (...data: any[]) => void;
 };
 
 export const messageHandlers: EventBusSubscriberCb = async (args) => {
@@ -21,7 +21,7 @@ export const messageHandlers: EventBusSubscriberCb = async (args) => {
     throw new Error(`Handler for message ${args.topic} not found`);
   }
   const context: MessageHandlerContext = {
-    publish: getPublish(),
+    logger: console.log,
   };
   await handler(args.payload as any, context);
 };
@@ -30,7 +30,7 @@ export const getPublish = () => {
   const publish: Publish = (data) => {
     return eventBus.publish({
       payload: data.payload,
-      topic: data.event,
+      topic: data.topic,
     });
   };
   return publish;
@@ -43,9 +43,8 @@ export const eventConsumerTypeDef = fs.readFileSync(
 
 export const eventbusConfig: RabbitMQEventBusConfig = {
   plugins: [LoggingPlugin()],
-  serviceName: "serviceC",
+  serviceName: "serviceA",
   publisher: {
-    // same service is the publisher for the schema
     schema: getSchema(path.join(__dirname, "schema-event.graphql")),
   },
   subscriber: {
@@ -62,7 +61,7 @@ export const eventBus = new RabbitMQEventBus(eventbusConfig);
 
 let isInitialized = false;
 
-export const initServiceCEventBus = async () => {
+export const initServiceAEventBus = async () => {
   if (!isInitialized) {
     await eventBus.init();
     isInitialized = true;

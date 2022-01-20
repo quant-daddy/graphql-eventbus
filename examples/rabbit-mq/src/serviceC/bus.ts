@@ -4,11 +4,7 @@ import { eventHandlers } from "./eventHandlers";
 import { EventHandlers } from "./generated/codegen-event-consumer";
 import gql from "graphql-tag";
 import { Publish } from "./generated/codegen-event-publisher";
-import {
-  EventBusSubscriberCb,
-  GraphQLEventbusMetadata,
-  LoggingPlugin,
-} from "graphql-eventbus";
+import { EventBusSubscriberCb, LoggingPlugin } from "graphql-eventbus";
 import { getSchema } from "../utils";
 import {
   RabbitMQEventBus,
@@ -25,17 +21,16 @@ export const messageHandlers: EventBusSubscriberCb = async (args) => {
     throw new Error(`Handler for message ${args.topic} not found`);
   }
   const context: MessageHandlerContext = {
-    publish: getPublish(args.metadata),
+    publish: getPublish(),
   };
   await handler(args.payload as any, context);
 };
 
-export const getPublish = (metadata?: GraphQLEventbusMetadata) => {
+export const getPublish = () => {
   const publish: Publish = (data) => {
     return eventBus.publish({
       payload: data.payload,
-      topic: data.event,
-      metadata,
+      topic: data.topic,
     });
   };
   return publish;
@@ -46,36 +41,28 @@ export const eventConsumerTypeDef = fs.readFileSync(
   "utf-8",
 );
 
-export const publisherSchema = getSchema(
-  path.join(__dirname, "schema-event.graphql"),
-);
-
-export const consumerSchema = getSchema(
-  path.join(__dirname, "generated/publisher.graphql"),
-);
-
 export const eventbusConfig: RabbitMQEventBusConfig = {
   plugins: [LoggingPlugin()],
-  serviceName: "serviceB",
+  serviceName: "serviceC",
   publisher: {
     // same service is the publisher for the schema
-    schema: publisherSchema,
+    schema: getSchema(path.join(__dirname, "schema-event.graphql")),
   },
   subscriber: {
     cb: messageHandlers,
     queries: gql`
       ${eventConsumerTypeDef}
     `,
-    schema: consumerSchema,
+    schema: getSchema(path.join(__dirname, "generated/publisher.graphql")),
   },
 };
 
-// export const eventBus = new PubSubEventBus(eventbusConfig);
 export const eventBus = new RabbitMQEventBus(eventbusConfig);
+// export const eventBus = new PubSubEventBus(eventbusConfig);
 
 let isInitialized = false;
 
-export const initServiceBEventBus = async () => {
+export const initServiceCEventBus = async () => {
   if (!isInitialized) {
     await eventBus.init();
     isInitialized = true;

@@ -12,14 +12,14 @@ GraphQL eventbus is an abstraction layer on top of GraphQL SDL to publish and co
 
 - ✂️ **Schema Driven:** Define your events and payloads in GraphQL schema. Consume your events using GraphQL documents.
 - 🤝 **Message Broker agnostic:** Works with any message broker. We provide packages for Google Pubsub and RabbitMQ. You can easily use the library to build a bus for your message broker.
-- 🚀 **Code Generation:** <a href="https://www.graphql-code-generator.com/">GraphQL Codegen</a>{" "}
-  plugin to generate code for typescript.
+- 🚀 **Code Generation:** <a href="https://www.graphql-code-generator.com/">GraphQL Codegen</a>
+  plugin to generate code for typescript (`npm i graphql-eventbus-codegen`).
 - 🎯 **Plugins:** We provide plugins for logging and monitoring. You can also build your custom plugins.
 - 🤖 **Testing Utilities:**: The library comes with utilities to easily sample payload for your events and test your event handlers.
 
 ## Documentation
 
-You can find extensive documentation at [https://graphql-eventbus.vercel.app](https://graphql-eventbus.vercel.app).
+You can find extensive documentation at <a href="https://graphql-eventbus.vercel.app/" target="_blank">https://graphql-eventbus.vercel.app</a>
 
 ## Contributing
 

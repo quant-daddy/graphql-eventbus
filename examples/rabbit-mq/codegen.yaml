@@ -6,7 +6,7 @@ generates:
           consumer:
             eventSampler: true
             contextType: "../bus#MessageHandlerContext"
-            publisherSchemaPath: "./src/serviceA/generated/publisher.graphql"
+            schemaPrintPath: "./src/serviceA/generated/publisher.graphql"
       - typescript
       - typescript-operations
     documents:
@@ -34,7 +34,7 @@ generates:
           consumer:
             eventSampler: true
             contextType: "../bus#MessageHandlerContext"
-            publisherSchemaPath: "./src/serviceB/generated/publisher.graphql"
+            schemaPrintPath: "./src/serviceB/generated/publisher.graphql"
       - typescript
       - typescript-operations
     documents:
@@ -62,7 +62,7 @@ generates:
           consumer:
             eventSampler: true
             contextType: "../bus#MessageHandlerContext"
-            publisherSchemaPath: "./src/serviceC/generated/publisher.graphql"
+            schemaPrintPath: "./src/serviceC/generated/publisher.graphql"
       - typescript
       - typescript-operations
     documents:

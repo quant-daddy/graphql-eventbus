@@ -8,15 +8,11 @@ type EmailOpenEvent {
   openedAt: DateTime!
 }
 
-type NoConsumerEvent {
-  eventId: UUID!
-}
-
 type Query {
   EmailOpenEvent: EmailOpenEvent!
-  NoConsumerEvent: NoConsumerEvent!
   SendEmailEvent: SendEmailEvent!
   UserCreatedEvent: UserCreatedEvent!
+  UserDeletedEvent: UserDeletedEvent!
 }
 
 type SendEmailEvent {
@@ -34,6 +30,11 @@ type UserCreatedEvent {
   userId: ID!
   userName: String
   userType: UserType!
+}
+
+type UserDeletedEvent {
+  eventId: UUID!
+  userId: ID!
 }
 
 enum UserType {

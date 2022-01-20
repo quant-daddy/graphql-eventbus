@@ -7,12 +7,15 @@ export const eventHandlers: EventHandlers = {
       return;
     }
     await ctx.publish({
-      event: "SendEmailEvent",
+      topic: "SendEmailEvent",
       payload: {
         content: `Welcome ${msg.userName}`,
         emailAddress: msg.userEmail,
         eventId: v4(),
       },
     });
+  },
+  EmailOpenEvent: async (msg) => {
+    console.log(`Yay an email has been opened!`);
   },
 };

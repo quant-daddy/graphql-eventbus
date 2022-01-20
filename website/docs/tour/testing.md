@@ -72,9 +72,9 @@ function eventSampler(args: {
   override?: Partial<EmailOpenEvent>;
 }): EmailOpenEvent;
 function eventSampler(args: {
-  event: "NoConsumerEvent";
-  override?: Partial<NoConsumerEvent>;
-}): NoConsumerEvent;
+  event: "UserDeletedEvent";
+  override?: Partial<UserDeletedEvent>;
+}): UserDeletedEvent;
 function eventSampler(args: {
   event: "SendEmailEvent";
   override?: Partial<SendEmailEvent>;

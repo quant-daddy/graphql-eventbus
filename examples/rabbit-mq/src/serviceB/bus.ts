@@ -4,7 +4,11 @@ import { eventHandlers } from "./eventHandlers";
 import { EventHandlers } from "./generated/codegen-event-consumer";
 import gql from "graphql-tag";
 import { Publish } from "./generated/codegen-event-publisher";
-import { EventBusSubscriberCb, LoggingPlugin } from "graphql-eventbus";
+import {
+  EventBusSubscriberCb,
+  GraphQLEventbusMetadata,
+  LoggingPlugin,
+} from "graphql-eventbus";
 import { getSchema } from "../utils";
 import {
   RabbitMQEventBus,
@@ -12,7 +16,7 @@ import {
 } from "graphql-eventbus-rabbitmq";
 
 export type MessageHandlerContext = {
-  logger: (...data: any[]) => void;
+  publish: Publish;
 };
 
 export const messageHandlers: EventBusSubscriberCb = async (args) => {
@@ -21,16 +25,17 @@ export const messageHandlers: EventBusSubscriberCb = async (args) => {
     throw new Error(`Handler for message ${args.topic} not found`);
   }
   const context: MessageHandlerContext = {
-    logger: console.log,
+    publish: getPublish(args.metadata),
   };
   await handler(args.payload as any, context);
 };
 
-export const getPublish = () => {
+export const getPublish = (metadata?: GraphQLEventbusMetadata) => {
   const publish: Publish = (data) => {
     return eventBus.publish({
       payload: data.payload,
-      topic: data.event,
+      topic: data.topic,
+      metadata,
     });
   };
   return publish;
@@ -41,27 +46,36 @@ export const eventConsumerTypeDef = fs.readFileSync(
   "utf-8",
 );
 
+export const publisherSchema = getSchema(
+  path.join(__dirname, "schema-event.graphql"),
+);
+
+export const consumerSchema = getSchema(
+  path.join(__dirname, "generated/publisher.graphql"),
+);
+
 export const eventbusConfig: RabbitMQEventBusConfig = {
   plugins: [LoggingPlugin()],
-  serviceName: "serviceA",
+  serviceName: "serviceB",
   publisher: {
-    schema: getSchema(path.join(__dirname, "schema-event.graphql")),
+    // same service is the publisher for the schema
+    schema: publisherSchema,
   },
   subscriber: {
     cb: messageHandlers,
     queries: gql`
       ${eventConsumerTypeDef}
     `,
-    schema: getSchema(path.join(__dirname, "generated/publisher.graphql")),
+    schema: consumerSchema,
   },
 };
 
-export const eventBus = new RabbitMQEventBus(eventbusConfig);
 // export const eventBus = new PubSubEventBus(eventbusConfig);
+export const eventBus = new RabbitMQEventBus(eventbusConfig);
 
 let isInitialized = false;
 
-export const initServiceAEventBus = async () => {
+export const initServiceBEventBus = async () => {
   if (!isInitialized) {
     await eventBus.init();
     isInitialized = true;

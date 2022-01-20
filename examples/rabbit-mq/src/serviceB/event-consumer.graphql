@@ -5,3 +5,9 @@ query UserCreatedEvent {
     userName
   }
 }
+
+query EmailOpenEvent {
+  EmailOpenEvent {
+    __typename
+  }
+}

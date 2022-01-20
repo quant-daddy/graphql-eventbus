@@ -5,10 +5,10 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: 
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 import { MessageHandlerContext } from '../bus'
 
-function eventSampler(args: { event: "EmailOpenEvent", override?: Partial<EmailOpenEvent> }): EmailOpenEvent
-function eventSampler(args: { event: "NoConsumerEvent", override?: Partial<NoConsumerEvent> }): NoConsumerEvent
-function eventSampler(args: { event: "SendEmailEvent", override?: Partial<SendEmailEvent> }): SendEmailEvent
-function eventSampler(args: { event: "UserCreatedEvent", override?: Partial<UserCreatedEvent> }): UserCreatedEvent
+function eventSampler(args: { topic: "EmailOpenEvent", override?: Partial<EmailOpenEvent> }): EmailOpenEvent
+function eventSampler(args: { topic: "SendEmailEvent", override?: Partial<SendEmailEvent> }): SendEmailEvent
+function eventSampler(args: { topic: "UserCreatedEvent", override?: Partial<UserCreatedEvent> }): UserCreatedEvent
+function eventSampler(args: { topic: "UserDeletedEvent", override?: Partial<UserDeletedEvent> }): UserDeletedEvent
 ;function eventSampler(): {}{
   return {};
 }
@@ -16,10 +16,12 @@ export type EventSampler = typeof eventSampler
 
 
 export interface EventHandlers {
-  UserCreatedEvent: (msg: UserCreatedEventQuery["UserCreatedEvent"], ctx: MessageHandlerContext) => Promise<any>
+  UserCreatedEvent: (msg: UserCreatedEventQuery["UserCreatedEvent"], ctx: MessageHandlerContext) => Promise<unknown>,
+  EmailOpenEvent: (msg: EmailOpenEventQuery["EmailOpenEvent"], ctx: MessageHandlerContext) => Promise<unknown>
 }
 export enum Events {
   UserCreatedEvent = "UserCreatedEvent",
+  EmailOpenEvent = "EmailOpenEvent",
 }
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -39,15 +41,11 @@ export type EmailOpenEvent = {
   openedAt: Scalars['DateTime'];
 };
 
-export type NoConsumerEvent = {
-  eventId: Scalars['UUID'];
-};
-
 export type Query = {
   EmailOpenEvent: EmailOpenEvent;
-  NoConsumerEvent: NoConsumerEvent;
   SendEmailEvent: SendEmailEvent;
   UserCreatedEvent: UserCreatedEvent;
+  UserDeletedEvent: UserDeletedEvent;
 };
 
 export type SendEmailEvent = {
@@ -65,6 +63,11 @@ export type UserCreatedEvent = {
   userType: UserType;
 };
 
+export type UserDeletedEvent = {
+  eventId: Scalars['UUID'];
+  userId: Scalars['ID'];
+};
+
 export enum UserType {
   Enterprise = 'ENTERPRISE',
   Startup = 'STARTUP'
@@ -74,3 +77,8 @@ export type UserCreatedEventQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type UserCreatedEventQuery = { UserCreatedEvent: { userEmail: string | null | undefined, userType: UserType, userName: string | null | undefined } };
+
+export type EmailOpenEventQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type EmailOpenEventQuery = { EmailOpenEvent: { __typename: 'EmailOpenEvent' } };

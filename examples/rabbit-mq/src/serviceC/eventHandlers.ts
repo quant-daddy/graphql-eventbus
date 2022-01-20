@@ -5,7 +5,7 @@ export const eventHandlers: EventHandlers = {
   SendEmailEvent: async (msg, ctx) => {
     setTimeout(() => {
       ctx.publish({
-        event: "EmailOpenEvent",
+        topic: "EmailOpenEvent",
         payload: {
           emailAddress: msg.emailAddress,
           eventId: v4(),

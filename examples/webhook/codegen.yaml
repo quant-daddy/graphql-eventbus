@@ -6,7 +6,7 @@ generates:
           consumer:
             eventSampler: true
             contextType: "../WebhookBus#MessageHandlerContext"
-            publisherSchemaPath: "src/schema-event.graphql"
+            schemaPrintPath: "src/schema-event.graphql"
           publisher: true
       - typescript
       - typescript-operations:

@@ -15,33 +15,20 @@ export type Scalars = {
   UUID: string;
 };
 
-export type NoConsumerEvent = {
-  eventId: Scalars['UUID'];
-};
-
 export type Query = {
-  NoConsumerEvent: NoConsumerEvent;
-  UserCreatedEvent: UserCreatedEvent;
+  SendEmailEvent: SendEmailEvent;
 };
 
-export type UserCreatedEvent = {
-  createdAt: Scalars['DateTime'];
+export type SendEmailEvent = {
+  content: Scalars['String'];
+  emailAddress: Scalars['EmailAddress'];
   eventId: Scalars['UUID'];
-  userEmail: Maybe<Scalars['EmailAddress']>;
-  userId: Scalars['ID'];
-  userName: Maybe<Scalars['String']>;
-  userType: UserType;
 };
-
-export type UserType =
-  | 'ENTERPRISE'
-  | 'STARTUP';
 
 
 function publish(
   data:
-    | { event: "NoConsumerEvent", payload: NoConsumerEvent }
-    | { event: "UserCreatedEvent", payload: UserCreatedEvent }
+    | { topic: "SendEmailEvent", payload: SendEmailEvent }
 ): Promise<void>;
 function publish(): Promise<void>{
   return Promise.resolve();

@@ -10,7 +10,7 @@ describe("EventHandlers", () => {
       publish: publishCb,
     });
     const payload = await sampleEventData({
-      event: "UserCreatedEvent",
+      topic: "UserCreatedEvent",
       override: {
         userType: UserType.Enterprise,
       },
@@ -31,7 +31,7 @@ describe("EventHandlers", () => {
     await bus.publish({
       event: "UserCreatedEvent",
       payload: sampleEventData({
-        event: "UserCreatedEvent",
+        topic: "UserCreatedEvent",
         override: {
           userEmail: null,
         },

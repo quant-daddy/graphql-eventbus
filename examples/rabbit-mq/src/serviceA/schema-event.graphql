@@ -4,11 +4,12 @@ scalar DateTime
 
 type Query {
   UserCreatedEvent: UserCreatedEvent!
-  NoConsumerEvent: NoConsumerEvent!
+  UserDeletedEvent: UserDeletedEvent!
 }
 
-type NoConsumerEvent {
+type UserDeletedEvent {
   eventId: UUID!
+  userId: ID!
 }
 
 type UserCreatedEvent {

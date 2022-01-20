@@ -11,7 +11,7 @@ const foo = async () => {
   await initServiceCEventBus();
   setInterval(() => {
     serviceAPublish({
-      event: "UserCreatedEvent",
+      topic: "UserCreatedEvent",
       payload: {
         createdAt: new Date().toISOString(),
         eventId: v4(),

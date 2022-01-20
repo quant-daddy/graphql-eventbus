@@ -15,20 +15,20 @@ export type Scalars = {
   UUID: string;
 };
 
-export type Query = {
-  SendEmailEvent: SendEmailEvent;
-};
-
-export type SendEmailEvent = {
-  content: Scalars['String'];
+export type EmailOpenEvent = {
   emailAddress: Scalars['EmailAddress'];
   eventId: Scalars['UUID'];
+  openedAt: Scalars['DateTime'];
+};
+
+export type Query = {
+  EmailOpenEvent: EmailOpenEvent;
 };
 
 
 function publish(
   data:
-    | { event: "SendEmailEvent", payload: SendEmailEvent }
+    | { topic: "EmailOpenEvent", payload: EmailOpenEvent }
 ): Promise<void>;
 function publish(): Promise<void>{
   return Promise.resolve();
