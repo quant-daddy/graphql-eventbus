@@ -4,9 +4,9 @@ sidebar_position: 3
 
 # RabbitMQEventBus
 
-Let's start by creating a bus using [RabbitMQ](https://www.rabbitmq.com/getstarted.html) as the message broker.
+Let create a bus that uses [RabbitMQ](https://www.rabbitmq.com/getstarted.html) as the message broker.
 
-We define a class that use `RabbitMQ` as the message broker. In the constructor function, we create an instance of `GraphQLEventbus` class. While most of the constructor argument fields are simply passed to the `GraphQLEventbus`, we have to implement the custom logic publishing, subscribing, and initialization for `RabbitQM`. First, we create a topic exchange (idempotent operation) and initialize consume and publish channel depending on if instance of the bus publisher and/or consumes (see the `init` method).
+We define our custom class, `RabbitMQEventBus` that use `RabbitMQ` as the message broker. In the constructor function, we create an instance of `GraphQLEventbus` class. While most of the constructor argument fields are simply passed to the `GraphQLEventbus`, we have to implement the custom logic publishing, subscribing, and initialization for `RabbitQM`. First, we create a topic exchange (idempotent operation) and initialize consume and publish channel depending on if instance of the bus publisher and/or consumes (see the `init` method).
 
 - Step 1: We publish an event with the routing key as the name of the topic. The `baggage`, which is an object with the event payload and the metadata is serialized string using `JSON.stringify` and published as a buffer.
 
@@ -14,7 +14,7 @@ We define a class that use `RabbitMQ` as the message broker. In the constructor 
 
 - Step 3: We add an `init` method to initialize our bus. We must initialize the `GraphQLEventbus`. In addition, we also initialize the connection and create the channels for publishing and consuming events. We also add a `closeConsumer` and a `closePublisher` method to close these channels when we close the connection. Finally, we expose a method `publish` to publish events. It simply calls `publish` on `GraphQLEventbus` and passes through the topic, payload, and metadata to be propagated.
 
-```typescript
+```typescript title="https://github.com/skk2142/graphql-eventbus/blob/master/packages/rabbitmq/src/RabbitMQEventBus.ts"
 import amqp from "amqplib";
 import { DocumentNode, GraphQLSchema } from "graphql";
 import {
@@ -61,8 +61,8 @@ export class RabbitMQEventBus {
                   JSON.stringify({
                     payload: args.baggage.payload,
                     metadata: args.baggage.metadata,
-                  })
-                )
+                  }),
+                ),
               );
             },
           }
@@ -80,18 +80,12 @@ export class RabbitMQEventBus {
                 })
                 .then((q) => {
                   topics.forEach((topic) => {
-                    this.consumeChannel?.bindQueue(
-                      queueName,
-                      EXCHANGE,
-                      topic
-                    );
+                    this.consumeChannel?.bindQueue(queueName, EXCHANGE, topic);
                   });
                   this.consumeChannel?.consume(queueName, (msg) => {
                     if (msg?.content) {
                       dataCb({
-                        baggage: JSON.parse(
-                          msg!.content.toString("utf-8")
-                        ),
+                        baggage: JSON.parse(msg!.content.toString("utf-8")),
                         topic: msg?.fields.routingKey!,
                       })
                         .then(() => {

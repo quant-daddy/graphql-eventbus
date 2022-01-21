@@ -50,7 +50,7 @@ enum UserType {
 
 #### `publish`
 
-This is the function you can use to publish the events in your message broker. It is up to you to decide how you want to encode the payload to publish to you message broker. For instance, you can just stringify the baggage and publish the buffer to your message broker. You must make sure that you can identify the event when consuming it from your broker. In the case of [MemoryEventBus](https://github.com/skk2142/graphql-eventbus/blob/b421905d07bd797a166a9bc10ac1581f9ed92686/packages/core/src/MemoryEventBus.ts#L30) which used `EventEmitter` under the hood, we use `message-${args.topic}` as the nameof the topic.
+This is the function you can use to publish the events in your message broker. It is up to you to decide how you want to encode the payload to publish to you message broker. For instance, you can just stringify the baggage and publish the buffer to your message broker. You must make sure that you can identify the event when consuming it from your broker. In the case of [MemoryEventBus](https://github.com/skk2142/graphql-eventbus/blob/b421905d07bd797a166a9bc10ac1581f9ed92686/packages/core/src/MemoryEventBus.ts#L30) which used `EventEmitter` under the hood, we use `message-${args.topic}` as the name of the topic.
 
 ```typescript
 export interface Baggage {
@@ -77,7 +77,7 @@ publish: async (args) => {
 
 #### `publishInit`
 
-Message broker typically require some initialization when publishing events. For instance, this could be creating some `topic` or `channel` object in your broker to publish events. This method is called when calling `init` method in `GraphQLEvent` instance.
+Message broker typically require some initialization when publishing events. For instance, this could be creating some `topic` or `channel` object in your broker to publish events. This method is called when calling `init` method in `GraphQLEventBus` instance.
 
 ```typescript
 publishInit?: (topics: string[]) => Promise<unknown>;

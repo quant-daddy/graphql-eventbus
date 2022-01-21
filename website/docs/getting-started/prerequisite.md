@@ -18,4 +18,4 @@ We also assume basic understanding of GraphQL. In order to start using GraphQLEv
 
 ## Event Architecture
 
-We assume that you understand the notion of publishing events, consuming events, and message broker (any one of RabbitMQ, Google Pubsub, Kafka, NATS etc).
+We assume that you understand the notion of publishing events, consuming events, and message broker (any one of RabbitMQ, Google Pubsub, Kafka, NATS etc). You have some level of familiarity with publishing to topics in a message broker and subscribing to topics to consume events.

@@ -20,7 +20,7 @@ For consuming events, start with defining the schema of events that the service 
 ```typescript
 const userCreatedEventHandler = async (
   msg: UserCreatedEventPayload,
-  ctx: MyContext
+  ctx: MyContext,
 ) => {};
 ```
 
@@ -28,14 +28,14 @@ As long as your existing message broker can be used to trigger the event handler
 
 ## Publisher
 
-For publish events, start with defining the schema of events that the service wants to publish. This involves defining each event and its payload in the [GraphQL schema format](/docs/principles/schema-specification). As long as your existing message broker can be used to publish individual events as topics with corresponding payload, you can use `GraphQLEventbus`. Finally, you can use the codegen plugin which generates the following signature for the publish function:
+For publishing events, start with defining the schema of events that the service wants to publish. This involves defining each event and its payload in the [GraphQL schema format](/docs/principles/schema-specification). As long as your existing message broker can be used to publish individual events as topics with corresponding payload, you can use `GraphQLEventbus`. Finally, you can use the codegen plugin which generates the following signature for the publish function:
 
 ```typescript
 type EventA {
   id: string
   name: string
 }
-type EventA {
+type EventB {
   id: string
   address: string
 }
@@ -44,4 +44,6 @@ function publish(
     | { topic: "EventA"; payload: EventA }
     | { topic: "EventB"; payload: EventB }
 ): Promise<void>;
+
+export type Publish = typeof publish
 ```

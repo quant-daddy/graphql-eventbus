@@ -33,7 +33,7 @@ Use this option to generate the signature of a function to publish events. This 
 
 ## Note
 
-Note that the schema used to consume events will likely be different from the scheme of events that the service publishes (unless it is consuming its own events using `MemoryEventBus`). Therefore, in most cases, consumer and publisher generated files would be different. Be careful to only specify only one of the options for each generated file.
+Note that the schema used to consume events will likely be different from the scheme of events that the service publishes (unless it is consuming its own events using `MemoryEventBus`). Therefore, in most cases, consumer and publisher generated files would be different. Be careful to only specify only one of the options for each generated file, unless the bus is consuming the same set of events that it is publishing.
 
 ## Sample Config
 

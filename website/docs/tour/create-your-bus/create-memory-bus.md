@@ -12,9 +12,9 @@ We define a class that use `EventEmitter` as the message broker. In the construc
 
 - Step 2: We subscribe to the topics that the consumer has subscribed to and trigger the callback `DataCb` with the name of the topic and the deserialized baggage. The `GraphQLEventBus` validates the payload, extracts the fields and triggers the `subscriber.cb` event handler provided by the consumer of our bus.
 
-- Step 3: We add an `init` method to initialize our bus. IN this case, we just initialize the `GraphQLEventbus`. However, in other case, we might add other startup logic. We also add a `close` method to do `EventEmitter` cleanup. Finally, we expose a method `publish` to publish events. It simply calls `publish` on `GraphQLEventbus` and passes through the topic, payload, and metadata to be propagated.
+- Step 3: We add an `init` method to initialize our bus. In this case, we just initialize the `GraphQLEventbus`. However, in other case, we might add other startup logic. We also add a `close` method to do `EventEmitter` cleanup. Finally, we expose a method `publish` to publish events. It simply calls `publish` on `GraphQLEventbus` and passes through the topic, payload, and metadata to be propagated.
 
-```typescript
+```typescript title="https://github.com/skk2142/graphql-eventbus/blob/master/packages/core/src/MemoryEventBus.ts"
 import { EventEmitter } from "events";
 import { DocumentNode, GraphQLSchema } from "graphql";
 import { EventBusSubscriberCb } from "./EventBus";
@@ -48,7 +48,7 @@ export class MemoryEventBus {
         publish: async (args) => {
           this.eventEmitter.emit(
             `message-${args.topic}`,
-            JSON.stringify(args.baggage)
+            JSON.stringify(args.baggage),
           );
         },
         allowInvalidTopic: config.allowPublishNonExistingTopic,
@@ -59,15 +59,12 @@ export class MemoryEventBus {
             // Step 2
             subscribe: (topics, cb: DataCb) => {
               topics.forEach((topic) => {
-                this.eventEmitter.on(
-                  `message-${topic}`,
-                  async (baggage) => {
-                    await cb({
-                      baggage: JSON.parse(baggage),
-                      topic,
-                    });
-                  }
-                );
+                this.eventEmitter.on(`message-${topic}`, async (baggage) => {
+                  await cb({
+                    baggage: JSON.parse(baggage),
+                    topic,
+                  });
+                });
               });
             },
             queries: this.config.subscriber.queries,
@@ -79,6 +76,7 @@ export class MemoryEventBus {
 
   // Step 3 Startup Logic
   init = async () => {
+    // this must be called
     await this.bus.init();
   };
 

@@ -52,7 +52,7 @@ const config = {
         items: [
           {
             type: "doc",
-            docId: "intro",
+            docId: "getting-started/intro",
             position: "left",
             label: "Docs",
           },
@@ -81,7 +81,7 @@ const config = {
             items: [
               {
                 label: "Twitter",
-                href: "https://twitter.com/quantdaddy",
+                href: "https://twitter.com/GraphqlEventbus",
               },
             ],
           },

@@ -1,5 +1,7 @@
 <p align="center"><img src="website/static/img/logo-large.png" width="200"/></p>
 
+---
+
 # GraphQL Eventbus
 
 > Build a GraphQL powered Event architecture
@@ -15,6 +17,7 @@ GraphQL eventbus is an abstraction layer on top of GraphQL SDL to publish and co
 - 🚀 **Code Generation:** <a href="https://www.graphql-code-generator.com/">GraphQL Codegen</a>
   plugin to generate code for typescript (`npm i graphql-eventbus-codegen`).
 - 🎯 **Plugins:** We provide plugins for logging and monitoring. You can also build your custom plugins.
+- ✴️ **Best Practices:**: Publish time, event ID, and other metadata propagation are built-in for observability.
 - 🤖 **Testing Utilities:**: The library comes with utilities to easily sample payload for your events and test your event handlers.
 
 ## Documentation

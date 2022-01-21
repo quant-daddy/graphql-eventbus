@@ -4,7 +4,7 @@ sidebar_position: 99
 
 # Testing
 
-Testing is the cornerstone of a reliable production level applicaton. The library provides all the tools you might need to easily test your revent publishing and event handlers. We will use `MemoryEventBus` to test the runtime behavior of our code.
+Testing is the cornerstone of a reliable production quality applicaton. The library provides all the tools you might need to easily test your event publishing and event handlers. We will use `MemoryEventBus` to test the runtime behavior of our code.
 
 ## Publishing Events
 
@@ -31,7 +31,7 @@ This function can be imported in your test file to publish events and detect err
 
 ## Consuming Events
 
-Testing event handlers require a tedious task of generating mock data. Don't worry, with the power of GraphQL schema, generating mock data is as simple as a function call. All we need to do is add mocks to our consumer schema to create a mocked schema. [See an example](https://github.com/skk2142/graphql-eventbus/blob/master/examples/google-pubsub/src/serviceB/utils/sampleEventData.ts). You can add your custom mock functions but we are using the default mocks from `graphql-scalars` library.
+Testing event handlers require a tedious task of generating mock data. Don't worry though: with the power of GraphQL schema, generating mock data is as simple as a function call. All we need to do is add mocks to our consumer schema to create a mocked schema. [See an example](https://github.com/skk2142/graphql-eventbus/blob/master/examples/rabbit-mq/src/serviceB/utils/sampleEventData.ts). You can add your custom mock functions but we are using the default mocks from `graphql-scalars` library.
 
 With the help of mocked schema, you can easily generate mock data for each event using `Validator` class exported from the library. It exposes a `sample` method which takes the event name and an optional override object to override fields in the final payload.
 
@@ -64,7 +64,7 @@ export const sampleEventData: EventSampler = (args: any) => {
 };
 ```
 
-To make our sampler function easy to use in typescript, we generate code for `EventSampler` which has the signature
+To make our sampler function easy to use in typescript, we also generate code for `EventSampler` using `eventSampler: true` option in `graphql-eventbus-config` plugin.
 
 ```typescript
 function eventSampler(args: {
@@ -91,4 +91,4 @@ export type EventSampler = typeof eventSampler;
 
 This makes the function `sampleEventData` fun to use.
 
-FInally, to test our event handlers, we create a `MemoryEventBus` which enables consuming the same events that are published. [See an example](https://github.com/skk2142/graphql-eventbus/blob/master/examples/google-pubsub/src/serviceB/eventHandlers.test.ts).
+FInally, to test our event handlers, we create a `MemoryEventBus` which enables consuming the same events that are published. [See an example](https://github.com/skk2142/graphql-eventbus/blob/master/examples/rabbit-mq/src/serviceB/utils/sampleEventData.ts).

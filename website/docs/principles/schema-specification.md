@@ -19,4 +19,4 @@ This enables us to publish simple JSON payload, including custom scalars.
 
 - When consuming events, only query for fields that the event handler needs.
 - Use non-null fields only when you have to. Note that if a non-null field is invalid when being consumed, this makes the whole payload null. This throws a runtime exception.
-- For `enums`, it's best to keep them nullable. When a new value is added to the enum values and is published by the published, the consumer service, unless updated with the latest schema, will encounter an error. If the field is non nullable, this will make the whole payload null.
+- For `enums`, it's best to keep them nullable. When a new value is added to the enum values and is published by the published, the consumer service, unless updated with the latest schema, will encounter an error and set the field to be null. If the field is non nullable, this will make the whole payload null.
