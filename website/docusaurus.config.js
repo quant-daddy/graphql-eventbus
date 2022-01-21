@@ -7,7 +7,7 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: "GraphQL Eventbus",
-  tagline: "Power your event driven architecture using GraphQL.",
+  tagline: "Power your event architecture using GraphQL.",
   url: "https://graphql-eventbus.vercel.app/",
   baseUrl: "/",
   onBrokenLinks: "throw",

@@ -6,6 +6,12 @@ sidebar_position: 1
 
 Metrics plugin prometheus metrics for your event bus. To use it, you must have installed `prom-client` required as a npm peer dependency.
 
+```bash
+npm i graphql-eventbus-metrics-plugin
+# Peer dependency
+npm i prom-client
+```
+
 ```typescript
 import { MetricsPlugin } from 'graphql-eventbus-metrics-plugin'
 const myBus = new MyBus({
@@ -14,14 +20,13 @@ const myBus = new MyBus({
 })
 ```
 
-```typescript
-# router.ts
-import { register } from 'prom-client'
-import * as express from 'express';
+```typescript title="router.ts"
+import { register } from "prom-client";
+import * as express from "express";
 
-const app = express()
-app.get('/metrics', async (_, res) => {
-  res.set('Content-Type', register.contentType);
+const app = express();
+app.get("/metrics", async (_, res) => {
+  res.set("Content-Type", register.contentType);
   res.send(await register.metrics());
 });
 ```

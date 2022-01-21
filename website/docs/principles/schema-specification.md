@@ -9,7 +9,7 @@ There are a certain rules that must be followed when defining a schema for Graph
 - Each published event must have a name under the root `Query` field in the SDL.
 - The return type of each event (i.e. the type of each field of the root query field) must be a non-null object.
 - `Mutation` root field is not allowed.
-- Abstract types like `Union` and `Interface` are not allowed.
+- Abstract types like `Union` and `Interface` are not allowed. The reason being the graphql executor requirer a resolver function to resolve the abstract types, which makes the architecture more complex.
 - Arguments are not allowed for any field.
 - Input type is not allowed
 

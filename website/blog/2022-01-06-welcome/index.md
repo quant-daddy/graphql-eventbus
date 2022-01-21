@@ -18,4 +18,4 @@ GraphQL SDL supports only three root types: Query, Mutation, and Subscription. I
 
 I had to come up with a rule that would let me express a list of topics and corresponding payloads in a GraphQL SDL. It turns out that using the fields of the root Query object as the event names and it's types as the event payload works out really well! And rest is history...GraphQL Eventbus was born. This makes GraphQL a universal language for building your APIs. To learn more, read the docs.
 
-_Long live GraphQL!_
+🚌 _Long live GraphQL!_ 🚌

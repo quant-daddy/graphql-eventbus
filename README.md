@@ -28,6 +28,8 @@ You can find extensive documentation at <a href="https://graphql-eventbus.vercel
 
 We are always looking for people to help us grow `graphql-eventbus`! If you have an issue, feature request, or pull request, let us know!
 
+Follow us on [Twitter](https://twitter.com/GraphqlEventbus)!
+
 ## License
 
 MIT @ Suraj Keshri

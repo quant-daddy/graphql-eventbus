@@ -18,7 +18,7 @@ npm i -D @graphql-codegen/cli @graphql-codegen/typescript @graphql-codegen/types
 npm i -D graphql-eventbus-codegen
 ```
 
-Code generator needs a `yaml` config file. In the sample file below, we are generating code for event handlers (for consuming events) and event publisher. Note that we are generating code for publisher (`./src/generated/codegen-event-publisher.ts`) and consumers (`./src/generated/codegen-event-consumer.ts`) in separate files. For the publisher, the input is the schema of events it publishes (`src/schema.event.graphql`). We use the `publisher: true` flag for `graphql-eventbus-codegen` plugin. For event consumer, we specify the URI of schemas: here are are downloading the schemas from Github for instance. We also need to specify the graphQL documents which has all the events the service is consuming. Finally, we use the conumer config for `graphql-eventbus-codegen` plugin. We specify our custom context object for the event handlers. We also specify a path to print the composed event schema that we are consuming. This schema will be used as an input to the event bus.
+Code generator needs a `yaml` config file. In the sample file below, we are generating code for event handlers (for consuming events) and event publisher. Note that we are generating code for publisher (`./src/generated/codegen-event-publisher.ts`) and consumers (`./src/generated/codegen-event-consumer.ts`) in separate files. For the publisher, the input is the schema of events it publishes (`src/schema.event.graphql`). We use the `publisher: true` flag for `graphql-eventbus-codegen` plugin. For event consumer, we specify the URI of schemas: here we are downloading the schemas from Github for instance. We also need to specify the graphQL documents which has all the events the service is consuming. Finally, we use the conumer config for `graphql-eventbus-codegen` plugin. We specify our custom context object for the event handlers. We also specify a path to print the composed event schema that we are consuming. This schema will be used as an input to the event bus.
 
 ```yaml codegen.yaml
 schema: ""
@@ -61,7 +61,7 @@ The signature of a `publish` function is generated like so:
 function publish(
   data:
     | { topic: "UserCreatedEvent"; payload: UserCreatedEvent }
-    | { topic: "UserDeletedEvent"; payload: UserDeletedEvent }
+    | { topic: "UserDeletedEvent"; payload: UserDeletedEvent },
 ): Promise<void>;
 function publish(): Promise<void> {
   return Promise.resolve();
@@ -76,7 +76,7 @@ The signature of the event handler functions is generated like so:
 export interface EventHandlers {
   UserCreatedEvent: (
     msg: UserCreatedEventQuery["UserCreatedEvent"],
-    ctx: MessageHandlerContext
+    ctx: MessageHandlerContext,
   ) => Promise<any>;
 }
 ```
