@@ -15,7 +15,6 @@ const config = {
   favicon: "img/favicon.ico",
   organizationName: "skk2142", // Usually your GitHub org/user name.
   projectName: "graphql-eventbus", // Usually your repo name.
-  plugins: ["docusaurus-tailwindcss"],
   presets: [
     [
       "classic",
@@ -72,7 +71,7 @@ const config = {
             items: [
               {
                 label: "Tutorial",
-                to: "/docs/intro",
+                to: "/docs/getting-started/intro",
               },
             ],
           },
