@@ -32,4 +32,4 @@ Follow us on [Twitter](https://twitter.com/GraphqlEventbus)!
 
 ## License
 
-MIT @ Suraj Keshri
+MIT @ [Suraj Keshri](https://twitter.com/quantdaddy)
