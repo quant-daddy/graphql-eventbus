@@ -1,5 +1,11 @@
 # graphql-eventbus
 
+## 0.1.7
+
+### Patch Changes
+
+- ecde871: Adds README to each package
+
 ## 0.1.6
 
 ### Patch Changes

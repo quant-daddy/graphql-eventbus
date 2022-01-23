@@ -1,5 +1,11 @@
 # graphql-eventbus-google-pubsub
 
+## 0.1.6
+
+### Patch Changes
+
+- ecde871: Adds README to each package
+
 ## 0.1.5
 
 ### Patch Changes
