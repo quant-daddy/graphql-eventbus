@@ -14,7 +14,7 @@ We define our custom class, `RabbitMQEventBus` that use `RabbitMQ` as the messag
 
 - Step 3: We add an `init` method to initialize our bus. We must initialize the `GraphQLEventbus`. In addition, we also initialize the connection and create the channels for publishing and consuming events. We also add a `closeConsumer` and a `closePublisher` method to close these channels when we close the connection. Finally, we expose a method `publish` to publish events. It simply calls `publish` on `GraphQLEventbus` and passes through the topic, payload, and metadata to be propagated.
 
-```typescript title="https://github.com/skk2142/graphql-eventbus/blob/master/packages/rabbitmq/src/RabbitMQEventBus.ts"
+```typescript title="https://github.com/quant-daddy/graphql-eventbus/blob/master/packages/rabbitmq/src/RabbitMQEventBus.ts"
 import amqp from "amqplib";
 import { DocumentNode, GraphQLSchema } from "graphql";
 import {

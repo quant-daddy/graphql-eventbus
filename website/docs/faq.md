@@ -18,4 +18,4 @@ The library has running in production at https://gully.to for last nine months. 
 
 ## How do I contribute?
 
-Please open PRs and issues on Github. To support us, please consider [leaving us a star](https://github.com/skk2142/graphql-eventbus) and spreading the word.
+Please open PRs and issues on Github. To support us, please consider [leaving us a star](https://github.com/quant-daddy/graphql-eventbus) and spreading the word.

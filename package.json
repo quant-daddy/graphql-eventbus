@@ -23,18 +23,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/skk2142/graphql-eventbus.git"
+    "url": "git+https://github.com/quant-daddy/graphql-eventbus.git"
   },
   "keywords": [],
   "author": "Suraj Keshri",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/skk2142/graphql-eventbus/issues"
+    "url": "https://github.com/quant-daddy/graphql-eventbus/issues"
   },
   "workspaces": [
     "./packages/*"
   ],
-  "homepage": "https://github.com/skk2142/graphql-eventbus#readme",
+  "homepage": "https://github.com/quant-daddy/graphql-eventbus#readme",
   "devDependencies": {
     "@changesets/cli": "^2.19.0",
     "@types/jest": "^27.4.0",

@@ -25,7 +25,7 @@ Use this option if you want to generate code for consuming events.
 
 - `contextType`: Relative path to import a custom context object that will be passed to the event handlers. The path is relative to where the generated file is located.
 - `schemaPrintPath`: Path to print the composed schema. If the consumer is consuming events from multiple schemas (each one could be published by individual service), you may want to print the composed schema which can be used when creating an instance of your bus.
-- `eventSampler`: Boolean. This option can be used to generate code to sample events using `Validator` class exported by the core library. It creates a function type (EventSampler) that can be assigned to data sampler. [See an example](https://github.com/skk2142/graphql-eventbus/blob/master/examples/google-pubsub/src/serviceB/utils/sampleEventData.ts).
+- `eventSampler`: Boolean. This option can be used to generate code to sample events using `Validator` class exported by the core library. It creates a function type (EventSampler) that can be assigned to data sampler. [See an example](https://github.com/quant-daddy/graphql-eventbus/blob/master/examples/google-pubsub/src/serviceB/utils/sampleEventData.ts).
 
 ## Publisher
 

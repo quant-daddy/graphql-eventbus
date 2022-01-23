@@ -5,13 +5,13 @@
   "engines": {
     "node": ">= 14 <17"
   },
-  "homepage": "https://github.com/skk2142/graphql-eventbus",
+  "homepage": "https://github.com/quant-daddy/graphql-eventbus",
   "bugs": {
-    "url": "https://github.com/skk2142/graphql-eventbus/issues"
+    "url": "https://github.com/quant-daddy/graphql-eventbus/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/skk2142/graphql-eventbus.git"
+    "url": "https://github.com/quant-daddy/graphql-eventbus.git"
   },
   "keywords": [
     "graphql",

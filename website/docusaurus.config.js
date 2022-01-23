@@ -13,7 +13,7 @@ const config = {
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
-  organizationName: "skk2142", // Usually your GitHub org/user name.
+  organizationName: "quant-daddy", // Usually your GitHub org/user name.
   projectName: "graphql-eventbus", // Usually your repo name.
   presets: [
     [
@@ -24,13 +24,13 @@ const config = {
           sidebarPath: require.resolve("./sidebars.js"),
           // Please change this to your repo.
           editUrl:
-            "https://github.com/skk2142/graphql-eventbus/tree/master/website/",
+            "https://github.com/quant-daddy/graphql-eventbus/tree/master/website/",
         },
         blog: {
           showReadingTime: true,
           // Please change this to your repo.
           editUrl:
-            "https://github.com/skk2142/graphql-eventbus/tree/master/website/",
+            "https://github.com/quant-daddy/graphql-eventbus/tree/master/website/",
         },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
@@ -57,7 +57,7 @@ const config = {
           },
           { to: "/blog", label: "Blog", position: "left" },
           {
-            href: "https://github.com/skk2142/graphql-eventbus",
+            href: "https://github.com/quant-daddy/graphql-eventbus",
             label: "GitHub",
             position: "right",
           },
@@ -93,7 +93,7 @@ const config = {
               },
               {
                 label: "GitHub",
-                href: "https://github.com/skk2142/graphql-eventbus",
+                href: "https://github.com/quant-daddy/graphql-eventbus",
               },
             ],
           },

@@ -50,7 +50,7 @@ enum UserType {
 
 #### `publish`
 
-This is the function you can use to publish the events in your message broker. It is up to you to decide how you want to encode the payload to publish to you message broker. For instance, you can just stringify the baggage and publish the buffer to your message broker. You must make sure that you can identify the event when consuming it from your broker. In the case of [MemoryEventBus](https://github.com/skk2142/graphql-eventbus/blob/b421905d07bd797a166a9bc10ac1581f9ed92686/packages/core/src/MemoryEventBus.ts#L30) which used `EventEmitter` under the hood, we use `message-${args.topic}` as the name of the topic.
+This is the function you can use to publish the events in your message broker. It is up to you to decide how you want to encode the payload to publish to you message broker. For instance, you can just stringify the baggage and publish the buffer to your message broker. You must make sure that you can identify the event when consuming it from your broker. In the case of [MemoryEventBus](https://github.com/quant-daddy/graphql-eventbus/blob/b421905d07bd797a166a9bc10ac1581f9ed92686/packages/core/src/MemoryEventBus.ts#L30) which used `EventEmitter` under the hood, we use `message-${args.topic}` as the name of the topic.
 
 ```typescript
 export interface Baggage {
@@ -83,7 +83,7 @@ Message broker typically require some initialization when publishing events. For
 publishInit?: (topics: string[]) => Promise<unknown>;
 ```
 
-In the case of [PubSubEventBus](https://github.com/skk2142/graphql-eventbus/blob/b421905d07bd797a166a9bc10ac1581f9ed92686/packages/google-pubsub/src/PubSubEventBus.ts), we use the follow initilization logic:
+In the case of [PubSubEventBus](https://github.com/quant-daddy/graphql-eventbus/blob/b421905d07bd797a166a9bc10ac1581f9ed92686/packages/google-pubsub/src/PubSubEventBus.ts), we use the follow initilization logic:
 
 ```typescript
 publishInit: async (topics) => {
@@ -112,7 +112,7 @@ If the event bus wants to consume events, this argument must be specified.
 #### `schema`
 
 _Required field_.
-The [GraphQLSchema](https://graphql.org/graphql-js/type/#graphqlschema) that has all the events that this bus could consume events from. Any event not defined inside this schema cannot be consumed by this bus. Typically, this schema represents a SDL stitched from all the publishers schemas in your event architecture. This schema is typically different from `publisher.schema`: a bus typically won't consume the events that it publishes. Except, in the case of [MemoryEventBus](https://github.com/skk2142/graphql-eventbus/blob/b421905d07bd797a166a9bc10ac1581f9ed92686/packages/core/src/MemoryEventBus.ts), you can only consume the events that are being published by the bus.
+The [GraphQLSchema](https://graphql.org/graphql-js/type/#graphqlschema) that has all the events that this bus could consume events from. Any event not defined inside this schema cannot be consumed by this bus. Typically, this schema represents a SDL stitched from all the publishers schemas in your event architecture. This schema is typically different from `publisher.schema`: a bus typically won't consume the events that it publishes. Except, in the case of [MemoryEventBus](https://github.com/quant-daddy/graphql-eventbus/blob/b421905d07bd797a166a9bc10ac1581f9ed92686/packages/core/src/MemoryEventBus.ts), you can only consume the events that are being published by the bus.
 
 #### `queries`
 
@@ -194,7 +194,7 @@ subscribe: (
 ) => OptionalPromise<unknown>;
 ```
 
-As an example, for [MemoryEventBus](https://github.com/skk2142/graphql-eventbus/blob/b421905d07bd797a166a9bc10ac1581f9ed92686/packages/core/src/MemoryEventBus.ts#L42), we invoke `cb` when an event is emitted:
+As an example, for [MemoryEventBus](https://github.com/quant-daddy/graphql-eventbus/blob/b421905d07bd797a166a9bc10ac1581f9ed92686/packages/core/src/MemoryEventBus.ts#L42), we invoke `cb` when an event is emitted:
 
 ```typescript
 {
@@ -223,11 +223,11 @@ We can provide plugins that provide us life cycle hooks to various parts of even
 
 ## `init`
 
-This method is used to initialize the event bus and catch various error before the bus starts. For instance, it checks if all the events being consumed are presentin the schema. It also calls the [publishInit](#publishinit) and [subscribe](#subscribe) functions.This method must be called in the implemention of your bus. See [MemoryEventBus](https://github.com/skk2142/graphql-eventbus/blob/b421905d07bd797a166a9bc10ac1581f9ed92686/packages/core/src/MemoryEventBus.ts)
+This method is used to initialize the event bus and catch various error before the bus starts. For instance, it checks if all the events being consumed are presentin the schema. It also calls the [publishInit](#publishinit) and [subscribe](#subscribe) functions.This method must be called in the implemention of your bus. See [MemoryEventBus](https://github.com/quant-daddy/graphql-eventbus/blob/b421905d07bd797a166a9bc10ac1581f9ed92686/packages/core/src/MemoryEventBus.ts)
 
 ## `publish`
 
-This method should be invoked by the implementation of the event bus to publish events. A publish method is typically exposed by the event bus implementation which in turns calls this method. `topic` is the name of the topic as defined in the schema, `payload` is the full payload for the event, and `metadata` is an optional object. This is propagated as part of the `Baggage`. All fields except See [MemoryEventBus publish method](https://github.com/skk2142/graphql-eventbus/blob/b421905d07bd797a166a9bc10ac1581f9ed92686/packages/core/src/MemoryEventBus.ts#L66) for instance.
+This method should be invoked by the implementation of the event bus to publish events. A publish method is typically exposed by the event bus implementation which in turns calls this method. `topic` is the name of the topic as defined in the schema, `payload` is the full payload for the event, and `metadata` is an optional object. This is propagated as part of the `Baggage`. All fields except See [MemoryEventBus publish method](https://github.com/quant-daddy/graphql-eventbus/blob/b421905d07bd797a166a9bc10ac1581f9ed92686/packages/core/src/MemoryEventBus.ts#L66) for instance.
 
 ```typescript
 publish = async (props: {

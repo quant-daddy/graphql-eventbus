@@ -14,7 +14,7 @@ We define a class that use `EventEmitter` as the message broker. In the construc
 
 - Step 3: We add an `init` method to initialize our bus. In this case, we just initialize the `GraphQLEventbus`. However, in other case, we might add other startup logic. We also add a `close` method to do `EventEmitter` cleanup. Finally, we expose a method `publish` to publish events. It simply calls `publish` on `GraphQLEventbus` and passes through the topic, payload, and metadata to be propagated.
 
-```typescript title="https://github.com/skk2142/graphql-eventbus/blob/master/packages/core/src/MemoryEventBus.ts"
+```typescript title="https://github.com/quant-daddy/graphql-eventbus/blob/master/packages/core/src/MemoryEventBus.ts"
 import { EventEmitter } from "events";
 import { DocumentNode, GraphQLSchema } from "graphql";
 import { EventBusSubscriberCb } from "./EventBus";

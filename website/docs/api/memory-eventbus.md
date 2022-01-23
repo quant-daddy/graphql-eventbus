@@ -4,7 +4,7 @@ sidebar_position: 2
 
 # MemoryEventBus
 
-`MemoryEventBus` is a class that implements an event bus using `EventEmitter` as the in-memory message broker. Since the message broker has no access to anything outside the `EventEmitter`, the bus can only consume events that are published by it. This bus can be used for consuming webhooks. See [this example](https://github.com/skk2142/graphql-eventbus/tree/master/examples/webhook).
+`MemoryEventBus` is a class that implements an event bus using `EventEmitter` as the in-memory message broker. Since the message broker has no access to anything outside the `EventEmitter`, the bus can only consume events that are published by it. This bus can be used for consuming webhooks. See [this example](https://github.com/quant-daddy/graphql-eventbus/tree/master/examples/webhook).
 
 ## constructor
 

@@ -53,4 +53,4 @@ function publish(): Promise<void> {
 export type Publish = typeof publish;
 ```
 
-In this example, service A publishes the `UserCreatedEvent` periodically. See [examples/rabbit-mq/src/index.ts](https://github.com/skk2142/graphql-eventbus/blob/master/examples/rabbit-mq/src/index.ts) file for details.
+In this example, service A publishes the `UserCreatedEvent` periodically. See [examples/rabbit-mq/src/index.ts](https://github.com/quant-daddy/graphql-eventbus/blob/master/examples/rabbit-mq/src/index.ts) file for details.
