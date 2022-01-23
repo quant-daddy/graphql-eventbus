@@ -10,6 +10,19 @@
     "test": "jest --runInBand --verbose --forceExit",
     "test:watch": "jest --watch --runInBand"
   },
+  "homepage": "https://github.com/skk2142/graphql-eventbus",
+  "bugs": {
+    "url": "https://github.com/skk2142/graphql-eventbus/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skk2142/graphql-eventbus.git"
+  },
+  "keywords": [
+    "graphql",
+    "graphql-eventbus",
+    "rabbitmq"
+  ],
   "files": [
     "dist/**/*"
   ],
