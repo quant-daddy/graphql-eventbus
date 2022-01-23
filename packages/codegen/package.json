@@ -6,6 +6,20 @@
   "files": [
     "dist/**/*"
   ],
+  "homepage": "https://github.com/skk2142/graphql-eventbus",
+  "bugs": {
+    "url": "https://github.com/skk2142/graphql-eventbus/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skk2142/graphql-eventbus.git"
+  },
+  "keywords": [
+    "graphql",
+    "graphql-eventbus",
+    "graphql-codegen",
+    "event"
+  ],
   "scripts": {
     "build": "rimraf dist && tsc -p tsconfig.build.json",
     "test": "jest --runInBand --verbose",
