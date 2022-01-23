@@ -1,5 +1,11 @@
 # graphql-eventbus-codegen
 
+## 0.1.5
+
+### Patch Changes
+
+- ecde871: Adds README to each package
+
 ## 0.1.4
 
 ### Patch Changes
