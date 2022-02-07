@@ -20,6 +20,10 @@ GraphQL eventbus is an abstraction layer on top of GraphQL SDL to publish and co
 - ✴️ **Best Practices:**: Publish time, event ID, and other metadata propagation are built-in for observability.
 - 🤖 **Testing Utilities:**: The library comes with utilities to easily sample payload for your events and test your event handlers.
 
+## Intro Video
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/XLbShOmkKk0/0.jpg)](https://www.youtube.com/watch?v=XLbShOmkKk0)
+
 ## Documentation
 
 You can find extensive documentation at <a href="https://graphql-eventbus.vercel.app/" target="_blank">https://graphql-eventbus.vercel.app</a>
