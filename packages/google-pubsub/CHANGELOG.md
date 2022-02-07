@@ -1,5 +1,11 @@
 # graphql-eventbus-google-pubsub
 
+## 0.1.7
+
+### Patch Changes
+
+- fcdc031: Bump node-fetch from 2.6.6 to 2.6.7 in /packages/google-pubsub
+
 ## 0.1.6
 
 ### Patch Changes
