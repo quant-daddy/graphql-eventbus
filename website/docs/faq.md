@@ -4,6 +4,10 @@ sidebar_position: 999
 
 # FAQ
 
+## Graphql Subscription
+
+The ideas in this library has nothing to do with GraphQL subscription. GraphQL subscription is a root type in the SDL that can be used to subscribe to real time updates from the server. Every subscriber who subscribes to a “subscription” gets pushed the data from the server in real time. If the client is offline, it misses the update. Also, there is no load balancing across consumers i.e. consumers are not competing: every consumer gets pushed the data that they query for. This is different from a typical service communication where an event is typically consumed by only one of the instances of the consumer deployment. The event is also stored in the message broker just in case the consumer is offline.
+
 ## Difference with Protobuf
 
 Protobuf can be a good choice if you want to reduce the size of your event payloads. However, there are no tools to visualize all your event schemas. GraphiQL allows you to easily explore/visualize all your events. In addition, Protobuf does not have a concept of querying fields from the payload: every consumer consumes fields that they might not even need. GraphQL Eventbus lets you consume specific fields from each event's payload which makes schema evolution and field deprecation or removal easier without breaking any clients.
