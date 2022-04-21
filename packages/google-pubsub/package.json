@@ -1,6 +1,6 @@
 {
   "name": "graphql-eventbus-google-pubsub",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Graphql eventbus for Google Pubsub",
   "main": "dist/index.js",
   "types": "./dist/index.d.ts",
@@ -29,7 +29,7 @@
   ],
   "dependencies": {
     "@google-cloud/pubsub": "^2.18.3",
-    "graphql-eventbus": "^0.1.0",
+    "graphql-eventbus": "^0.2.0",
     "module-alias": "^2.2.2",
     "uuid": "^8.3.2"
   },

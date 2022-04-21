@@ -1,5 +1,11 @@
 # graphql-eventbus
 
+## 0.2.0
+
+### Minor Changes
+
+- 1493595: Update packages: importantly graphql to 16
+
 ## 0.1.7
 
 ### Patch Changes
