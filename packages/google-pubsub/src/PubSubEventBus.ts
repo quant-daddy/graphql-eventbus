@@ -18,6 +18,7 @@ export type PubSubEventBusConfig = {
   };
   plugins?: EventBusPlugin[];
   serviceName: string;
+  isDarkRelease?: boolean;
 };
 
 export class PubSubEventBus {
@@ -56,7 +57,9 @@ export class PubSubEventBus {
                   const [topic] = await this.pubsubClient
                     .topic(topicName)
                     .get({ autoCreate: true });
-                  const subscriptionName = `${this.config.serviceName}-${topicName}`;
+                  const subscriptionName = `${
+                    this.config.serviceName
+                  }-${topicName}${this.config.isDarkRelease ? "-dark" : ""}`;
                   let subscription = await topic.subscription(
                     subscriptionName,
                     {
@@ -70,7 +73,11 @@ export class PubSubEventBus {
                     console.log(
                       `Service ${this.config.serviceName}: Subscription created: ${subscriptionName}`,
                     );
-                    [subscription] = await subscription.create({});
+                    [subscription] = await subscription.create({
+                      filter: !this.config.isDarkRelease
+                        ? `NOT attributes:x-prop-${this.config.serviceName}-dark`
+                        : `attributes:x-prop-${this.config.serviceName}-dark`,
+                    });
                   }
                   this.subscriptions.push(subscription);
                   subscription.on("message", async (msg: Message) => {
