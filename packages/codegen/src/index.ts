@@ -31,7 +31,7 @@ export const plugin = (
     let publisherString: string = Object.entries(queryType.getFields())
       .map(([queryName, queryReturnObject]) => {
         return `    | { topic: "${queryName}", payload: ${
-          queryReturnObject.type.inspect().split("!")[0]
+          queryReturnObject.type.toString().split("!")[0]
         } }`;
       })
       .join("\n");
@@ -49,8 +49,8 @@ export const plugin = (
       let eventSamplerString: string = Object.entries(queryType.getFields())
         .map(([queryName, queryReturnObject]) => {
           return `function eventSampler(args: { topic: "${queryName}", override?: Partial<${
-            queryReturnObject.type.inspect().split("!")[0]
-          }> }): ${queryReturnObject.type.inspect().split("!")[0]}`;
+            queryReturnObject.type.toString().split("!")[0]
+          }> }): ${queryReturnObject.type.toString().split("!")[0]}`;
         })
         .join("\n");
       eventSamplerString = `${eventSamplerString}\n;function eventSampler(): {}{\n  return {};\n}\nexport type EventSampler = typeof eventSampler`;

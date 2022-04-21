@@ -22,7 +22,7 @@ npm i graphql-eventbus-pubsub
 **Peer Dependency**
 
 ```bash
-npm i graphql@"<16.0.0"
+npm i graphql@latest
 ```
 
 To create GraphQL documents, use the `graphql-tag` library

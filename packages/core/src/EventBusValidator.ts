@@ -54,7 +54,7 @@ export class EventBusValidator {
       args.data,
     );
     return {
-      data: queriedData.payload.data?.[args.topic] || null,
+      data: (queriedData.payload.data?.[args.topic] || null) as {} | null,
       errors: queriedData.errors,
       deprecated: queriedData.deprecated,
     };

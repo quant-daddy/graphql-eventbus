@@ -36,8 +36,12 @@ export class Validator {
     if (Object.keys(this.rootQueryFieldQueries).indexOf(topic) === -1) {
       throw new Error("Invalid key");
     }
-    const result = graphqlSync(this.schema, this.rootQueryFieldQueries[topic], {
-      [topic]: data,
+    const result = graphqlSync({
+      schema: this.schema,
+      source: this.rootQueryFieldQueries[topic],
+      rootValue: {
+        [topic]: data,
+      },
     });
     if (result.errors) {
       throw new Error(JSON.stringify(result.errors, null, 2));
@@ -61,8 +65,12 @@ export class Validator {
     const deprecatedFields = validate(this.schema, [new Source(printedQuery)], {
       strictDeprecated: true,
     })[0];
-    const payload = graphqlSync(this.schema, printedQuery, {
-      [topic]: data,
+    const payload = graphqlSync({
+      schema: this.schema,
+      source: printedQuery,
+      rootValue: {
+        [topic]: data,
+      },
     });
     return {
       payload,
@@ -77,7 +85,12 @@ export class Validator {
    */
   sample = (eventKey: string) => {
     return JSON.parse(
-      JSON.stringify(graphqlSync(this.schema, this.allQueries[eventKey])),
+      JSON.stringify(
+        graphqlSync({
+          schema: this.schema,
+          source: this.allQueries[eventKey],
+        }),
+      ),
     );
   };
 }
