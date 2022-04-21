@@ -1,6 +1,6 @@
 {
   "name": "graphql-eventbus-rabbitmq",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Graphql eventbus for RabbitMQ",
   "main": "dist/index.js",
   "types": "./dist/index.d.ts",
@@ -28,7 +28,7 @@
   ],
   "dependencies": {
     "amqplib": "^0.8.0",
-    "graphql-eventbus": "^0.1.0",
+    "graphql-eventbus": "^0.2.0",
     "module-alias": "^2.2.2"
   },
   "author": "Suraj Keshri",
