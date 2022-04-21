@@ -9,5 +9,6 @@ const pkg = require(pkgPath);
 const version = argv[2];
 
 pkg.devDependencies.graphql = `^${version}`;
+pkg.overrides.graphql = `^${version}`;
 
 writeFileSync(pkgPath, JSON.stringify(pkg, null, 2), "utf8");
