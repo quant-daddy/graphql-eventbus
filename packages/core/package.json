@@ -32,9 +32,9 @@
     "cleanup": false
   },
   "devDependencies": {
-    "@graphql-tools/mock": "^8.4.3",
+    "@graphql-tools/mock": "^8.6.8",
     "@types/uuid": "^8.3.0",
-    "graphql-scalars": "^1.13.6"
+    "graphql-scalars": "^1.17.0"
   },
   "scripts": {
     "build": "rimraf dist && tsc -p tsconfig.json",
@@ -46,8 +46,8 @@
   "author": "Suraj Keshri",
   "license": "MIT",
   "dependencies": {
-    "@graphql-inspector/core": "^2.2.0",
-    "@graphql-tools/schema": "^7.1.5",
+    "@graphql-inspector/core": "^3.1.2",
+    "@graphql-tools/schema": "^8.3.10",
     "module-alias": "^2.2.2",
     "ts-is-present": "^1.2.2",
     "uuid": "^8.3.2"

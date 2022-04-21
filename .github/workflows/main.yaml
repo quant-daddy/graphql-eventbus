@@ -17,7 +17,8 @@ jobs:
         node_version: [16]
         # TODO: use the version specified here
         graphql_version:
-          - 15
+          - "16.3.0"
+          - "15.8.0"
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -27,7 +28,9 @@ jobs:
           node-version: ${{ matrix.node_version }}
           cache: "npm"
           cache-dependency-path: "**/package-lock.json"
-      - run: npm ci
+      - name: Use GraphQL v${{matrix.graphql_version}}
+        run: node ./scripts/match-graphql.js ${{matrix.graphql_version}}
+      - run: npm i
       - name: Build
         run: npm run build
       - name: Start eventbus

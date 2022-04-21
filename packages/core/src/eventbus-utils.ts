@@ -51,7 +51,7 @@ export const getRootQueryFields = (schema: GraphQLSchema): string[] => {
   const queryFields = queryType.getFields();
   // We enforce non null payload to use graphql typescript code generation fields.
   if (
-    !Object.values(queryFields).every((a) => a.type.inspect().endsWith("!"))
+    !Object.values(queryFields).every((a) => a.type.toString().endsWith("!"))
   ) {
     throw new Error("All events must have a non null payload");
   }

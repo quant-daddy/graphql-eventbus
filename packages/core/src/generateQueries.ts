@@ -61,7 +61,7 @@ const generateQuery = ({
   }
   // console.log(`${parentType.name} => ${curName}`);
   const field = parentType.getFields()[curName];
-  const curTypeName = field.type.inspect().replace(/[[\]!]/g, "");
+  const curTypeName = field.type.toString().replace(/[[\]!]/g, "");
   // console.log(`${curName} type: ${curTypeName}`);
   const curType = gqlSchema.getType(curTypeName);
   if (!curType) {
