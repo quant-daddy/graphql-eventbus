@@ -17,6 +17,7 @@ jobs:
         node_version: [16]
         # TODO: use the version specified here
         graphql_version:
+          - 16
           - 15
     steps:
       - name: Checkout
