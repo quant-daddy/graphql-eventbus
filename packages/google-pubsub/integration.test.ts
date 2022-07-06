@@ -4,8 +4,14 @@ import gql from "graphql-tag";
 import wait from "waait";
 import { PubSubEventBus } from "./dist/index";
 
+// Before running this test, start google pubsub locally
+// docker run --rm --tty --interactive --publish 8538:8538 bigtruedata/gcloud-pubsub-emulator start --host-port=0.0.0.0:8538
 describe("Google Pubsub integration test", () => {
   test("publist topics are created", async () => {
+    if (process.env.IS_CI === "true") {
+      console.log(`Skipping in Github Actions`);
+      return;
+    }
     const schema = buildSchema(`
     type TopicA {
       id: String!
