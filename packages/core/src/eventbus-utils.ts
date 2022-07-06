@@ -1,11 +1,10 @@
-import { validate } from "@graphql-inspector/core";
+import { validate } from "graphql";
 import {
   DocumentNode,
   GraphQLSchema,
   isObjectType,
   OperationDefinitionNode,
   print,
-  Source,
 } from "graphql";
 
 export const getTopicsFromDocument = (
@@ -66,8 +65,8 @@ export const getRootQueryFields = (schema: GraphQLSchema): string[] => {
 };
 
 export const validateQuery = (schema: GraphQLSchema, query: DocumentNode) => {
-  const result = validate(schema, [new Source(print(query))]);
-  if (result.length > 0 && result.find((a) => a.errors.length > 0)) {
+  const result = validate(schema, query);
+  if (result.length > 0) {
     throw new Error(
       `Invalid queries found: ${JSON.stringify(result, null, 2)}`,
     );

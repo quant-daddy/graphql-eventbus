@@ -1,13 +1,7 @@
 import { print } from "graphql/language/printer";
 // import { validate } from "@graphql-inspector/core";
-import { validate } from "@graphql-inspector/core";
-import {
-  DocumentNode,
-  GraphQLSchema,
-  graphqlSync,
-  printSchema,
-  Source,
-} from "graphql";
+import { NoDeprecatedCustomRule, validate } from "graphql";
+import { DocumentNode, GraphQLSchema, graphqlSync, printSchema } from "graphql";
 import { generateQueries } from "./generateQueries";
 
 export class Validator {
@@ -62,9 +56,9 @@ export class Validator {
     data: {},
   ) => {
     const printedQuery = print(query);
-    const deprecatedFields = validate(this.schema, [new Source(printedQuery)], {
-      strictDeprecated: true,
-    })[0];
+    const deprecatedFields = validate(this.schema, query, [
+      NoDeprecatedCustomRule,
+    ]);
     const payload = graphqlSync({
       schema: this.schema,
       source: printedQuery,
@@ -75,7 +69,7 @@ export class Validator {
     return {
       payload,
       errors: payload.errors,
-      deprecated: deprecatedFields?.deprecated,
+      deprecated: deprecatedFields,
     };
   };
 
