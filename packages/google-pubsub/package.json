@@ -28,9 +28,8 @@
     "dist/**/*"
   ],
   "dependencies": {
-    "@google-cloud/pubsub": "^2.18.3",
+    "@google-cloud/pubsub": "^3.0.1",
     "graphql-eventbus": "^0.2.0",
-    "module-alias": "^2.2.2",
     "uuid": "^8.3.2"
   },
   "author": "Suraj Keshri",

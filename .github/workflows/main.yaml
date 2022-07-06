@@ -11,6 +11,12 @@ jobs:
   test:
     name: Unit Test on Node ${{matrix.node_version}} (${{matrix.os}}) and GraphQL v${{matrix.graphql_version}}
     runs-on: ubuntu-latest
+    services:
+      eventbus:
+        image: bigtruedata/gcloud-pubsub-emulator
+        options: start --host-port=0.0.0.0:8538
+        ports:
+          - 8538:8538
     strategy:
       matrix:
         os: [ubuntu-latest]

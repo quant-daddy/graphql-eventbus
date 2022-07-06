@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "test": "jest --runInBand --verbose --forceExit",
+    "test:watch": "jest --runInBand --verbose --forceExit --watch",
     "build": "npm run build -ws",
     "lint": "eslint packages/**/*.ts",
     "prettier": "prettier --ignore-path .gitignore --list-different --write \"**/*.{ts,tsx,graphql,yml}\"",

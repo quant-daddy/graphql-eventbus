@@ -4,7 +4,7 @@ import { getRootQueryFields } from "./eventbus-utils";
 import { DocumentNode, GraphQLError, GraphQLSchema } from "graphql";
 import { InvalidPublishTopic } from ".";
 import { v4 } from "uuid";
-import { isPresent } from "ts-is-present";
+import { isPresent } from "./utils";
 
 export type DataCb = (args: {
   baggage: Baggage;
@@ -192,7 +192,10 @@ export class GraphQLEventbus {
           `Payload error: Received ${JSON.stringify(extractedPayload.data)}`,
         );
       }
-      if (extractedPayload.deprecated && consumeDeprecatedErrorsHooks.length) {
+      if (
+        extractedPayload.deprecated?.length &&
+        consumeDeprecatedErrorsHooks.length
+      ) {
         await Promise.all(
           consumeDeprecatedErrorsHooks.map((hook) => {
             return hook(extractedPayload.errors as GraphQLError[]);

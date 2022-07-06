@@ -98,8 +98,30 @@ describe("EventBusValidator", () => {
       },
     });
     expect(result.deprecated?.[0].message).toMatchInlineSnapshot(
-      `"The field 'EventA.name' is deprecated. Do not use this field"`,
+      `"The field EventA.name is deprecated. Do not use this field"`,
     );
+  });
+  test.only("consumer does not detect deprecated field if it is not queried", async () => {
+    const queries = gql`
+      query EventA {
+        EventA {
+          id
+          type
+        }
+      }
+    `;
+    const validator = new EventBusValidator({
+      publisherSchema,
+    });
+    await validator.validateConsumerQueries(queries);
+    const result = await validator.extractData({
+      topic: "EventA",
+      data: {
+        id: "123",
+        type: null,
+      },
+    });
+    expect(result.deprecated?.length).toBeFalsy();
   });
   test("consumer throws error for required field if not present in payload", async () => {
     const queries = gql`
@@ -157,6 +179,34 @@ describe("EventBusValidator", () => {
     expect(result.errors?.[0].message).toMatchInlineSnapshot(
       `"Enum \\"EventType\\" cannot represent value: \\"INVALID\\""`,
     );
+  });
+  test("consumer set not-required field to null if not present in the payload", async () => {
+    const queries = gql`
+      query EventA {
+        EventA {
+          id
+          type
+        }
+      }
+    `;
+    const consumerEventBus = new EventBusValidator({
+      publisherSchema,
+    });
+    await consumerEventBus.validateConsumerQueries(queries);
+    const result = await consumerEventBus.extractData({
+      topic: "EventA",
+      data: {
+        name: "Dan Schafer",
+        id: "123",
+      },
+    });
+    expect(result).toMatchObject({
+      data: {
+        id: "123",
+        type: null,
+      },
+    });
+    expect(result.errors).toBeFalsy();
   });
   test("consumer throws error for non-valid field value for a required field", async () => {
     const consumerEventBus = new EventBusValidator({
