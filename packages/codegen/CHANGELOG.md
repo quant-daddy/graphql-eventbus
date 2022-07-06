@@ -1,5 +1,11 @@
 # graphql-eventbus-codegen
 
+## 0.2.1
+
+### Patch Changes
+
+- 418d7ed: dependency updates
+
 ## 0.2.0
 
 ### Minor Changes

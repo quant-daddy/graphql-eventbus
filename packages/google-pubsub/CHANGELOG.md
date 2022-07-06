@@ -1,5 +1,18 @@
 # graphql-eventbus-google-pubsub
 
+## 0.3.0
+
+### Minor Changes
+
+- f9d37b5: Removes a lot of production dependencies. graphql is the only peer dependency required.
+
+### Patch Changes
+
+- 418d7ed: dependency updates
+- Updated dependencies [418d7ed]
+- Updated dependencies [f9d37b5]
+  - graphql-eventbus@0.3.0
+
 ## 0.2.0
 
 ### Minor Changes
