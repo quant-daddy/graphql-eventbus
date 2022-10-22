@@ -11,6 +11,7 @@ import { addMocksToSchema, MockStore } from "@graphql-tools/mock";
 import { gql } from "graphql-tag";
 import { Validator } from "./validator";
 import { v4 } from "uuid";
+import { Query } from "./generated/codegen-events";
 
 const typeDefs = fs.readFileSync(
   path.join(__dirname, "../data/events.graphql"),
@@ -33,7 +34,7 @@ const mockSchema = addMocksToSchema({
   mocks,
 });
 
-const validator = new Validator(mockSchema);
+const validator = new Validator<Query>(mockSchema);
 
 describe("validate", () => {
   test("correct data does not throw", async () => {
@@ -125,7 +126,7 @@ describe("sample", () => {
       preserveResolvers: true,
       store,
     });
-    const mockValidator = new Validator(mockSchema);
+    const mockValidator = new Validator<Query>(mockSchema);
     const result = mockValidator.sample("EntityFlagEvent");
     store.reset();
     const result2 = mockValidator.sample("EntityFlagEvent");

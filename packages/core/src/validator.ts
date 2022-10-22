@@ -4,7 +4,9 @@ import { NoDeprecatedCustomRule, validate } from "graphql";
 import { DocumentNode, GraphQLSchema, graphqlSync, printSchema } from "graphql";
 import { generateQueries } from "./generateQueries";
 
-export class Validator {
+export class Validator<
+  RootQuery extends { [key: string]: unknown } = { [key: string]: unknown },
+> {
   private allQueries!: { [key: string]: string };
   private rootQueryFieldQueries!: { [key: string]: string };
 
@@ -26,12 +28,15 @@ export class Validator {
    * When publishing message, validate the data against generated query
    */
   // eslint-disable-next-line @typescript-eslint/ban-types
-  validate = (topic: string, data: {}) => {
-    if (Object.keys(this.rootQueryFieldQueries).indexOf(topic) === -1) {
+  validate = (topic: keyof RootQuery, data: {}) => {
+    if (
+      Object.keys(this.rootQueryFieldQueries).indexOf(topic as string) === -1
+    ) {
       throw new Error("Invalid key");
     }
     const result = graphqlSync({
       schema: this.schema,
+      // @ts-ignore this is inforced at runtime by the check above
       source: this.rootQueryFieldQueries[topic],
       rootValue: {
         [topic]: data,
@@ -51,7 +56,7 @@ export class Validator {
    */
   extract = (
     query: DocumentNode,
-    topic: string,
+    topic: keyof RootQuery,
     // eslint-disable-next-line @typescript-eslint/ban-types
     data: {},
   ) => {
@@ -77,11 +82,12 @@ export class Validator {
    * Sample data for consumer testing purposes
    * Needs the schema to have mock resolvers
    */
-  sample = (eventKey: string) => {
+  sample = (eventKey: keyof RootQuery) => {
     return JSON.parse(
       JSON.stringify(
         graphqlSync({
           schema: this.schema,
+          // @ts-ignore
           source: this.allQueries[eventKey],
         }),
       ),

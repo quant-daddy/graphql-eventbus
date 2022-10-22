@@ -16,8 +16,12 @@ describe("Google Pubsub integration test", () => {
     type TopicA {
       id: String!
     }
+    type TopicB {
+      id: String!
+    }
     type Query {
       TopicA: TopicA!
+      TopicB: TopicB!
     }
   `);
     const cb = jest.fn();
@@ -34,6 +38,11 @@ describe("Google Pubsub integration test", () => {
         queries: gql`
           query TopicA {
             TopicA {
+              id
+            }
+          }
+          query TopicB {
+            TopicB {
               id
             }
           }
