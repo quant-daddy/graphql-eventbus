@@ -5,7 +5,7 @@ import { DocumentNode, GraphQLSchema, graphqlSync, printSchema } from "graphql";
 import { generateQueries } from "./generateQueries";
 
 export class Validator<
-  RootQuery extends { [key: string]: unknown } = { [key: string]: unknown },
+  RootQuery extends Record<string, unknown> = { [key: string]: unknown },
 > {
   private allQueries!: { [key: string]: string };
   private rootQueryFieldQueries!: { [key: string]: string };
@@ -28,7 +28,10 @@ export class Validator<
    * When publishing message, validate the data against generated query
    */
   // eslint-disable-next-line @typescript-eslint/ban-types
-  validate = (topic: keyof RootQuery, data: {}) => {
+  validate = <T extends Exclude<keyof RootQuery, "__typename">>(
+    topic: T,
+    data: unknown,
+  ) => {
     if (
       Object.keys(this.rootQueryFieldQueries).indexOf(topic as string) === -1
     ) {
@@ -45,7 +48,7 @@ export class Validator<
     if (result.errors) {
       throw new Error(JSON.stringify(result.errors, null, 2));
     }
-    return result;
+    return result as RootQuery[T];
   };
 
   /**
@@ -54,9 +57,9 @@ export class Validator<
    * @param key Name of the event or root query field name
    * @param data the data to resolve the query
    */
-  extract = (
+  extract = <T extends Exclude<keyof RootQuery, "__typename">>(
     query: DocumentNode,
-    topic: keyof RootQuery,
+    topic: T,
     // eslint-disable-next-line @typescript-eslint/ban-types
     data: {},
   ) => {
