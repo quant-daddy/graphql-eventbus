@@ -1,5 +1,11 @@
 # graphql-eventbus
 
+## 0.4.0
+
+### Minor Changes
+
+- c8b69af: Adds type support for validator class
+
 ## 0.3.0
 
 ### Minor Changes
