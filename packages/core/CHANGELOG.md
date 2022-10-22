@@ -1,5 +1,11 @@
 # graphql-eventbus
 
+## 0.4.1
+
+### Patch Changes
+
+- d11409c: Makes validator validate typecheck simpler
+
 ## 0.4.0
 
 ### Minor Changes
