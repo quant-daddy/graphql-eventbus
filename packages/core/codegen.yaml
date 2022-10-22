@@ -1,0 +1,9 @@
+schema: ""
+generates:
+  ./src/generated/codegen-events.ts:
+    schema:
+      - "data/events.graphql"
+    plugins:
+      - "typescript"
+config:
+  avoidOptionals: true

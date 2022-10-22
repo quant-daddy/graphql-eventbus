@@ -32,6 +32,9 @@
     "cleanup": false
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^2.13.7",
+    "@graphql-codegen/typescript": "^2.7.5",
+    "@graphql-codegen/typescript-operations": "^2.5.5",
     "@graphql-tools/mock": "^8.6.8",
     "@types/uuid": "^8.3.0",
     "graphql-scalars": "^1.17.0",
@@ -42,7 +45,8 @@
     "typecheck": "tsc --noEmit",
     "test": "jest --runInBand --verbose --forceExit",
     "test:watch": "jest --watch --runInBand",
-    "lint": "eslint . --ext .ts,.tsx"
+    "lint": "eslint . --ext .ts,.tsx",
+    "codegen": "graphql-codegen --config=codegen.yaml"
   },
   "author": "Suraj Keshri",
   "license": "MIT",
