@@ -51,7 +51,7 @@ export class Validator<
     if (!result.data) {
       throw new Error("No data found");
     }
-    // @ts-ignore the rootValue about has this key
+    // @ts-ignore the rootValue above has this key
     return result.data[topic] as RootQuery[T];
   };
 
