@@ -1,5 +1,11 @@
 # graphql-eventbus
 
+## 0.4.2
+
+### Patch Changes
+
+- 898504b: Fixes the return value of validator.validate
+
 ## 0.4.1
 
 ### Patch Changes
