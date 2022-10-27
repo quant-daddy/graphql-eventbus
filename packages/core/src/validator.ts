@@ -48,7 +48,11 @@ export class Validator<
     if (result.errors) {
       throw new Error(JSON.stringify(result.errors, null, 2));
     }
-    return result as RootQuery[T];
+    if (!result.data) {
+      throw new Error("No data found");
+    }
+    // @ts-ignore the rootValue above has this key
+    return result.data[topic] as RootQuery[T];
   };
 
   /**

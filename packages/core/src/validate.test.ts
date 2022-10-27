@@ -40,7 +40,8 @@ describe("validate", () => {
   test("correct data does not throw", async () => {
     const key = "ClosedGroupJoinRequestResponseEvent";
     const data = validator.sample("ClosedGroupJoinRequestResponseEvent");
-    validator.validate(key, data.data[key]);
+    const r = validator.validate(key, data.data[key]);
+    // expect(r).toMatchObject(data.data[key]);
   });
   test("incorrect data throws", async () => {
     const key = "ClosedGroupJoinRequestResponseEvent";

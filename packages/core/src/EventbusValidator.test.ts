@@ -101,7 +101,7 @@ describe("EventBusValidator", () => {
       `"The field EventA.name is deprecated. Do not use this field"`,
     );
   });
-  test.only("consumer does not detect deprecated field if it is not queried", async () => {
+  test("consumer does not detect deprecated field if it is not queried", async () => {
     const queries = gql`
       query EventA {
         EventA {
