@@ -6,6 +6,11 @@ sidebar_position: 3
 
 To start using this library, you need to decide the message broker you are using. The core library, `graphql-eventbus`, provides a framework to create an event bus powered by GraphQL. We have two libraries that provides an implementation of the event bus using `RabbitMQ` and `Google Pubsub` as the message broker. It's very easy to create an implementation using your favorite message broker as covered in the [Create Your Bus](/docs/tour/create-your-bus/) section in the tour. To follow the example in `examples/rabbit-mq` uses RabbitMQ event bus.
 
+**Core**
+```bash
+npm i graphql-eventbus
+```
+
 **RabbitMQ**
 
 ```bash
