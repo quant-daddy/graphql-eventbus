@@ -44,7 +44,7 @@ describe("RabbitMQEventBus", () => {
     });
     await bus.init();
     // wait for consumer queur to be initialized
-    await wait(5000);
+    await wait(10000);
     cb.mockClear();
     await bus.publish({
       topic: "TestEvent",
