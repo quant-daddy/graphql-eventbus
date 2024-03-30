@@ -1,6 +1,20 @@
 version: 2
 updates:
   - package-ecosystem: "npm"
+    directory: "/examples
+    schedule:
+      interval: "monthly"
+    labels: [ ]
+    ignore:
+      - dependency-name: "*"
+  - package-ecosystem: "npm"
+    directory: "/website
+    schedule:
+      interval: "monthly"
+    labels: [ ]
+    ignore:
+      - dependency-name: "*"
+  - package-ecosystem: "npm"
     directory: "/**"
     schedule:
       interval: "daily"

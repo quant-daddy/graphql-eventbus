@@ -18,7 +18,7 @@ JSON schema can be verbose to write. Also, it is not easily extendable. GraphQL 
 
 ## Is this library production ready?
 
-The library has running in production at https://gully.to for last nine months. We are using this library for event based communication across seven microservices and for consuming external webhooks. Since the company is a small startup, we have not handled high volume. Take this as more of a proof of concept. We would love to help any organization who is interested in using this library. Send us a private message on Twitter!
+I have used this library in multiple personal and client projects. This library was originally developed for a startup (now closed) whose backend involved event based communication across seven microservices and for consuming external webhooks. It worked really well and helped up easily build an event driven architecture. We would love to help any organization who is interested in using this library. 
 
 ## How do I contribute?
 

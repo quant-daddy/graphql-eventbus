@@ -20,11 +20,11 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        node_version: [16]
+        node_version: [16, 18, 20]
         # TODO: use the version specified here
         graphql_version:
           - "16.3.0"
-          # - "15.8.0"
+          - "15.8.0"
     steps:
       - name: Checkout
         uses: actions/checkout@v2

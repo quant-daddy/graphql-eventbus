@@ -85,7 +85,7 @@ export class RabbitMQEventBus {
     });
   }
   init = async (url?: string | amqp.Options.Connect) => {
-    const connection = await amqp.connect(url || "amqp://localhost");
+    const connection = await amqp.connect(url || "amqp://localhost:5672/");
     if (this.config.publisher) {
       const channel = await connection.createChannel();
       await channel.assertExchange(EXCHANGE, "topic", {
