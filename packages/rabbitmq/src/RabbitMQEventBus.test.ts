@@ -53,6 +53,7 @@ describe("RabbitMQEventBus", () => {
     await wait(5000);
     await bus.closePublisher();
     await bus.closeConsumer();
+    await bus.close();
     // console.log(cb.mock.calls);
     expect(cb).toBeCalledTimes(1);
     expect(cb.mock.calls[0][0]).toMatchObject({
