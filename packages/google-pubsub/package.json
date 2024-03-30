@@ -28,7 +28,7 @@
     "dist/**/*"
   ],
   "dependencies": {
-    "@google-cloud/pubsub": "^3.0.1",
+    "@google-cloud/pubsub": "^4.3.3",
     "graphql-eventbus": "^0.4.0",
     "uuid": "^8.3.2"
   },
