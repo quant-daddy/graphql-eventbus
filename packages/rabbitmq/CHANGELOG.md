@@ -1,5 +1,11 @@
 # graphql-eventbus-rabbitmq
 
+## 0.1.10
+
+### Patch Changes
+
+- b9fc615: Update Google pubsub package"
+
 ## 0.1.9
 
 ### Patch Changes

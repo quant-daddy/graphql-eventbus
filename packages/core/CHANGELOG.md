@@ -1,5 +1,11 @@
 # graphql-eventbus
 
+## 0.4.3
+
+### Patch Changes
+
+- b9fc615: Update Google pubsub package"
+
 ## 0.4.2
 
 ### Patch Changes
