@@ -1,5 +1,11 @@
 # graphql-eventbus-google-pubsub
 
+## 0.5.0
+
+### Minor Changes
+
+- b9fc615: Update Google pubsub package"
+
 ## 0.3.1
 
 ### Patch Changes
