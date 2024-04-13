@@ -1,5 +1,11 @@
 # graphql-eventbus
 
+## 0.5.0
+
+### Minor Changes
+
+- 81d354b: The bus throws an error if publish is called without initializing.
+
 ## 0.4.3
 
 ### Patch Changes
