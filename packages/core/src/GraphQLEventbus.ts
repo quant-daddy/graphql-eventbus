@@ -247,6 +247,9 @@ export class GraphQLEventbus {
     payload: {};
     metadata?: Partial<GraphQLEventbusMetadata>;
   }) => {
+    if (!this.isInitialized) {
+      throw new Error("The eventbus must be initialized before publishing.");
+    }
     if (!this.publishValidator) {
       throw new Error("Publish config not added!");
     }

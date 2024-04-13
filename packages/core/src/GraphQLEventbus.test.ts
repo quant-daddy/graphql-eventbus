@@ -100,6 +100,28 @@ test("Allow invalid topic publishing", async () => {
   });
 });
 
+test("Publishing fails if bus is not initialized", async () => {
+  const publishCb = jest.fn();
+  const bus = new GraphQLEventbus({
+    publisher: {
+      schema: pubSchema,
+      publish: async (d) => {
+        publishCb(d);
+      },
+      allowInvalidTopic: true,
+    },
+  });
+  await expect(() =>
+    bus.publish({
+      topic: "TestEvent",
+      payload: {
+        id: "123",
+        name: "name",
+      },
+    }),
+  ).rejects.toThrow();
+});
+
 test("valid events are consumed and hooks are called", async () => {
   const consumeCb = jest.fn();
   let cbRef!: DataCb;
