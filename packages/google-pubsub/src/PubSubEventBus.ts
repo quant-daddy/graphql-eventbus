@@ -24,6 +24,8 @@ export type PubSubEventBusConfig = {
     schema: GraphQLSchema;
     cb: EventBusSubscriberCb;
     options?: SubscriptionOptions;
+    skipTopics?: string[];
+    includeTopics?: string[];
   };
   plugins?: EventBusPlugin[];
   serviceName: string;
@@ -61,8 +63,19 @@ export class PubSubEventBus {
       subscriber: this.config.subscriber
         ? {
             cb: this.config.subscriber?.cb,
-            subscribe: async (topics, cb) => {
-              await topics.reduce(async (acc, topicName) => {
+            subscribe: async (allTopics, cb) => {
+              let finalTopics = allTopics;
+              if (this.config.subscriber?.includeTopics?.length) {
+                finalTopics = allTopics.filter((t) =>
+                  this.config.subscriber?.includeTopics?.includes(t),
+                );
+              }
+              if (this.config.subscriber?.skipTopics?.length) {
+                finalTopics = allTopics.filter(
+                  (t) => !this.config.subscriber?.skipTopics?.includes(t),
+                );
+              }
+              await finalTopics.reduce(async (acc, topicName) => {
                 const [topic] = await this.pubsubClient
                   .topic(topicName)
                   .get({ autoCreate: true });
