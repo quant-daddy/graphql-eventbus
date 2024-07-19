@@ -15,6 +15,8 @@ export type RabbitMQEventBusConfig = {
     schema: GraphQLSchema;
     queries: DocumentNode;
     cb: EventBusSubscriberCb;
+    skipTopics?: string[];
+    includeTopics?: string[];
   };
   serviceName: string;
   plugins?: EventBusPlugin[];
@@ -35,7 +37,7 @@ export class RabbitMQEventBus {
       publisher: config.publisher
         ? {
             schema: config.publisher?.schema,
-            publish: async args => {
+            publish: async (args) => {
               this.publishChannel?.publish(
                 EXCHANGE,
                 args.topic,
@@ -54,16 +56,27 @@ export class RabbitMQEventBus {
             schema: config.subscriber.schema,
             queries: config.subscriber.queries,
             cb: config.subscriber.cb,
-            subscribe: (topics, dataCb) => {
+            subscribe: (allTopics, dataCb) => {
+              let finalTopics = allTopics;
+              if (this.config.subscriber?.includeTopics?.length) {
+                finalTopics = allTopics.filter((t) =>
+                  this.config.subscriber?.includeTopics?.includes(t),
+                );
+              }
+              if (this.config.subscriber?.skipTopics?.length) {
+                finalTopics = allTopics.filter(
+                  (t) => !this.config.subscriber?.skipTopics?.includes(t),
+                );
+              }
               this.consumeChannel
                 ?.assertQueue(queueName, {
                   exclusive: false,
                 })
                 .then(() => {
-                  topics.forEach(topic => {
+                  finalTopics.forEach((topic) => {
                     this.consumeChannel?.bindQueue(queueName, EXCHANGE, topic);
                   });
-                  this.consumeChannel?.consume(queueName, msg => {
+                  this.consumeChannel?.consume(queueName, (msg) => {
                     if (msg?.content) {
                       dataCb({
                         baggage: JSON.parse(msg.content.toString("utf-8")),
@@ -72,7 +85,7 @@ export class RabbitMQEventBus {
                         .then(() => {
                           this.consumeChannel?.ack(msg);
                         })
-                        .catch(e => {
+                        .catch((e) => {
                           this.consumeChannel?.nack(msg);
                           throw e;
                         });

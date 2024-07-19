@@ -13,6 +13,9 @@ export type MemoryEventBusConfig = {
   subscriber?: {
     cb: EventBusSubscriberCb;
     queries: DocumentNode;
+    allowConsumingNonExistingTopic?: boolean;
+    skipTopics?: string[];
+    includeTopics?: string[];
   };
   plugins?: EventBusPlugin[];
   allowPublishNonExistingTopic?: boolean;
@@ -38,8 +41,19 @@ export class MemoryEventBus {
       subscriber: this.config.subscriber
         ? {
             cb: this.config.subscriber.cb,
-            subscribe: (topics, cb: DataCb) => {
-              topics.forEach((topic) => {
+            subscribe: (allTopics, cb: DataCb) => {
+              let finalTopics = allTopics;
+              if (this.config.subscriber?.includeTopics?.length) {
+                finalTopics = allTopics.filter((t) =>
+                  this.config.subscriber?.includeTopics?.includes(t),
+                );
+              }
+              if (this.config.subscriber?.skipTopics?.length) {
+                finalTopics = allTopics.filter(
+                  (t) => !this.config.subscriber?.skipTopics?.includes(t),
+                );
+              }
+              finalTopics.forEach((topic) => {
                 this.eventEmitter.on(`message-${topic}`, async (baggage) => {
                   await cb({
                     baggage: JSON.parse(baggage),

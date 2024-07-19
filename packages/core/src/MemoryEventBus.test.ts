@@ -100,4 +100,110 @@ describe("MemoryEventBus", () => {
     await wait(0);
     expect(consumeCb).not.toBeCalled();
   });
+  test("only included topics are consumed", async () => {
+    const consumeCb = jest.fn();
+    const queries = gql`
+      query Query1 {
+        SignUpEvent {
+          id
+        }
+      }
+      query Query2 {
+        EntityFlagEvent {
+          id
+          groupId
+        }
+      }
+    `;
+    const subscribeConfig: SubscriberConfig = {
+      cb: consumeCb,
+      queries,
+      schema: publisherSchema,
+    };
+    const bus = new MemoryEventBus({
+      schema: publisherSchema,
+      subscriber: {
+        ...subscribeConfig,
+        includeTopics: ["SignUpEvent"],
+      },
+      plugins: [LoggingPlugin()],
+    });
+    await bus.init();
+    await bus.publish({
+      topic: "SignUpEvent",
+      payload: validator.sample("SignUpEvent").data["SignUpEvent"],
+      metadata: { test: "data" },
+    });
+    await wait(0);
+    expect(consumeCb).toBeCalledTimes(1);
+    expect(consumeCb.mock.calls[0][0]).toMatchObject({
+      payload: {
+        id: expect.any(String),
+      },
+      topic: "SignUpEvent",
+      // metadata is propagated
+      metadata: { test: "data" },
+    });
+    consumeCb.mockClear();
+    await bus.publish({
+      topic: "EntityFlagEvent",
+      payload: validator.sample("EntityFlagEvent").data["EntityFlagEvent"],
+      metadata: { "x-request-id": "123" },
+    });
+    await wait(0);
+    expect(consumeCb).not.toBeCalled();
+  });
+  test("skipped topics are not consumed", async () => {
+    const consumeCb = jest.fn();
+    const queries = gql`
+      query Query1 {
+        SignUpEvent {
+          id
+        }
+      }
+      query Query2 {
+        EntityFlagEvent {
+          id
+          groupId
+        }
+      }
+    `;
+    const subscribeConfig: SubscriberConfig = {
+      cb: consumeCb,
+      queries,
+      schema: publisherSchema,
+    };
+    const bus = new MemoryEventBus({
+      schema: publisherSchema,
+      subscriber: {
+        ...subscribeConfig,
+        skipTopics: ["EntityFlagEvent"],
+      },
+      plugins: [LoggingPlugin()],
+    });
+    await bus.init();
+    await bus.publish({
+      topic: "SignUpEvent",
+      payload: validator.sample("SignUpEvent").data["SignUpEvent"],
+      metadata: { test: "data" },
+    });
+    await wait(0);
+    expect(consumeCb).toBeCalledTimes(1);
+    expect(consumeCb.mock.calls[0][0]).toMatchObject({
+      payload: {
+        id: expect.any(String),
+      },
+      topic: "SignUpEvent",
+      // metadata is propagated
+      metadata: { test: "data" },
+    });
+    consumeCb.mockClear();
+    await bus.publish({
+      topic: "EntityFlagEvent",
+      payload: validator.sample("EntityFlagEvent").data["EntityFlagEvent"],
+      metadata: { "x-request-id": "123" },
+    });
+    await wait(0);
+    expect(consumeCb).not.toBeCalled();
+  });
 });
