@@ -1,5 +1,11 @@
 # graphql-eventbus
 
+## 0.6.0
+
+### Minor Changes
+
+- e3a38d9: adds ability to include or skip specific topics subscribed to
+
 ## 0.5.0
 
 ### Minor Changes

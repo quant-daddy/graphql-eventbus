@@ -1,5 +1,16 @@
 # graphql-eventbus-rabbitmq
 
+## 0.2.0
+
+### Minor Changes
+
+- e3a38d9: adds ability to include or skip specific topics subscribed to
+
+### Patch Changes
+
+- Updated dependencies [e3a38d9]
+  - graphql-eventbus@0.6.0
+
 ## 0.1.11
 
 ### Patch Changes
