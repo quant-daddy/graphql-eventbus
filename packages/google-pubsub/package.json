@@ -1,6 +1,6 @@
 {
   "name": "graphql-eventbus-google-pubsub",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Graphql eventbus for Google Pubsub",
   "main": "dist/index.js",
   "types": "./dist/index.d.ts",
@@ -29,7 +29,7 @@
   ],
   "dependencies": {
     "@google-cloud/pubsub": "^4.3.3",
-    "graphql-eventbus": "^0.6.0",
+    "graphql-eventbus": "^0.7.0",
     "uuid": "^8.3.2"
   },
   "author": "Suraj Keshri",

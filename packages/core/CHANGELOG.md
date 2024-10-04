@@ -1,5 +1,11 @@
 # graphql-eventbus
 
+## 0.7.0
+
+### Minor Changes
+
+- 06b9b40: Allow for every instance of a service to consume a fanout topic subscription by specifying the topic name in fanoutTopics option in subscripiton config
+
 ## 0.6.0
 
 ### Minor Changes
