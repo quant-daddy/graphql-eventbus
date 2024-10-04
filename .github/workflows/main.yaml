@@ -40,7 +40,7 @@ jobs:
       - name: Build
         run: npm run build
       - name: Start eventbus
-        run: docker-compose up -d pubsub rabbit
+        run: docker compose up -d pubsub rabbit
       - run: npm test
         env:
           CI: true
