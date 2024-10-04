@@ -26,6 +26,7 @@ export type PubSubEventBusConfig = {
     options?: SubscriptionOptions;
     skipTopics?: string[];
     includeTopics?: string[];
+    fanoutTopics?: string[];
   };
   plugins?: EventBusPlugin[];
   serviceName: string;
@@ -79,9 +80,15 @@ export class PubSubEventBus {
                 const [topic] = await this.pubsubClient
                   .topic(topicName)
                   .get({ autoCreate: true });
-                const subscriptionName = `${
+                let subscriptionName = `${
                   this.config.serviceName
                 }-${topicName}${this.config.isDarkRelease ? "-dark" : ""}`;
+                // we use a different subscription name for each instance of the service for a fanout topic
+                if (this.config.subscriber?.fanoutTopics?.includes(topicName)) {
+                  subscriptionName = `${this.config.serviceName}-${topicName}-${
+                    Math.random().toString().split(".")[1]
+                  }${this.config.isDarkRelease ? "-dark" : ""}`;
+                }
                 let subscription = await topic.subscription(subscriptionName, {
                   streamingOptions: {
                     maxStreams: 1,
