@@ -16,6 +16,7 @@ export type MemoryEventBusConfig = {
     allowConsumingNonExistingTopic?: boolean;
     skipTopics?: string[];
     includeTopics?: string[];
+    fanoutTopics?: string[];
   };
   plugins?: EventBusPlugin[];
   allowPublishNonExistingTopic?: boolean;
