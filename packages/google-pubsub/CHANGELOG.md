@@ -1,5 +1,16 @@
 # graphql-eventbus-google-pubsub
 
+## 0.8.0
+
+### Minor Changes
+
+- f031b22: allows for publishing extra attributes in google pubsub
+
+### Patch Changes
+
+- Updated dependencies [f031b22]
+  - graphql-eventbus@0.8.0
+
 ## 0.7.0
 
 ### Minor Changes
