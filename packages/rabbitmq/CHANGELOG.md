@@ -1,5 +1,12 @@
 # graphql-eventbus-rabbitmq
 
+## 0.2.2
+
+### Patch Changes
+
+- Updated dependencies [f031b22]
+  - graphql-eventbus@0.8.0
+
 ## 0.2.1
 
 ### Patch Changes
