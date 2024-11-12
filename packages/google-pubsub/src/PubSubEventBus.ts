@@ -57,6 +57,7 @@ export class PubSubEventBus {
             publish: async (a) => {
               await this.publishTopics[a.topic].publishMessage({
                 data: Buffer.from(JSON.stringify(a.baggage)),
+                ...a.extra,
               });
             },
           }
@@ -153,11 +154,20 @@ export class PubSubEventBus {
     topic: string;
     payload: Record<string, unknown>;
     metadata?: Partial<GraphQLEventbusMetadata>;
+    attributes?:
+      | {
+          [k: string]: string;
+        }
+      | null
+      | undefined;
   }) => {
     await this.bus.publish({
       payload: a.payload,
       topic: a.topic,
       metadata: a.metadata,
+      extra: {
+        atttibutes: a.attributes,
+      },
     });
   };
 }

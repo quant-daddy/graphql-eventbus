@@ -122,6 +122,43 @@ test("Publishing fails if bus is not initialized", async () => {
   ).rejects.toThrow();
 });
 
+test("extra payload is passed to the publish cb", async () => {
+  const publishCb = jest.fn();
+  const bus = new GraphQLEventbus({
+    publisher: {
+      schema: pubSchema,
+      publish: async (d) => {
+        publishCb(d);
+      },
+      allowInvalidTopic: true,
+    },
+  });
+  await bus.init();
+  await bus.publish({
+    topic: "TestEvent",
+    payload: {
+      id: "123",
+      name: "name",
+    },
+    extra: {
+      a: 1,
+    },
+  });
+  expect(publishCb).toBeCalledTimes(1);
+  expect(publishCb.mock.calls[0][0]).toMatchObject({
+    baggage: {
+      payload: {
+        id: "123",
+        name: "name",
+      },
+    },
+    topic: "TestEvent",
+    extra: {
+      a: 1,
+    },
+  });
+});
+
 test("valid events are consumed and hooks are called", async () => {
   const consumeCb = jest.fn();
   let cbRef!: DataCb;
