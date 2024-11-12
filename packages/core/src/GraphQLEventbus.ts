@@ -92,6 +92,7 @@ export class GraphQLEventbus {
         publish: (args: {
           topic: string;
           baggage: Baggage;
+          extra?: Record<string, unknown>;
         }) => Promise<unknown>;
         allowInvalidTopic?: boolean;
       };
@@ -246,6 +247,7 @@ export class GraphQLEventbus {
     topic: string;
     payload: {};
     metadata?: Partial<GraphQLEventbusMetadata>;
+    extra?: Record<string, unknown>;
   }) => {
     if (!this.isInitialized) {
       throw new Error("The eventbus must be initialized before publishing.");
@@ -294,6 +296,7 @@ export class GraphQLEventbus {
           metadata,
           payload: props.payload,
         },
+        extra: props.extra,
       });
       if (publishSuccessHooks.length) {
         await Promise.all(
