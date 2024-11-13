@@ -1,5 +1,11 @@
 # graphql-eventbus-google-pubsub
 
+## 0.8.1
+
+### Patch Changes
+
+- f12e301: fix type
+
 ## 0.8.0
 
 ### Minor Changes
