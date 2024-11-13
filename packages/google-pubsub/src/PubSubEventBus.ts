@@ -166,7 +166,7 @@ export class PubSubEventBus {
       topic: a.topic,
       metadata: a.metadata,
       extra: {
-        atttibutes: a.attributes,
+        attributes: a.attributes,
       },
     });
   };
