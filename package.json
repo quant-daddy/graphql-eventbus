@@ -62,5 +62,8 @@
   },
   "overrides": {
     "graphql": "^16.3.0"
+  },
+  "dependencies": {
+    "@google-cloud/pubsub": "^4.8.0"
   }
 }
