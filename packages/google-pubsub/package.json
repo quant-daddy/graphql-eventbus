@@ -1,6 +1,6 @@
 {
   "name": "graphql-eventbus-google-pubsub",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Graphql eventbus for Google Pubsub",
   "main": "dist/index.js",
   "types": "./dist/index.d.ts",
