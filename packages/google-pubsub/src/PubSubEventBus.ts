@@ -57,7 +57,9 @@ export class PubSubEventBus {
             publish: async (a) => {
               await this.publishTopics[a.topic].publishMessage({
                 data: Buffer.from(JSON.stringify(a.baggage)),
-                ...a.extra,
+                ...(a.extra as {
+                  attributes: Record<string, string> | undefined;
+                }),
               });
             },
           }
