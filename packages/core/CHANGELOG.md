@@ -1,5 +1,11 @@
 # graphql-eventbus
 
+## 0.8.1
+
+### Patch Changes
+
+- cfd2569: type fixes and adds aws eventbus
+
 ## 0.8.0
 
 ### Minor Changes
