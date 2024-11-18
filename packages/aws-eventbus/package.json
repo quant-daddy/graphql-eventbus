@@ -30,7 +30,7 @@
     "@aws-sdk/client-sns": "^3.693.0",
     "@aws-sdk/client-sqs": "^3.693.0",
     "@aws-sdk/client-sts": "^3.693.0",
-    "graphql-eventbus": "^0.7.0",
+    "graphql-eventbus": "^0.8.0",
     "uuid": "^8.3.2"
   },
   "author": "Suraj Keshri",
