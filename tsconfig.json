@@ -5,6 +5,7 @@
     "target": "es2018",
     "module": "commonjs",
     "moduleResolution": "node",
+    "noImplicitAny": false,
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
     "emitDecoratorMetadata": true,
