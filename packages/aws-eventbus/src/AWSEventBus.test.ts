@@ -6,6 +6,9 @@ import wait from "waait";
 jest.setTimeout(60000);
 
 describe("AWSEventBus", () => {
+  test("placeholder", () => {
+    return;
+  });
   if (process.env.CI === "true") {
     console.log("skipping AWSEventBus integration test in CI");
     return;
