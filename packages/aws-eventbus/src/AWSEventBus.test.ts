@@ -47,7 +47,7 @@ describe("AWSEventBus", () => {
       topic: "TestEvent",
       payload: { id: "1", name: "coolio" },
     });
-    await wait(30000);
+    await wait(15000);
     // console.log(cb.mock.calls);
     expect(cb).toBeCalledTimes(1);
     expect(cb.mock.calls[0][0]).toMatchObject({
@@ -106,7 +106,7 @@ describe("AWSEventBus", () => {
       topic: "TestEvent",
       payload: { id: "1", name: "coolio" },
     });
-    await wait(30000);
+    await wait(15000);
     await bus.closePublisher();
     await bus.closeConsumer();
     // console.log(cb.mock.calls);
@@ -157,7 +157,7 @@ describe("AWSEventBus", () => {
         "x-prop-test-dark": "true",
       },
     });
-    await wait(30000);
+    await wait(15000);
     // console.log(cb.mock.calls);
     expect(cb).toBeCalledTimes(1);
     expect(cb.mock.calls[0][0]).toMatchObject({

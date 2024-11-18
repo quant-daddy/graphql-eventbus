@@ -37,6 +37,11 @@ export type AWSEventBusConfig = {
     skipTopics?: string[];
     includeTopics?: string[];
     fanoutTopics?: string[];
+    /**
+     * Maximum value: 20
+     * Set to 0 for no wait
+     */
+    pollingTimeSeconds?: number;
   };
   plugins?: EventBusPlugin[];
   serviceName: string;
@@ -52,6 +57,138 @@ export class AWSEventBus {
   private ongoingPublishes = new Set();
   private existingTopicsArns: ListTopicsCommandOutput | undefined;
   private bus: GraphQLEventbus;
+  constructor(private config: AWSEventBusConfig) {
+    this.snsClient = new SNSClient({
+      region: config.region,
+    });
+    this.sqsClient = new SQSClient({
+      region: config.region,
+    });
+    this.stsClient = new STSClient({ region: config.region });
+    this.bus = new GraphQLEventbus({
+      plugins: config.plugins,
+      publisher: this.config.publisher
+        ? {
+            publishInit: async (topics) => {
+              for (const topicName of topics) {
+                // eslint-disable-next-line no-await-in-loop
+                this.publishTopics[topicName] = await this.createTopic(
+                  `graphql-eventbus-${topicName}`,
+                );
+              }
+            },
+            schema: this.config.publisher?.schema,
+            publish: async (a) => {
+              const message = JSON.stringify(a.baggage);
+              const attributes = Object.entries(
+                (
+                  a.extra as {
+                    attributes: Record<string, string> | undefined;
+                  }
+                ).attributes || {},
+              ).reduce(
+                (acc, [key, value]) => {
+                  return {
+                    ...acc,
+                    [key]: {
+                      DataType: "String",
+                      StringValue: value,
+                    },
+                  };
+                },
+                // https://docs.aws.amazon.com/sns/latest/dg/attribute-key-matching.html
+                // we must have a non empty attribute for filtering to work for non existing key
+                {
+                  dummy: {
+                    DataType: "String",
+                    StringValue: "dummy",
+                  },
+                },
+              );
+              const publishCommand = new PublishCommand({
+                TopicArn: this.publishTopics[a.topic],
+                Message: message, // The message content (JSON)
+                MessageAttributes: attributes, // The attributes for the message,
+              });
+              const publishPromise = this.snsClient.send(publishCommand);
+              this.ongoingPublishes.add(publishPromise);
+              try {
+                await publishPromise;
+              } catch (e) {
+                console.error(e);
+                throw e;
+              } finally {
+                this.ongoingPublishes.delete(publishPromise);
+              }
+            },
+          }
+        : undefined,
+      subscriber: this.config.subscriber
+        ? {
+            cb: this.config.subscriber?.cb,
+            subscribe: async (allTopics, cb) => {
+              let finalTopics = allTopics;
+              if (this.config.subscriber?.includeTopics?.length) {
+                finalTopics = allTopics.filter((t) =>
+                  this.config.subscriber?.includeTopics?.includes(t),
+                );
+              }
+              if (this.config.subscriber?.skipTopics?.length) {
+                finalTopics = allTopics.filter(
+                  (t) => !this.config.subscriber?.skipTopics?.includes(t),
+                );
+              }
+              await finalTopics.reduce(async (acc, topicName) => {
+                const topicArn = await this.createTopic(
+                  `graphql-eventbus-${topicName}`,
+                );
+                let subscriptionName = `graphql-eventbus-${
+                  this.config.serviceName
+                }-${topicName}${this.config.isDarkRelease ? "-dark" : ""}`;
+                // we use a different subscription name for each instance of the service for a fanout topic
+                if (this.config.subscriber?.fanoutTopics?.includes(topicName)) {
+                  subscriptionName = `graphql-eventbus-${
+                    this.config.serviceName
+                  }-${topicName}-${Math.random().toString().split(".")[1]}${
+                    this.config.isDarkRelease ? "-dark" : ""
+                  }`;
+                }
+                const { queueArn, queueUrl } = await this.createQueue(
+                  subscriptionName,
+                  topicArn,
+                );
+                const subscribeCommand = new SubscribeCommand({
+                  TopicArn: topicArn,
+                  Protocol: "sqs",
+                  Endpoint: queueArn,
+                  Attributes: {
+                    FilterPolicy: JSON.stringify(
+                      !this.config.isDarkRelease
+                        ? {
+                            [`x-prop-${this.config.serviceName}-dark`]: [
+                              { exists: false },
+                            ],
+                          }
+                        : {
+                            [`x-prop-${this.config.serviceName}-dark`]: [
+                              "true",
+                            ],
+                          },
+                    ),
+                    FilterPolicyScope: "MessageAttributes",
+                  },
+                });
+                await this.snsClient.send(subscribeCommand);
+                this.pollQueue(queueUrl, topicName, cb);
+                return acc.then(() => Promise.resolve());
+              }, Promise.resolve());
+            },
+            queries: this.config.subscriber.queries,
+            schema: this.config.subscriber.schema,
+          }
+        : undefined,
+    });
+  }
   private receiveMessageFromQueue = async (
     queueUrl: string,
     cb: (baggage: Baggage) => Promise<void>,
@@ -61,7 +198,7 @@ export class AWSEventBus {
       const receiveMessageCommand = new ReceiveMessageCommand({
         QueueUrl: queueUrl, // The URL of the SQS queue
         MaxNumberOfMessages: 1, // Number of messages to retrieve (max is 10)
-        WaitTimeSeconds: 20, // Long polling (wait for messages up to 20 seconds)
+        WaitTimeSeconds: this.config.subscriber?.pollingTimeSeconds ?? 5, // Long polling (wait for messages up to 20 seconds)
         VisibilityTimeout: 30, // The time for which a message is hidden after being received
         AttributeNames: ["All"], // Optionally retrieve additional message attributes
         MessageAttributeNames: ["All"], // Optionally retrieve all message attributes
@@ -199,138 +336,6 @@ export class AWSEventBus {
       queueUrl,
     };
   };
-  constructor(private config: AWSEventBusConfig) {
-    this.snsClient = new SNSClient({
-      region: config.region,
-    });
-    this.sqsClient = new SQSClient({
-      region: config.region,
-    });
-    this.stsClient = new STSClient({ region: config.region });
-    this.bus = new GraphQLEventbus({
-      plugins: config.plugins,
-      publisher: this.config.publisher
-        ? {
-            publishInit: async (topics) => {
-              for (const topicName of topics) {
-                // eslint-disable-next-line no-await-in-loop
-                this.publishTopics[topicName] = await this.createTopic(
-                  `graphql-eventbus-${topicName}`,
-                );
-              }
-            },
-            schema: this.config.publisher?.schema,
-            publish: async (a) => {
-              const message = JSON.stringify(a.baggage);
-              const attributes = Object.entries(
-                (
-                  a.extra as {
-                    attributes: Record<string, string> | undefined;
-                  }
-                ).attributes || {},
-              ).reduce(
-                (acc, [key, value]) => {
-                  return {
-                    ...acc,
-                    [key]: {
-                      DataType: "String",
-                      StringValue: value,
-                    },
-                  };
-                },
-                // https://docs.aws.amazon.com/sns/latest/dg/attribute-key-matching.html
-                // we must have a non empty attribute for filtering to work for non existing key
-                {
-                  dummy: {
-                    DataType: "String",
-                    StringValue: "dummy",
-                  },
-                },
-              );
-              const publishCommand = new PublishCommand({
-                TopicArn: this.publishTopics[a.topic],
-                Message: message, // The message content (JSON)
-                MessageAttributes: attributes, // The attributes for the message,
-              });
-              const publishPromise = this.snsClient.send(publishCommand);
-              this.ongoingPublishes.add(publishPromise);
-              try {
-                await publishPromise;
-              } catch (e) {
-                console.error(e);
-                throw e;
-              } finally {
-                this.ongoingPublishes.delete(publishPromise);
-              }
-            },
-          }
-        : undefined,
-      subscriber: this.config.subscriber
-        ? {
-            cb: this.config.subscriber?.cb,
-            subscribe: async (allTopics, cb) => {
-              let finalTopics = allTopics;
-              if (this.config.subscriber?.includeTopics?.length) {
-                finalTopics = allTopics.filter((t) =>
-                  this.config.subscriber?.includeTopics?.includes(t),
-                );
-              }
-              if (this.config.subscriber?.skipTopics?.length) {
-                finalTopics = allTopics.filter(
-                  (t) => !this.config.subscriber?.skipTopics?.includes(t),
-                );
-              }
-              await finalTopics.reduce(async (acc, topicName) => {
-                const topicArn = await this.createTopic(
-                  `graphql-eventbus-${topicName}`,
-                );
-                let subscriptionName = `graphql-eventbus-${
-                  this.config.serviceName
-                }-${topicName}${this.config.isDarkRelease ? "-dark" : ""}`;
-                // we use a different subscription name for each instance of the service for a fanout topic
-                if (this.config.subscriber?.fanoutTopics?.includes(topicName)) {
-                  subscriptionName = `graphql-eventbus-${
-                    this.config.serviceName
-                  }-${topicName}-${Math.random().toString().split(".")[1]}${
-                    this.config.isDarkRelease ? "-dark" : ""
-                  }`;
-                }
-                const { queueArn, queueUrl } = await this.createQueue(
-                  subscriptionName,
-                  topicArn,
-                );
-                const subscribeCommand = new SubscribeCommand({
-                  TopicArn: topicArn,
-                  Protocol: "sqs",
-                  Endpoint: queueArn,
-                  Attributes: {
-                    FilterPolicy: JSON.stringify(
-                      !this.config.isDarkRelease
-                        ? {
-                            [`x-prop-${this.config.serviceName}-dark`]: [
-                              { exists: false },
-                            ],
-                          }
-                        : {
-                            [`x-prop-${this.config.serviceName}-dark`]: [
-                              "true",
-                            ],
-                          },
-                    ),
-                    FilterPolicyScope: "MessageAttributes",
-                  },
-                });
-                await this.snsClient.send(subscribeCommand);
-                this.pollQueue(queueUrl, topicName, cb);
-                return acc.then(() => Promise.resolve());
-              }, Promise.resolve());
-            },
-            queries: this.config.subscriber.queries,
-            schema: this.config.subscriber.schema,
-          }
-        : undefined,
-    });
-  }
   closeConsumer = async () => {
     this.pollTimers.forEach((timer) => {
       clearInterval(timer);
