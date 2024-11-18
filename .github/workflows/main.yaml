@@ -36,9 +36,9 @@ jobs:
           cache-dependency-path: "**/package-lock.json"
       # - name: Use GraphQL v${{matrix.graphql_version}}
       #   run: node ./scripts/match-graphql.js ${{matrix.graphql_version}}
-      - run: cd packages/core && npm ci && npm run build
-        name: Build core
       - run: npm ci
+      - run: cd packages/core && npm run build
+        name: Build core
       - name: Build
         run: npm run build
       - name: Start eventbus
