@@ -18,6 +18,8 @@ jobs:
           node-version: 16
           cache: "npm"
           cache-dependency-path: "**/package-lock.json"
+      - run: cd packages/core && npm run build
+        name: Build core
       - run: npm ci
       - name: Create Release Pull Request or Publish to npm
         id: changesets
