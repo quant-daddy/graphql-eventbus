@@ -44,7 +44,7 @@ describe("EventBusValidator", () => {
       },
     });
     expect(result.data).toMatchInlineSnapshot(`
-      Object {
+      {
         "id": "123",
         "name": "Dan Schafer",
       }
@@ -71,7 +71,7 @@ describe("EventBusValidator", () => {
       },
     });
     expect(result.data).toMatchInlineSnapshot(`
-      Object {
+      {
         "id": "123",
         "name": "Dan Schafer",
       }
@@ -177,7 +177,7 @@ describe("EventBusValidator", () => {
       },
     });
     expect(result.errors?.[0].message).toMatchInlineSnapshot(
-      `"Enum \\"EventType\\" cannot represent value: \\"INVALID\\""`,
+      `"Enum "EventType" cannot represent value: "INVALID""`,
     );
   });
   test("consumer set not-required field to null if not present in the payload", async () => {
@@ -239,7 +239,7 @@ describe("EventBusValidator", () => {
       data: null,
     });
     expect(result.errors?.[0].message).toMatchInlineSnapshot(
-      `"Int cannot represent non-integer value: \\"INVALID\\""`,
+      `"Int cannot represent non-integer value: "INVALID""`,
     );
   });
   test("consumer throws for consuming non existing topic", async () => {

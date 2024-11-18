@@ -12,7 +12,7 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "alwaysStrict": true,
-    "sourceMap": false,
+    "sourceMap": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,

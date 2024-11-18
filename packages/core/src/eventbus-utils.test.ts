@@ -16,15 +16,12 @@ describe("getTopicsFromDocument", () => {
       }
       query B {
         some {
-          ...Cool
+          name
         }
-      }
-      fragment Cool on Cool {
-        name
       }
     `);
     expect(Object.keys(result)).toMatchInlineSnapshot(`
-      Array [
+      [
         "C",
         "some",
       ]
@@ -131,7 +128,7 @@ describe("getRootQueryNames", () => {
       `),
     );
     expect(topicNames).toMatchInlineSnapshot(`
-      Array [
+      [
         "EventA",
         "EventB",
       ]
