@@ -92,7 +92,7 @@ export class GraphQLEventbus {
         publish: (args: {
           topic: string;
           baggage: Baggage;
-          extra?: Record<string, unknown>;
+          extra?: unknown;
         }) => Promise<unknown>;
         allowInvalidTopic?: boolean;
       };

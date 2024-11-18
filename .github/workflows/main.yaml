@@ -37,6 +37,8 @@ jobs:
       # - name: Use GraphQL v${{matrix.graphql_version}}
       #   run: node ./scripts/match-graphql.js ${{matrix.graphql_version}}
       - run: npm ci
+      - run: cd packages/core && npm run build
+        name: Build core
       - name: Build
         run: npm run build
       - name: Start eventbus

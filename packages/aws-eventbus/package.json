@@ -1,0 +1,38 @@
+{
+  "name": "graphql-eventbus-aws-eventbus",
+  "version": "0.1",
+  "description": "Graphql eventbus for AWS using SQS and SNS",
+  "main": "dist/index.js",
+  "types": "./dist/index.d.ts",
+  "homepage": "https://github.com/quant-daddy/graphql-eventbus",
+  "bugs": {
+    "url": "https://github.com/quant-daddy/graphql-eventbus/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/quant-daddy/graphql-eventbus.git"
+  },
+  "keywords": [
+    "graphql",
+    "graphql-eventbus",
+    "event"
+  ],
+  "scripts": {
+    "build": "rimraf dist && tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "jest --runInBand --verbose --forceExit",
+    "test:watch": "jest --watch --runInBand"
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "dependencies": {
+    "@aws-sdk/client-sns": "^3.693.0",
+    "@aws-sdk/client-sqs": "^3.693.0",
+    "@aws-sdk/client-sts": "^3.693.0",
+    "graphql-eventbus": "^0.8.0",
+    "uuid": "^8.3.2"
+  },
+  "author": "Suraj Keshri",
+  "license": "MIT"
+}
