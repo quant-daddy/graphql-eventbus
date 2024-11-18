@@ -6,11 +6,11 @@ import wait from "waait";
 jest.setTimeout(60000);
 
 describe("AWSEventBus", () => {
+  if (process.env.CI === "true") {
+    console.log("skipping AWSEventBus integration test in CI");
+    return;
+  }
   test("works", async () => {
-    // if (process.env.CI !== "true") {
-    //   console.log("skipping AWSEventBus test");
-    //   return;
-    // }
     const schema = buildSchema(`
     type TestEvent {
       id: ID!
