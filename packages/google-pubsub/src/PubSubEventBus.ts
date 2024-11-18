@@ -56,6 +56,7 @@ export class PubSubEventBus {
             schema: this.config.publisher?.schema,
             publish: async (a) => {
               await this.publishTopics[a.topic].publishMessage({
+                // @ts-ignore this works
                 data: Buffer.from(JSON.stringify(a.baggage)),
                 ...(a.extra as {
                   attributes: Record<string, string> | undefined;
