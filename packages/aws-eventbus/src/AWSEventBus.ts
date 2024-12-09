@@ -42,6 +42,7 @@ export type AWSEventBusConfig = {
      * Set to 0 for no wait
      */
     pollingTimeSeconds?: number;
+    maxNumberOfMessages?: number;
   };
   plugins?: EventBusPlugin[];
   serviceName: string;
@@ -197,8 +198,8 @@ export class AWSEventBus {
       // Receive messages from the queue
       const receiveMessageCommand = new ReceiveMessageCommand({
         QueueUrl: queueUrl, // The URL of the SQS queue
-        MaxNumberOfMessages: 1, // Number of messages to retrieve (max is 10)
-        WaitTimeSeconds: this.config.subscriber?.pollingTimeSeconds ?? 5, // Long polling (wait for messages up to 20 seconds)
+        MaxNumberOfMessages: this.config.subscriber?.maxNumberOfMessages ?? 10, // Number of messages to retrieve (max is 10)
+        WaitTimeSeconds: this.config.subscriber?.pollingTimeSeconds ?? 0, // Long polling (wait for messages up to 20 seconds)
         VisibilityTimeout: 30, // The time for which a message is hidden after being received
         AttributeNames: ["All"], // Optionally retrieve additional message attributes
         MessageAttributeNames: ["All"], // Optionally retrieve all message attributes
