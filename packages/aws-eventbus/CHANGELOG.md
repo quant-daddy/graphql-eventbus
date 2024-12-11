@@ -1,5 +1,11 @@
 # graphql-eventbus-aws-eventbus
 
+## 0.2.1
+
+### Patch Changes
+
+- 622786e: fix for polling
+
 ## 0.2.0
 
 ### Minor Changes
