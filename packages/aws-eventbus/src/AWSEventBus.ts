@@ -54,7 +54,7 @@ export class AWSEventBus {
   public sqsClient: SQSClient;
   public stsClient: STSClient;
   private publishTopics: { [topicName: string]: string } = {};
-  private pollTimers: NodeJS.Timer[] = [];
+  private closeSignal = false;
   private ongoingPublishes = new Set();
   private existingTopicsArns: ListTopicsCommandOutput | undefined;
   private bus: GraphQLEventbus;
@@ -207,7 +207,6 @@ export class AWSEventBus {
 
       // Send the command to receive the message
       const response = await this.sqsClient.send(receiveMessageCommand);
-
       for (const message of response.Messages || []) {
         const messageBody = JSON.parse(message.Body || "");
         // Process the message
@@ -225,7 +224,11 @@ export class AWSEventBus {
       console.error("Error receiving or deleting message:", error);
     }
   };
-  private pollQueue = (queueUrl: string, topicName: string, cb: DataCb) => {
+  private pollQueue = async (
+    queueUrl: string,
+    topicName: string,
+    cb: DataCb,
+  ) => {
     const foo = () =>
       this.receiveMessageFromQueue(queueUrl, async (baggage) => {
         await cb({
@@ -236,8 +239,10 @@ export class AWSEventBus {
           },
         });
       });
-    foo();
-    this.pollTimers.push(setInterval(foo, 1000));
+    while (!this.closeSignal) {
+      await foo();
+    }
+    // this.pollTimers.push(setInterval(foo, 1000));
   };
   private createTopic = async (topicName: string): Promise<string> => {
     if (!this.existingTopicsArns) {
@@ -338,9 +343,7 @@ export class AWSEventBus {
     };
   };
   closeConsumer = async () => {
-    this.pollTimers.forEach((timer) => {
-      clearInterval(timer);
-    });
+    this.closeSignal = true;
   };
   closePublisher = async () => {
     await Promise.all(this.ongoingPublishes);
