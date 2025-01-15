@@ -374,7 +374,7 @@ export class AWSEventBus {
           await this.sqsClient.send(deleteQueueCommand);
         },
       ),
-    );
+    ).catch(console.error);
     this.closeSignal = true;
   };
   closePublisher = async () => {
