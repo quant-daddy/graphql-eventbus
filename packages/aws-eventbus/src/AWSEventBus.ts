@@ -6,6 +6,7 @@ import {
   SubscribeCommand,
   PublishCommand,
   ListTopicsCommandOutput,
+  UnsubscribeCommand,
 } from "@aws-sdk/client-sns";
 import {
   SQSClient,
@@ -14,6 +15,7 @@ import {
   ReceiveMessageCommand,
   DeleteMessageCommand,
   GetQueueAttributesCommand,
+  DeleteQueueCommand,
 } from "@aws-sdk/client-sqs";
 import { DocumentNode, GraphQLSchema } from "graphql";
 import {
@@ -55,6 +57,10 @@ export class AWSEventBus {
   public stsClient: STSClient;
   private publishTopics: { [topicName: string]: string } = {};
   private closeSignal = false;
+  private deleteSubscriptionsAndQueues: {
+    subscriptionArn: string;
+    queueUrl: string;
+  }[] = [];
   private ongoingPublishes = new Set();
   private existingTopicsArns: ListTopicsCommandOutput | undefined;
   private bus: GraphQLEventbus;
@@ -146,8 +152,10 @@ export class AWSEventBus {
                 let subscriptionName = `graphql-eventbus-${
                   this.config.serviceName
                 }-${topicName}${this.config.isDarkRelease ? "-dark" : ""}`;
+                const isFanout =
+                  this.config.subscriber?.fanoutTopics?.includes(topicName);
                 // we use a different subscription name for each instance of the service for a fanout topic
-                if (this.config.subscriber?.fanoutTopics?.includes(topicName)) {
+                if (isFanout) {
                   subscriptionName = `graphql-eventbus-${
                     this.config.serviceName
                   }-${topicName}-${Math.random().toString().split(".")[1]}${
@@ -179,7 +187,14 @@ export class AWSEventBus {
                     FilterPolicyScope: "MessageAttributes",
                   },
                 });
-                await this.snsClient.send(subscribeCommand);
+                const response = await this.snsClient.send(subscribeCommand);
+                if (isFanout) {
+                  response.SubscriptionArn &&
+                    this.deleteSubscriptionsAndQueues.push({
+                      queueUrl: queueUrl,
+                      subscriptionArn: response.SubscriptionArn,
+                    });
+                }
                 this.pollQueue(queueUrl, topicName, cb);
                 return acc.then(() => Promise.resolve());
               }, Promise.resolve());
@@ -343,6 +358,23 @@ export class AWSEventBus {
     };
   };
   closeConsumer = async () => {
+    await Promise.all(
+      this.deleteSubscriptionsAndQueues.map(
+        async ({ queueUrl, subscriptionArn }) => {
+          console.log(
+            `deleting queue ${queueUrl} and subscription ${subscriptionArn}`,
+          );
+          const unsubscribeCommand = new UnsubscribeCommand({
+            SubscriptionArn: subscriptionArn,
+          });
+          await this.snsClient.send(unsubscribeCommand);
+          const deleteQueueCommand = new DeleteQueueCommand({
+            QueueUrl: queueUrl,
+          });
+          await this.sqsClient.send(deleteQueueCommand);
+        },
+      ),
+    ).catch(console.error);
     this.closeSignal = true;
   };
   closePublisher = async () => {
