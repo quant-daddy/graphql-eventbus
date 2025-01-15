@@ -177,4 +177,51 @@ describe("AWSEventBus", () => {
     await bus.closeConsumer();
     await bus.closePublisher();
   });
+  test("fanout topic subscription and queue is deleted", async () => {
+    // if (process.env.CI !== "true") {
+    //   console.log("skipping AWSEventBus test");
+    //   return;
+    // }
+    const schema = buildSchema(`
+    type TestEvent {
+      id: ID!
+      name: String
+    }
+    type Query {
+      TestEvent: TestEvent!
+    }
+  `);
+    const cb = jest.fn();
+    const bus = new AWSEventBus({
+      region: "us-east-1",
+      serviceName: "test",
+      publisher: {
+        schema,
+      },
+      subscriber: {
+        cb: async (...args) => {
+          return cb(...args);
+        },
+        fanoutTopics: ["TestEvent"],
+        queries: gql`
+          query TestEvent {
+            TestEvent {
+              id
+            }
+          }
+        `,
+        schema,
+      },
+    });
+    await bus.init();
+    cb.mockClear();
+    await bus.publish({
+      topic: "TestEvent",
+      payload: { id: "1", name: "coolio" },
+    });
+    await wait(15000);
+    await bus.closePublisher();
+    await bus.closeConsumer();
+    // console.log(cb.mock.calls);
+  });
 });

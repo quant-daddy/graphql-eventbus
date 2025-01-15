@@ -236,6 +236,9 @@ export class AWSEventBus {
         });
       }
     } catch (error) {
+      if (this.closeSignal) {
+        return;
+      }
       console.error("Error receiving or deleting message:", error);
     }
   };
@@ -358,6 +361,7 @@ export class AWSEventBus {
     };
   };
   closeConsumer = async () => {
+    this.closeSignal = true;
     await Promise.all(
       this.deleteSubscriptionsAndQueues.map(
         async ({ queueUrl, subscriptionArn }) => {
@@ -375,7 +379,6 @@ export class AWSEventBus {
         },
       ),
     ).catch(console.error);
-    this.closeSignal = true;
   };
   closePublisher = async () => {
     await Promise.all(this.ongoingPublishes);
