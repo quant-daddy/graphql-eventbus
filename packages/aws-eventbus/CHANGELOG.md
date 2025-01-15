@@ -1,5 +1,11 @@
 # graphql-eventbus-aws-eventbus
 
+## 0.2.2
+
+### Patch Changes
+
+- 75aab85: delete fanout queues and subscriptions
+
 ## 0.2.1
 
 ### Patch Changes
