@@ -1,5 +1,11 @@
 # graphql-eventbus-aws-eventbus
 
+## 0.2.3
+
+### Patch Changes
+
+- 5a59b65: adds test and close consumer logic
+
 ## 0.2.2
 
 ### Patch Changes
