@@ -198,9 +198,7 @@ export class AWSEventBus {
                 };
                 if (this.config.isDarkRelease) {
                   filterPolicy = {
-                    [`x-prop-${this.config.serviceName}-version`]: [
-                      { exists: false },
-                    ],
+                    [`x-prop-${this.config.serviceName}-dark`]: ["true"],
                   };
                 }
                 if (this.config.subscriber?.version) {
