@@ -1,5 +1,11 @@
 # graphql-eventbus-aws-eventbus
 
+## 0.3.0
+
+### Minor Changes
+
+- 8780c30: support for version of the subscription. if version is specified, isDarkRelease is ignored.
+
 ## 0.2.3
 
 ### Patch Changes
