@@ -45,10 +45,22 @@ export type AWSEventBusConfig = {
      */
     pollingTimeSeconds?: number;
     maxNumberOfMessages?: number;
+    version?: string;
   };
   plugins?: EventBusPlugin[];
   serviceName: string;
   isDarkRelease?: boolean;
+};
+
+type SNSFilterPolicy = {
+  [attribute: string]: Array<
+    | { exists: boolean } // Existence check (e.g., { exists: false })
+    | string // Exact string match (e.g., ["value1", "value2"])
+    | { anythingBut: string[] } // Exclude certain values (e.g., { anythingBut: ["value1", "value2"] })
+    | { numeric: { min?: number; max?: number } } // Numeric conditions (e.g., { numeric: { min: 5 } })
+    | { prefix: string } // Prefix matching (e.g., { prefix: "v1" })
+    | { suffix: string } // Suffix matching (e.g., { suffix: "end" })
+  >;
 };
 
 export class AWSEventBus {
@@ -152,6 +164,9 @@ export class AWSEventBus {
                 let subscriptionName = `graphql-eventbus-${
                   this.config.serviceName
                 }-${topicName}${this.config.isDarkRelease ? "-dark" : ""}`;
+                if (this.config.subscriber?.version) {
+                  subscriptionName = `graphql-eventbus-${this.config.serviceName}-${topicName}-${this.config.subscriber?.version}`;
+                }
                 const isFanout =
                   this.config.subscriber?.fanoutTopics?.includes(topicName);
                 // we use a different subscription name for each instance of the service for a fanout topic
@@ -161,29 +176,46 @@ export class AWSEventBus {
                   }-${topicName}-${Math.random().toString().split(".")[1]}${
                     this.config.isDarkRelease ? "-dark" : ""
                   }`;
+                  if (this.config.subscriber?.version) {
+                    subscriptionName = `graphql-eventbus-${
+                      this.config.serviceName
+                    }-${topicName}-${Math.random().toString().split(".")[1]}-${
+                      this.config.subscriber?.version
+                    }`;
+                  }
                 }
                 const { queueArn, queueUrl } = await this.createQueue(
                   subscriptionName,
                   topicArn,
                 );
+                let filterPolicy: SNSFilterPolicy = {
+                  [`x-prop-${this.config.serviceName}-dark`]: [
+                    { exists: false },
+                  ],
+                  [`x-prop-${this.config.serviceName}-version`]: [
+                    { exists: false },
+                  ],
+                };
+                if (this.config.isDarkRelease) {
+                  filterPolicy = {
+                    [`x-prop-${this.config.serviceName}-version`]: [
+                      { exists: false },
+                    ],
+                  };
+                }
+                if (this.config.subscriber?.version) {
+                  filterPolicy = {
+                    [`x-prop-${this.config.serviceName}-version`]: [
+                      this.config.subscriber?.version,
+                    ],
+                  };
+                }
                 const subscribeCommand = new SubscribeCommand({
                   TopicArn: topicArn,
                   Protocol: "sqs",
                   Endpoint: queueArn,
                   Attributes: {
-                    FilterPolicy: JSON.stringify(
-                      !this.config.isDarkRelease
-                        ? {
-                            [`x-prop-${this.config.serviceName}-dark`]: [
-                              { exists: false },
-                            ],
-                          }
-                        : {
-                            [`x-prop-${this.config.serviceName}-dark`]: [
-                              "true",
-                            ],
-                          },
-                    ),
+                    FilterPolicy: JSON.stringify(filterPolicy),
                     FilterPolicyScope: "MessageAttributes",
                   },
                 });
