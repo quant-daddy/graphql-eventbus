@@ -224,6 +224,17 @@ export class GraphQLEventbus {
         );
       }
     } catch (e) {
+      console.error(
+        "Consume failed for the payload ",
+        JSON.stringify(
+          {
+            topic,
+            data: baggage.payload,
+          },
+          null,
+          2,
+        ),
+      );
       if (consumeErrorHooks.length) {
         await Promise.all(
           consumeErrorHooks.map((hook) => {
@@ -306,6 +317,21 @@ export class GraphQLEventbus {
         );
       }
     } catch (e) {
+      console.error(
+        "Publish failed for the payload ",
+        JSON.stringify(
+          {
+            topic: props.topic,
+            baggage: {
+              metadata,
+              payload: props.payload,
+            },
+            extra: props.extra,
+          },
+          null,
+          2,
+        ),
+      );
       if (publishErrorHooks.length) {
         await Promise.all(
           publishErrorHooks.map((hook) => {
