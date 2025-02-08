@@ -1,5 +1,11 @@
 # graphql-eventbus
 
+## 0.8.2
+
+### Patch Changes
+
+- d6c910d: error log
+
 ## 0.8.1
 
 ### Patch Changes
