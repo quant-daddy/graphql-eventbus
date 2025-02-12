@@ -320,7 +320,7 @@ export class AWSEventBus {
             console.error(
               `Error in parsing the baggage payload for key ${baggage["__s3Key"]}`,
             );
-            throw e;
+            return;
           }
         }
         await cb({
