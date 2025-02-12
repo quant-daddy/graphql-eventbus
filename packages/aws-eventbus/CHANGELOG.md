@@ -1,5 +1,11 @@
 # graphql-eventbus-aws-eventbus
 
+## 0.4.0
+
+### Minor Changes
+
+- 6bf9d53: large payload support
+
 ## 0.3.0
 
 ### Minor Changes
