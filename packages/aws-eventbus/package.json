@@ -27,6 +27,7 @@
     "dist/**/*"
   ],
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.744.0",
     "@aws-sdk/client-sns": "^3.693.0",
     "@aws-sdk/client-sqs": "^3.693.0",
     "@aws-sdk/client-sts": "^3.693.0",

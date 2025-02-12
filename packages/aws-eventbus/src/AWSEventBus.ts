@@ -26,6 +26,10 @@ import {
   GraphQLEventbus,
   GraphQLEventbusMetadata,
 } from "graphql-eventbus";
+import { getS3 } from "./s3";
+import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+import { v4 } from "uuid";
+import { Config } from "./config";
 
 export type AWSEventBusConfig = {
   region: string;
@@ -98,7 +102,7 @@ export class AWSEventBus {
             },
             schema: this.config.publisher?.schema,
             publish: async (a) => {
-              const message = JSON.stringify(a.baggage);
+              let message = JSON.stringify(a.baggage);
               const attributes = Object.entries(
                 (
                   a.extra as {
@@ -124,11 +128,31 @@ export class AWSEventBus {
                   },
                 },
               );
+              const maxSize = 256 * 1024; // 256 KB SNS message limit
+              const messageSize = Buffer.byteLength(message, "utf8");
+              if (messageSize > maxSize) {
+                console.log("large message detected...");
+                const localS3 = getS3();
+                const keyPrefix = Config.s3Prefix;
+                const key = keyPrefix + "/" + v4() + ".json";
+                console.log("uploading payload to ", key);
+                const command = new PutObjectCommand({
+                  Bucket: Config.bucket,
+                  Key: key,
+                  Body: message,
+                });
+                await localS3.send(command);
+                console.log("payload uploaded");
+                message = JSON.stringify({
+                  __s3Key: key,
+                });
+              }
               const publishCommand = new PublishCommand({
                 TopicArn: this.publishTopics[a.topic],
                 Message: message, // The message content (JSON)
                 MessageAttributes: attributes, // The attributes for the message,
               });
+              await this.snsClient.send(publishCommand);
               const publishPromise = this.snsClient.send(publishCommand);
               this.ongoingPublishes.add(publishPromise);
               try {
@@ -279,6 +303,26 @@ export class AWSEventBus {
   ) => {
     const foo = () =>
       this.receiveMessageFromQueue(queueUrl, async (baggage) => {
+        if ("__s3Key" in baggage) {
+          const command = new GetObjectCommand({
+            Bucket: Config.bucket,
+            Key: baggage["__s3Key"] as string,
+          });
+          const response = await getS3().send(command);
+          if (!response.Body) {
+            return;
+          }
+          try {
+            baggage = JSON.parse(
+              await response.Body.transformToString("utf-8"),
+            );
+          } catch (e) {
+            console.error(
+              `Error in parsing the baggage payload for key ${baggage["__s3Key"]}`,
+            );
+            return;
+          }
+        }
         await cb({
           topic: topicName,
           baggage: {
