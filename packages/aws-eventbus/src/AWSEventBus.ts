@@ -152,7 +152,6 @@ export class AWSEventBus {
                 Message: message, // The message content (JSON)
                 MessageAttributes: attributes, // The attributes for the message,
               });
-              await this.snsClient.send(publishCommand);
               const publishPromise = this.snsClient.send(publishCommand);
               this.ongoingPublishes.add(publishPromise);
               try {
