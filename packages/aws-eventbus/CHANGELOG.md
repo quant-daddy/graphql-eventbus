@@ -1,5 +1,11 @@
 # graphql-eventbus-aws-eventbus
 
+## 0.4.1
+
+### Patch Changes
+
+- 82703be: bug fix double publishing
+
 ## 0.4.0
 
 ### Minor Changes
