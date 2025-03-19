@@ -275,6 +275,9 @@ export class AWSEventBus {
 
       // Send the command to receive the message
       const response = await this.sqsClient.send(receiveMessageCommand);
+      if (this.closeSignal) {
+        return;
+      }
       for (const message of response.Messages || []) {
         const messageBody = JSON.parse(message.Body || "");
         // Process the message
