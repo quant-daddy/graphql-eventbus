@@ -283,6 +283,57 @@ describe("EventBusValidator", () => {
       }),
     ).resolves;
   });
+  test("publisher works for JSON field", async () => {
+    const eventBusValidator = new EventBusValidator({
+      publisherSchema: buildSchema(`
+        scalar JSON
+        type EventA {
+          id: ID!
+          value: JSON
+        }
+        type Query {
+          EventA: EventA!
+        }
+      `),
+    });
+    await expect(
+      eventBusValidator.publishValidate({
+        topic: "EventA",
+        payload: {
+          id: "123",
+          value: {
+            a: 1,
+          },
+        },
+      }),
+    ).resolves;
+    const queries = gql`
+      query EventA {
+        EventA {
+          id
+          value
+        }
+      }
+    `;
+    await eventBusValidator.validateConsumerQueries(queries);
+    const result = await eventBusValidator.extractData({
+      topic: "EventA",
+      data: {
+        id: "123",
+        value: {
+          a: 1,
+        },
+      },
+    });
+    expect(result).toMatchObject({
+      data: {
+        id: "123",
+        value: {
+          a: 1,
+        },
+      },
+    });
+  });
   test("publisher works for full payload", async () => {
     const eventBusValidator = new EventBusValidator({
       publisherSchema: buildSchema(`
