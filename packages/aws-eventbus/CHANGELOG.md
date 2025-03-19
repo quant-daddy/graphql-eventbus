@@ -1,5 +1,11 @@
 # graphql-eventbus-aws-eventbus
 
+## 0.4.2
+
+### Patch Changes
+
+- eb90dd0: fixed closeConsumer logic for aws eventbus
+
 ## 0.4.1
 
 ### Patch Changes
