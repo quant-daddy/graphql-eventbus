@@ -1,5 +1,11 @@
 # graphql-eventbus-aws-eventbus
 
+## 0.4.3
+
+### Patch Changes
+
+- 8c10621: adds delete option on close for queues for AWS eventbus
+
 ## 0.4.2
 
 ### Patch Changes
