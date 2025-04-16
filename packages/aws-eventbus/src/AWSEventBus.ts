@@ -50,6 +50,7 @@ export type AWSEventBusConfig = {
     pollingTimeSeconds?: number;
     maxNumberOfMessages?: number;
     version?: string;
+    deleteQueuesOnClose?: boolean;
   };
   plugins?: EventBusPlugin[];
   serviceName: string;
@@ -242,6 +243,13 @@ export class AWSEventBus {
                 });
                 const response = await this.snsClient.send(subscribeCommand);
                 if (isFanout) {
+                  response.SubscriptionArn &&
+                    this.deleteSubscriptionsAndQueues.push({
+                      queueUrl: queueUrl,
+                      subscriptionArn: response.SubscriptionArn,
+                    });
+                }
+                if (this.config.subscriber?.deleteQueuesOnClose && !isFanout) {
                   response.SubscriptionArn &&
                     this.deleteSubscriptionsAndQueues.push({
                       queueUrl: queueUrl,
