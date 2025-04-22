@@ -208,6 +208,7 @@ export class AWSEventBus {
                     }`;
                   }
                 }
+                subscriptionName = subscriptionName.slice(0, 80);
                 const { queueArn, queueUrl } = await this.createQueue(
                   subscriptionName,
                   topicArn,
