@@ -1,5 +1,11 @@
 # graphql-eventbus-aws-eventbus
 
+## 0.4.4
+
+### Patch Changes
+
+- fdec29c: fix for maximum length subscription name for aws queue
+
 ## 0.4.3
 
 ### Patch Changes
