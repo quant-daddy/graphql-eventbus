@@ -242,7 +242,6 @@ export class GraphQLEventbus {
           }),
         );
       }
-      throw e;
     } finally {
       if (consumeEndHooks.length) {
         await Promise.all(
