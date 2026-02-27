@@ -1,5 +1,11 @@
 # graphql-eventbus
 
+## 0.8.3
+
+### Patch Changes
+
+- a24f593: we remove error being thrown on consume because there is no way for client to handle it
+
 ## 0.8.2
 
 ### Patch Changes
