@@ -1,5 +1,11 @@
 # graphql-eventbus-aws-eventbus
 
+## 0.5.1
+
+### Patch Changes
+
+- 307d642: Queue creation fix
+
 ## 0.5.0
 
 ### Minor Changes
