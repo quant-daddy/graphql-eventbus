@@ -1,5 +1,11 @@
 # graphql-eventbus-aws-eventbus
 
+## 0.0.0
+
+### Minor Changes
+
+- 4d9cf1c: Topic and queue creation logic change. s3 connection config change. Adds documentation.
+
 ## 0.0.0-20260626091701
 
 ### Minor Changes
