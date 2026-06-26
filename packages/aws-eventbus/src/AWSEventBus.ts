@@ -13,6 +13,7 @@ import {
   ReceiveMessageCommand,
   DeleteMessageCommand,
   DeleteQueueCommand,
+  GetQueueUrlCommand,
 } from "@aws-sdk/client-sqs";
 import { DocumentNode, GraphQLSchema } from "graphql";
 import {
@@ -425,37 +426,48 @@ export class AWSEventBus {
     queueUrl: string;
     queueArn: string;
   }> => {
-    let queueUrl;
     const queueArn = `arn:aws:sqs:${this.config.region}:${this.awsAccountId}:${queueName}`;
+    let queueUrl;
     try {
-      const policy = {
-        Version: "2012-10-17",
-        Statement: [
-          {
-            Effect: "Allow",
-            Principal: "*",
-            Action: "SQS:SendMessage",
-            Resource: queueArn,
-            Condition: {
-              ArnEquals: {
-                "aws:SourceArn": topicArn, // Restrict access to the specific SNS topic ARN
+      // Step 1: Check if the queue already exists
+      const getQueueUrlResponse = await this.sqsClient.send(
+        new GetQueueUrlCommand({ QueueName: queueName }),
+      );
+      queueUrl = getQueueUrlResponse.QueueUrl;
+      console.log(`Queue already exists with URL: ${queueUrl}`);
+    } catch (error) {
+      if (error instanceof Error && error.name === "QueueDoesNotExist") {
+        console.log(`Queue does not exist. Creating queue: ${queueName}`);
+        const policy = {
+          Version: "2012-10-17",
+          Statement: [
+            {
+              Effect: "Allow",
+              Principal: "*",
+              Action: "SQS:SendMessage",
+              Resource: queueArn,
+              Condition: {
+                ArnEquals: {
+                  "aws:SourceArn": topicArn, // Restrict access to the specific SNS topic ARN
+                },
               },
             },
-          },
-        ],
-      };
-      const createQueueResponse = await this.sqsClient.send(
-        new CreateQueueCommand({
-          QueueName: queueName,
-          Attributes: {
-            Policy: JSON.stringify(policy),
-          },
-        }),
-      );
-      queueUrl = createQueueResponse.QueueUrl;
-    } catch (error) {
-      console.error("Error finding or creating queue:", error);
-      throw error;
+          ],
+        };
+        const createQueueResponse = await this.sqsClient.send(
+          new CreateQueueCommand({
+            QueueName: queueName,
+            Attributes: {
+              Policy: JSON.stringify(policy),
+            },
+          }),
+        );
+        queueUrl = createQueueResponse.QueueUrl;
+        console.log(`Queue created with URL: ${queueUrl}`);
+      } else {
+        console.error("Error finding or creating queue:", error);
+        throw error;
+      }
     }
     if (!queueUrl) {
       throw new Error(`queue creation failed ${queueName}`);
