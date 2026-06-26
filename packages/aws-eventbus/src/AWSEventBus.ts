@@ -1,20 +1,17 @@
+import { S3 } from "@aws-sdk/client-s3";
 import { STSClient, GetCallerIdentityCommand } from "@aws-sdk/client-sts";
 import {
   SNSClient,
-  ListTopicsCommand,
   CreateTopicCommand,
   SubscribeCommand,
   PublishCommand,
-  ListTopicsCommandOutput,
   UnsubscribeCommand,
 } from "@aws-sdk/client-sns";
 import {
   SQSClient,
-  GetQueueUrlCommand,
   CreateQueueCommand,
   ReceiveMessageCommand,
   DeleteMessageCommand,
-  GetQueueAttributesCommand,
   DeleteQueueCommand,
 } from "@aws-sdk/client-sqs";
 import { DocumentNode, GraphQLSchema } from "graphql";
@@ -26,22 +23,54 @@ import {
   GraphQLEventbus,
   GraphQLEventbusMetadata,
 } from "graphql-eventbus";
-import { getS3 } from "./s3";
 import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { v4 } from "uuid";
-import { Config } from "./config";
 
 export type AWSEventBusConfig = {
+  /**
+   * The SNS client region
+   */
   region: string;
+  /**
+   * GraphQL schema for publishing events.
+   */
   publisher?: {
     schema: GraphQLSchema;
   };
+  /**
+   * To handle payloads that are above the max payload size for aws SQS events
+   */
+  s3?: {
+    region: string;
+    accessKeyId: string;
+    secretAccessKey: string;
+    bucket: string;
+    folder: string;
+  };
   subscriber?: {
+    /**
+     * Queries for events being subcribed to
+     */
     queries: DocumentNode;
+    /**
+     * GraphQL schema of events
+     */
     schema: GraphQLSchema;
     cb: EventBusSubscriberCb;
+    /**
+     * Override the topics that the subscriber consumes.
+     * The subscribers get event for all the topics from queries that are not included in this list
+     */
     skipTopics?: string[];
+    /**
+     * Override the topics that the subscriber consumes.
+     * The subscribers get event for only subset of topics from queries that are included in this list
+     */
     includeTopics?: string[];
+    /**
+     * Fanout topic names
+     * When publishing to a fanout topic, all the subscribers of each service get the event
+     */
     fanoutTopics?: string[];
     /**
      * Maximum value: 20
@@ -49,11 +78,30 @@ export type AWSEventBusConfig = {
      */
     pollingTimeSeconds?: number;
     maxNumberOfMessages?: number;
+    /**
+     * Used to consume messages that are published for specific version of subscribers. Example: "dark", "canary"
+     * To target this version of consumer, the publisher must publish message with header `x-prop-${serviceName}-version: ${version}`
+     */
     version?: string;
+    /**
+     * Used to delete queues that were created temporarily. For instance, you can use set it to true for temporary version of your service.
+     */
     deleteQueuesOnClose?: boolean;
   };
   plugins?: EventBusPlugin[];
+  /**
+   * Every service in your app should use a different serviceName.
+   * This is used to create topics/queues are are consumed by a certain service.
+   * Only one instance of a service gets an event that it is subscribed to
+   */
   serviceName: string;
+  /**
+   * Topics and queue names are prefixed by this value. By default we use "graphql-eventbus".
+   */
+  topicPrefix?: string | null;
+  /**
+   * Deprecated. Use version field under subscriber insread.
+   */
   isDarkRelease?: boolean;
 };
 
@@ -68,23 +116,35 @@ type SNSFilterPolicy = {
   >;
 };
 
+const TOPIC_PREFIX = "graphql-eventbus";
+
 export class AWSEventBus {
   public snsClient: SNSClient;
   public sqsClient: SQSClient;
   public stsClient: STSClient;
+  private s3Client: S3 | null = null;
   private publishTopics: { [topicName: string]: string } = {};
   private closeSignal = false;
+  private awsAccountId = "";
   private deleteSubscriptionsAndQueues: {
     subscriptionArn: string;
     queueUrl: string;
   }[] = [];
   private ongoingPublishes = new Set();
-  private existingTopicsArns: ListTopicsCommandOutput | undefined;
   private bus: GraphQLEventbus;
   constructor(private config: AWSEventBusConfig) {
     this.snsClient = new SNSClient({
       region: config.region,
     });
+    this.s3Client = config.s3
+      ? new S3({
+          region: config.s3.region,
+          credentials: {
+            accessKeyId: config.s3.accessKeyId,
+            secretAccessKey: config.s3.secretAccessKey,
+          },
+        })
+      : null;
     this.sqsClient = new SQSClient({
       region: config.region,
     });
@@ -97,7 +157,7 @@ export class AWSEventBus {
               for (const topicName of topics) {
                 // eslint-disable-next-line no-await-in-loop
                 this.publishTopics[topicName] = await this.createTopic(
-                  `graphql-eventbus-${topicName}`,
+                  `${config.topicPrefix || TOPIC_PREFIX}-${topicName}`,
                 );
               }
             },
@@ -131,18 +191,20 @@ export class AWSEventBus {
               );
               const maxSize = 256 * 1024; // 256 KB SNS message limit
               const messageSize = Buffer.byteLength(message, "utf8");
-              if (messageSize > maxSize) {
+              if (messageSize > maxSize && this.s3Client && this.config.s3) {
                 console.log("large message detected...");
-                const localS3 = getS3();
-                const keyPrefix = Config.s3Prefix;
-                const key = keyPrefix + "/" + v4() + ".json";
+                const keyPrefix = this.config.s3.folder;
+                const key =
+                  (keyPrefix.endsWith("/") ? keyPrefix : keyPrefix + "/") +
+                  v4() +
+                  ".json";
                 console.log("uploading payload to ", key);
                 const command = new PutObjectCommand({
-                  Bucket: Config.bucket,
+                  Bucket: this.config.s3.bucket,
                   Key: key,
                   Body: message,
                 });
-                await localS3.send(command);
+                await this.s3Client.send(command);
                 console.log("payload uploaded");
                 message = JSON.stringify({
                   __s3Key: key,
@@ -183,25 +245,27 @@ export class AWSEventBus {
               }
               await finalTopics.reduce(async (acc, topicName) => {
                 const topicArn = await this.createTopic(
-                  `graphql-eventbus-${topicName}`,
+                  `${config.topicPrefix || TOPIC_PREFIX}-${topicName}`,
                 );
-                let subscriptionName = `graphql-eventbus-${
+                let subscriptionName = `${config.topicPrefix || TOPIC_PREFIX}-${
                   this.config.serviceName
                 }-${topicName}${this.config.isDarkRelease ? "-dark" : ""}`;
                 if (this.config.subscriber?.version) {
-                  subscriptionName = `graphql-eventbus-${this.config.serviceName}-${topicName}-${this.config.subscriber?.version}`;
+                  subscriptionName = `${config.topicPrefix || TOPIC_PREFIX}-${
+                    this.config.serviceName
+                  }-${topicName}-${this.config.subscriber?.version}`;
                 }
                 const isFanout =
                   this.config.subscriber?.fanoutTopics?.includes(topicName);
                 // we use a different subscription name for each instance of the service for a fanout topic
                 if (isFanout) {
-                  subscriptionName = `graphql-eventbus-${
+                  subscriptionName = `${config.topicPrefix || TOPIC_PREFIX}-${
                     this.config.serviceName
                   }-${topicName}-${Math.random().toString().split(".")[1]}${
                     this.config.isDarkRelease ? "-dark" : ""
                   }`;
                   if (this.config.subscriber?.version) {
-                    subscriptionName = `graphql-eventbus-${
+                    subscriptionName = `${config.topicPrefix || TOPIC_PREFIX}-${
                       this.config.serviceName
                     }-${topicName}-${Math.random().toString().split(".")[1]}-${
                       this.config.subscriber?.version
@@ -314,12 +378,12 @@ export class AWSEventBus {
   ) => {
     const foo = () =>
       this.receiveMessageFromQueue(queueUrl, async (baggage) => {
-        if ("__s3Key" in baggage) {
+        if ("__s3Key" in baggage && this.config.s3 && this.s3Client) {
           const command = new GetObjectCommand({
-            Bucket: Config.bucket,
+            Bucket: this.config.s3.bucket,
             Key: baggage["__s3Key"] as string,
           });
-          const response = await getS3().send(command);
+          const response = await this.s3Client.send(command);
           if (!response.Body) {
             return;
           }
@@ -348,29 +412,10 @@ export class AWSEventBus {
     // this.pollTimers.push(setInterval(foo, 1000));
   };
   private createTopic = async (topicName: string): Promise<string> => {
-    if (!this.existingTopicsArns) {
-      this.existingTopicsArns = await this.snsClient.send(
-        new ListTopicsCommand({}),
-      );
-    }
-    let topicArn: string | undefined;
-    for (const topic of this.existingTopicsArns.Topics || []) {
-      if (topic.TopicArn?.endsWith(`:${topicName}`)) {
-        topicArn = topic.TopicArn;
-        console.log(`Topic already exists for: ${topicName}`);
-        break;
-      }
-    }
-    if (!topicArn) {
-      // eslint-disable-next-line no-await-in-loop
-      const createTopicResponse = await this.snsClient.send(
-        new CreateTopicCommand({ Name: topicName }),
-      );
-      topicArn = createTopicResponse.TopicArn;
-    }
-    if (!topicArn) {
-      throw new Error(`Topic creation failed for topic ${topicArn}`);
-    }
+    const topicArn = `arn:aws:sns:${this.config.region}:${this.awsAccountId}:${
+      this.config.topicPrefix || TOPIC_PREFIX
+    }-${topicName}`;
+    await this.snsClient.send(new CreateTopicCommand({ Name: topicName }));
     return topicArn;
   };
   private createQueue = async (
@@ -381,64 +426,39 @@ export class AWSEventBus {
     queueArn: string;
   }> => {
     let queueUrl;
+    const queueArn = `arn:aws:sqs:${this.config.region}:${this.awsAccountId}:${queueName}`;
     try {
-      // Step 1: Check if the queue already exists
-      const getQueueUrlResponse = await this.sqsClient.send(
-        new GetQueueUrlCommand({ QueueName: queueName }),
-      );
-      queueUrl = getQueueUrlResponse.QueueUrl;
-      console.log(`Queue already exists with URL: ${queueUrl}`);
-    } catch (error) {
-      if (error instanceof Error && error.name === "QueueDoesNotExist") {
-        console.log(`Queue does not exist. Creating queue: ${queueName}`);
-        const stsResponse = await this.stsClient.send(
-          new GetCallerIdentityCommand({}),
-        );
-        const accountId = stsResponse.Account;
-        const queueArn = `arn:aws:sqs:${this.config.region}:${accountId}:${queueName}`;
-        const policy = {
-          Version: "2012-10-17",
-          Statement: [
-            {
-              Effect: "Allow",
-              Principal: "*",
-              Action: "SQS:SendMessage",
-              Resource: queueArn,
-              Condition: {
-                ArnEquals: {
-                  "aws:SourceArn": topicArn, // Restrict access to the specific SNS topic ARN
-                },
+      const policy = {
+        Version: "2012-10-17",
+        Statement: [
+          {
+            Effect: "Allow",
+            Principal: "*",
+            Action: "SQS:SendMessage",
+            Resource: queueArn,
+            Condition: {
+              ArnEquals: {
+                "aws:SourceArn": topicArn, // Restrict access to the specific SNS topic ARN
               },
             },
-          ],
-        };
-        const createQueueResponse = await this.sqsClient.send(
-          new CreateQueueCommand({
-            QueueName: queueName,
-            Attributes: {
-              Policy: JSON.stringify(policy),
-            },
-          }),
-        );
-        queueUrl = createQueueResponse.QueueUrl;
-        console.log(`Queue created with URL: ${queueUrl}`);
-      } else {
-        console.error("Error finding or creating queue:", error);
-        throw error;
-      }
+          },
+        ],
+      };
+      const createQueueResponse = await this.sqsClient.send(
+        new CreateQueueCommand({
+          QueueName: queueName,
+          Attributes: {
+            Policy: JSON.stringify(policy),
+          },
+        }),
+      );
+      queueUrl = createQueueResponse.QueueUrl;
+    } catch (error) {
+      console.error("Error finding or creating queue:", error);
+      throw error;
     }
     if (!queueUrl) {
       throw new Error(`queue creation failed ${queueName}`);
-    }
-    const getQueueAttributesResponse = await this.sqsClient.send(
-      new GetQueueAttributesCommand({
-        QueueUrl: queueUrl,
-        AttributeNames: ["QueueArn"], // Specify that you want the QueueArn attribute
-      }),
-    );
-    const queueArn = getQueueAttributesResponse.Attributes?.QueueArn;
-    if (!queueArn) {
-      throw new Error(`queue ARN retrieval failed ${queueArn}`);
     }
     return {
       queueArn,
@@ -468,7 +488,12 @@ export class AWSEventBus {
   closePublisher = async () => {
     await Promise.all(this.ongoingPublishes);
   };
-  init = () => {
+  init = async () => {
+    const stsResponse = await this.stsClient.send(
+      new GetCallerIdentityCommand({}),
+    );
+    const accountId = stsResponse.Account;
+    this.awsAccountId = accountId || "";
     return this.bus.init();
   };
   publish = async (a: {
