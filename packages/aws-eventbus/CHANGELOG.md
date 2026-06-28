@@ -1,5 +1,11 @@
 # graphql-eventbus-aws-eventbus
 
+## 0.5.2
+
+### Patch Changes
+
+- e5cda9e: Fix awseventbus
+
 ## 0.5.1
 
 ### Patch Changes
