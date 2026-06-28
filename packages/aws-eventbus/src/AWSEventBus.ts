@@ -157,9 +157,14 @@ export class AWSEventBus {
             publishInit: async (topics) => {
               for (const topicName of topics) {
                 // eslint-disable-next-line no-await-in-loop
-                this.publishTopics[topicName] = await this.createTopic(
-                  `${config.topicPrefix || TOPIC_PREFIX}-${topicName}`,
-                );
+                try {
+                  this.publishTopics[topicName] = await this.createTopic(
+                    `${config.topicPrefix || TOPIC_PREFIX}-${topicName}`,
+                  );
+                } catch (e) {
+                  console.error(`Creation of topic ${topicName} failed.`);
+                  throw e;
+                }
               }
             },
             schema: this.config.publisher?.schema,
@@ -298,30 +303,43 @@ export class AWSEventBus {
                     ],
                   };
                 }
-                const subscribeCommand = new SubscribeCommand({
-                  TopicArn: topicArn,
-                  Protocol: "sqs",
-                  Endpoint: queueArn,
-                  Attributes: {
-                    FilterPolicy: JSON.stringify(filterPolicy),
-                    FilterPolicyScope: "MessageAttributes",
-                  },
-                });
-                const response = await this.snsClient.send(subscribeCommand);
-                if (isFanout) {
-                  response.SubscriptionArn &&
-                    this.deleteSubscriptionsAndQueues.push({
-                      queueUrl: queueUrl,
-                      subscriptionArn: response.SubscriptionArn,
-                    });
+                try {
+                  const subscribeCommand = new SubscribeCommand({
+                    TopicArn: topicArn,
+                    Protocol: "sqs",
+                    Endpoint: queueArn,
+                    Attributes: {
+                      FilterPolicy: JSON.stringify(filterPolicy),
+                      FilterPolicyScope: "MessageAttributes",
+                    },
+                  });
+                  const response = await this.snsClient.send(subscribeCommand);
+                  if (isFanout) {
+                    response.SubscriptionArn &&
+                      this.deleteSubscriptionsAndQueues.push({
+                        queueUrl: queueUrl,
+                        subscriptionArn: response.SubscriptionArn,
+                      });
+                  }
+                  if (
+                    this.config.subscriber?.deleteQueuesOnClose &&
+                    !isFanout
+                  ) {
+                    response.SubscriptionArn &&
+                      this.deleteSubscriptionsAndQueues.push({
+                        queueUrl: queueUrl,
+                        subscriptionArn: response.SubscriptionArn,
+                      });
+                  }
+                } catch (e) {
+                  console.error(
+                    "Subscripiton to topic and queue failed",
+                    topicArn,
+                    queueArn,
+                  );
+                  throw e;
                 }
-                if (this.config.subscriber?.deleteQueuesOnClose && !isFanout) {
-                  response.SubscriptionArn &&
-                    this.deleteSubscriptionsAndQueues.push({
-                      queueUrl: queueUrl,
-                      subscriptionArn: response.SubscriptionArn,
-                    });
-                }
+
                 this.pollQueue(queueUrl, topicName, cb);
                 return acc.then(() => Promise.resolve());
               }, Promise.resolve());
@@ -413,9 +431,8 @@ export class AWSEventBus {
     // this.pollTimers.push(setInterval(foo, 1000));
   };
   private createTopic = async (topicName: string): Promise<string> => {
-    const topicArn = `arn:aws:sns:${this.config.region}:${this.awsAccountId}:${
-      this.config.topicPrefix || TOPIC_PREFIX
-    }-${topicName}`;
+    console.log("creating topic ", topicName);
+    const topicArn = `arn:aws:sns:${this.config.region}:${this.awsAccountId}:${topicName}`;
     await this.snsClient.send(new CreateTopicCommand({ Name: topicName }));
     return topicArn;
   };
