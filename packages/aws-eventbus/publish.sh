@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Create an NPM token that bypasses the 2FA. Then set that token as env var.
+npm config set //registry.npmjs.org/:_authToken=$NPM_TOKEN
 set -e
 set -o pipefail
 

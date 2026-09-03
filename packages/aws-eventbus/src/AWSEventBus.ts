@@ -1,3 +1,4 @@
+import * as crypto from "crypto";
 import { S3 } from "@aws-sdk/client-s3";
 import { STSClient, GetCallerIdentityCommand } from "@aws-sdk/client-sts";
 import {
@@ -26,6 +27,45 @@ import {
 } from "graphql-eventbus";
 import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { v4 } from "uuid";
+
+/**
+ * Compresses an event name to a maximum of 30 characters if its length exceeds 40 characters.
+ * Otherwise, returns the original name unchanged.
+ */
+function compressEventIfNeeded(name: string, maxLen = 42): string {
+  if (name.length <= maxLen) {
+    return name;
+  }
+
+  // 1. Generate 4-character MD5 hash of original string
+  const shortHash = crypto
+    .createHash("md5")
+    .update(name)
+    .digest("hex")
+    .substring(0, 4);
+
+  // Target length for readable prefix: 30 - 1 separator - 4 hash = 25 chars
+  const prefixTargetLen = maxLen - 1 - shortHash.length;
+
+  // 2. Split PascalCase / camelCase / hyphens / underscores
+  const tokens = name.match(/[A-Z]?[a-z0-9]+|[A-Z]+(?=[A-Z][a-z]|\d|\b)/g) || [
+    name,
+  ];
+
+  // 3. Strip inner vowels from words longer than 3 characters
+  const shortened = tokens.map((word) => {
+    if (word.length > 3) {
+      return word[0] + word.slice(1).replace(/[aeiouAEIOU]/g, "");
+    }
+    return word;
+  });
+
+  // 4. Join and truncate prefix to max allowed length
+  let prefix = shortened.join("-").toLowerCase();
+  prefix = prefix.substring(0, prefixTargetLen).replace(/-+$/, "");
+
+  return `${prefix}_${shortHash}`;
+}
 
 export type AWSEventBusConfig = {
   /**
@@ -253,34 +293,42 @@ export class AWSEventBus {
                 const topicArn = await this.createTopic(
                   `${config.topicPrefix || TOPIC_PREFIX}-${topicName}`,
                 );
-                let subscriptionName = `${config.topicPrefix || TOPIC_PREFIX}-${
+                const compressedTopicName = compressEventIfNeeded(topicName);
+                let queueName = `${config.topicPrefix || TOPIC_PREFIX}-${
                   this.config.serviceName
-                }-${topicName}${this.config.isDarkRelease ? "-dark" : ""}`;
+                }-${compressedTopicName}${
+                  this.config.isDarkRelease ? "-dark" : ""
+                }`;
                 if (this.config.subscriber?.version) {
-                  subscriptionName = `${config.topicPrefix || TOPIC_PREFIX}-${
+                  queueName = `${config.topicPrefix || TOPIC_PREFIX}-${
                     this.config.serviceName
-                  }-${topicName}-${this.config.subscriber?.version}`;
+                  }-${compressedTopicName}-${this.config.subscriber?.version}`;
                 }
                 const isFanout =
                   this.config.subscriber?.fanoutTopics?.includes(topicName);
                 // we use a different subscription name for each instance of the service for a fanout topic
                 if (isFanout) {
-                  subscriptionName = `${config.topicPrefix || TOPIC_PREFIX}-${
+                  queueName = `${config.topicPrefix || TOPIC_PREFIX}-${
                     this.config.serviceName
-                  }-${topicName}-${Math.random().toString().split(".")[1]}${
-                    this.config.isDarkRelease ? "-dark" : ""
-                  }`;
+                  }-${compressedTopicName}-${
+                    Math.random().toString().split(".")[1]
+                  }${this.config.isDarkRelease ? "-dark" : ""}`;
                   if (this.config.subscriber?.version) {
-                    subscriptionName = `${config.topicPrefix || TOPIC_PREFIX}-${
+                    queueName = `${config.topicPrefix || TOPIC_PREFIX}-${
                       this.config.serviceName
-                    }-${topicName}-${Math.random().toString().split(".")[1]}-${
-                      this.config.subscriber?.version
-                    }`;
+                    }-${compressedTopicName}-${
+                      Math.random().toString().split(".")[1]
+                    }-${this.config.subscriber?.version}`;
                   }
                 }
-                subscriptionName = subscriptionName.slice(0, 80);
+                if (queueName.length > 80) {
+                  console.error(
+                    `Queue name ${queueName} for topic ${topicName} exceeded 80 characters. Skipping...`,
+                  );
+                  return;
+                }
                 const { queueArn, queueUrl } = await this.createQueue(
-                  subscriptionName,
+                  queueName,
                   topicArn,
                 );
                 let filterPolicy: SNSFilterPolicy = {
