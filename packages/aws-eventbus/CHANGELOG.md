@@ -1,5 +1,11 @@
 # graphql-eventbus-aws-eventbus
 
+## 0.6.0
+
+### Minor Changes
+
+- 187448b: trim queue names when topic name exceeds 42 chars. skip creating queue when final queue name exceed 80 chars
+
 ## 0.5.2
 
 ### Patch Changes
