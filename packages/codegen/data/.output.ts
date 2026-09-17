@@ -76,3 +76,4 @@ export enum Events {
   CommentsDelete = "CommentsDelete",
   ReactionEntityDelete = "ReactionEntityDelete",
 }
+export type EventsUnion = "DeleteGroup" | "AnswerAccept" | "AnswerCreate" | "AnswerEdit" | "QuestionCreate" | "QuestionEdit" | "QuestionResolve" | "CommentCreate" | "CommentReaction" | "EntityReaction" | "AnswerAcceptUndo" | "QuestionResolveUndo" | "AnswerDelete" | "QuestionDelete" | "CommentReactionUndo" | "EntityReactionUndo" | "CommentsDelete" | "ReactionEntityDelete"

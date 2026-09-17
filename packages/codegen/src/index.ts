@@ -106,6 +106,10 @@ export const plugin = (
     exportString = `${importString}${exportString}\n\nexport interface EventHandlers {\n${eventHandlers.join(
       ",\n",
     )}\n}\n${enumsString}`;
+    const eventsTypeString = `export type EventsUnion = ${returnTypes
+      .map((a) => `"${a[0]}"`)
+      .join(" | ")}`;
+    exportString = `${exportString}\n${eventsTypeString}\n`;
   }
   return exportString;
 };
