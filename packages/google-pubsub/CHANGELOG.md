@@ -1,5 +1,12 @@
 # graphql-eventbus-google-pubsub
 
+## 0.8.3
+
+### Patch Changes
+
+- Updated dependencies [a463774]
+  - graphql-eventbus@0.9.0
+
 ## 0.8.2
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # graphql-eventbus-aws-eventbus
 
+## 0.7.0
+
+### Minor Changes
+
+- a463774: error handling fixes. message retrieval updates. s3 credentials. updates logging
+
+### Patch Changes
+
+- Updated dependencies [a463774]
+  - graphql-eventbus@0.9.0
+
 ## 0.6.0
 
 ### Minor Changes
