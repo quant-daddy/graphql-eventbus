@@ -5,7 +5,7 @@ npm config set //registry.npmjs.org/:_authToken=$NPM_TOKEN
 set -e
 set -o pipefail
 
-npm run build --prefix packages/aws-eventbus
+npm run build --prefix packages/core
 
 # printf -- '---\n"graphql-eventbus-aws-eventbus": patch\n---\n\nForce snapshot' > .changeset/force-snapshot-test.md
 

@@ -27,6 +27,7 @@ import {
 } from "graphql-eventbus";
 import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { v4 } from "uuid";
+import wait from "waait";
 
 /**
  * Compresses an event name to a maximum of 30 characters if its length exceeds 40 characters.
@@ -83,8 +84,8 @@ export type AWSEventBusConfig = {
    */
   s3?: {
     region: string;
-    accessKeyId: string;
-    secretAccessKey: string;
+    accessKeyId?: string;
+    secretAccessKey?: string;
     bucket: string;
     folder: string;
   };
@@ -98,6 +99,7 @@ export type AWSEventBusConfig = {
      */
     schema: GraphQLSchema;
     cb: EventBusSubscriberCb;
+    fetchMessagesOptions?: (topicName: string) => { maxMessageCount?: number };
     /**
      * Override the topics that the subscriber consumes.
      * The subscribers get event for all the topics from queries that are not included in this list
@@ -180,10 +182,13 @@ export class AWSEventBus {
     this.s3Client = config.s3
       ? new S3({
           region: config.s3.region,
-          credentials: {
-            accessKeyId: config.s3.accessKeyId,
-            secretAccessKey: config.s3.secretAccessKey,
-          },
+          credentials:
+            config.s3.accessKeyId && config.s3.secretAccessKey
+              ? {
+                  accessKeyId: config.s3.accessKeyId,
+                  secretAccessKey: config.s3.secretAccessKey,
+                }
+              : undefined,
         })
       : null;
     this.sqsClient = new SQSClient({
@@ -400,13 +405,24 @@ export class AWSEventBus {
   }
   private receiveMessageFromQueue = async (
     queueUrl: string,
-    cb: (baggage: Baggage) => Promise<void>,
+    cb: (baggage: Baggage) => Promise<unknown>,
+    options?: {
+      MaxNumberOfMessages?: number;
+    },
   ) => {
+    const MaxNumberOfMessages = Math.max(
+      options?.MaxNumberOfMessages ??
+        this.config.subscriber?.maxNumberOfMessages ??
+        10,
+      0,
+    );
     try {
+      // in every fetch request, we wait for up to 20 seconds to retrieve at most MaxNumberOfMessages.
+      // once all those messages by processed by cb, we do the next fetch.
       // Receive messages from the queue
       const receiveMessageCommand = new ReceiveMessageCommand({
         QueueUrl: queueUrl, // The URL of the SQS queue
-        MaxNumberOfMessages: this.config.subscriber?.maxNumberOfMessages ?? 10, // Number of messages to retrieve (max is 10)
+        MaxNumberOfMessages, // Number of messages to retrieve (max is 10)
         WaitTimeSeconds: this.config.subscriber?.pollingTimeSeconds ?? 20, // Long polling (wait for messages up to 20 seconds)
         VisibilityTimeout: 30, // The time for which a message is hidden after being received
         AttributeNames: ["All"], // Optionally retrieve additional message attributes
@@ -418,19 +434,29 @@ export class AWSEventBus {
       if (this.closeSignal) {
         return;
       }
-      for (const message of response.Messages || []) {
-        const messageBody = JSON.parse(message.Body || "");
-        // Process the message
-        // Your custom logic for processing the message goes here
-        cb(JSON.parse(messageBody.Message)).then(() => {
-          const deleteMessageCommand = new DeleteMessageCommand({
-            QueueUrl: queueUrl,
-            ReceiptHandle: message.ReceiptHandle, // Required to delete the message
-          });
-          // Delete the message from the queue to avoid reprocessing it
-          this.sqsClient.send(deleteMessageCommand);
-        });
+      if (!response.Messages?.length) {
+        return;
       }
+      return Promise.allSettled(
+        response.Messages.map(async (message) => {
+          const messageBody = JSON.parse(message.Body || "");
+          await cb(JSON.parse(messageBody.Message)).then((r) => {
+            if (r instanceof Error) {
+              console.log(
+                "skipping deleting the message because of returned error: ",
+                r.message,
+              );
+              return;
+            }
+            const deleteMessageCommand = new DeleteMessageCommand({
+              QueueUrl: queueUrl,
+              ReceiptHandle: message.ReceiptHandle, // Required to delete the message
+            });
+            // Delete the message from the queue to avoid reprocessing it
+            this.sqsClient.send(deleteMessageCommand);
+          });
+        }),
+      );
     } catch (error) {
       if (this.closeSignal) {
         return;
@@ -443,38 +469,51 @@ export class AWSEventBus {
     topicName: string,
     cb: DataCb,
   ) => {
-    const foo = () =>
-      this.receiveMessageFromQueue(queueUrl, async (baggage) => {
-        if ("__s3Key" in baggage && this.config.s3 && this.s3Client) {
-          const command = new GetObjectCommand({
-            Bucket: this.config.s3.bucket,
-            Key: baggage["__s3Key"] as string,
+    const foo = (options?: { MaxNumberOfMessages?: number }) =>
+      this.receiveMessageFromQueue(
+        queueUrl,
+        async (baggage) => {
+          if ("__s3Key" in baggage && this.config.s3 && this.s3Client) {
+            const command = new GetObjectCommand({
+              Bucket: this.config.s3.bucket,
+              Key: baggage["__s3Key"] as string,
+            });
+            const response = await this.s3Client.send(command);
+            if (!response.Body) {
+              return;
+            }
+            try {
+              baggage = JSON.parse(
+                await response.Body.transformToString("utf-8"),
+              );
+            } catch (e) {
+              console.error(
+                `Error in parsing the baggage payload for key ${baggage["__s3Key"]}`,
+              );
+              return;
+            }
+          }
+          return cb({
+            topic: topicName,
+            baggage: {
+              metadata: baggage.metadata,
+              payload: baggage.payload,
+            },
           });
-          const response = await this.s3Client.send(command);
-          if (!response.Body) {
-            return;
-          }
-          try {
-            baggage = JSON.parse(
-              await response.Body.transformToString("utf-8"),
-            );
-          } catch (e) {
-            console.error(
-              `Error in parsing the baggage payload for key ${baggage["__s3Key"]}`,
-            );
-            return;
-          }
-        }
-        await cb({
-          topic: topicName,
-          baggage: {
-            metadata: baggage.metadata,
-            payload: baggage.payload,
-          },
-        });
-      });
+        },
+        options,
+      );
     while (!this.closeSignal) {
-      await foo();
+      const clientFetchOptions =
+        this.config.subscriber?.fetchMessagesOptions?.(topicName);
+      if (clientFetchOptions?.maxMessageCount === 0) {
+        // if we don't wait there will be infinite sync while loop that will block the event loop
+        await wait(1 * 1000);
+      } else {
+        await foo({
+          MaxNumberOfMessages: clientFetchOptions?.maxMessageCount,
+        });
+      }
     }
     // this.pollTimers.push(setInterval(foo, 1000));
   };

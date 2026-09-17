@@ -17,13 +17,19 @@ export const LoggingPlugin = (): EventBusPlugin => {
         durationInMs: 0,
       };
       const logStr = () =>
-        `[${new Date().toISOString()}] CONSUME ${args.topic} ${
+        `[${new Date().toISOString()}] CONSUMED ${args.topic} ${
           values.errorStatus
-        } ${values.durationInMs} "${args.metadata["x-request-id"]}" "${
+        } ${values.durationInMs + "ms"} "${args.metadata["x-request-id"]}" "${
           args.metadata.eventId
         }"`;
+      console.log(
+        `[${new Date().toISOString()}] RECEIVED ${args.topic} "${
+          args.metadata["x-request-id"]
+        }" "${args.metadata.eventId}"`,
+      );
       return {
         consumeEndHook: () => {
+          values.durationInMs = new Date().getTime() - currentDate.getTime();
           console.log(logStr());
         },
         consumeErrorHook: (err) => {
@@ -40,6 +46,7 @@ export const LoggingPlugin = (): EventBusPlugin => {
       };
     },
     publishStartHook: (args) => {
+      const currentDate = new Date();
       const values: {
         errorStatus: "OK" | "DEPRECATED" | "ERROR" | "GRAPHQL_ERROR";
         durationInMs: number;
@@ -48,13 +55,14 @@ export const LoggingPlugin = (): EventBusPlugin => {
         durationInMs: 0,
       };
       const logStr = () =>
-        `[${new Date().toISOString()}] PUBLISH ${args.topic} ${
+        `[${new Date().toISOString()}] PUBLISHED ${args.topic} ${
           values.errorStatus
-        } ${values.durationInMs} "${args.metadata["x-request-id"]}" "${
+        } ${values.durationInMs}ms "${args.metadata["x-request-id"]}" "${
           args.metadata.eventId
         }"`;
       return {
         publishEndHook: () => {
+          values.durationInMs = new Date().getTime() - currentDate.getTime();
           console.log(logStr());
         },
         publishErrorHook: (err) => {
