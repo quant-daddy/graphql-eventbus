@@ -1,5 +1,11 @@
 # graphql-eventbus
 
+## 0.9.0
+
+### Minor Changes
+
+- a463774: error handling fixes. message retrieval updates. s3 credentials. updates logging
+
 ## 0.8.3
 
 ### Patch Changes
