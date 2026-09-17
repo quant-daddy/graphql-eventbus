@@ -1,5 +1,11 @@
 # graphql-eventbus-codegen
 
+## 0.3.0
+
+### Minor Changes
+
+- 4fb3a91: adds eventunion type
+
 ## 0.2.1
 
 ### Patch Changes
