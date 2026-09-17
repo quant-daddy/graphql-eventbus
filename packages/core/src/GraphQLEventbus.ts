@@ -183,6 +183,7 @@ export class GraphQLEventbus {
         }),
       );
     }
+    let returnVal: unknown;
     try {
       const extractedPayload = await this.consumeValidator.extractData({
         topic,
@@ -210,7 +211,7 @@ export class GraphQLEventbus {
           }),
         );
       }
-      await this.config.subscriber.cb({
+      returnVal = await this.config.subscriber.cb({
         topic: topic,
         payload: extractedPayload?.data,
         metadata: baggage.metadata,
@@ -224,17 +225,6 @@ export class GraphQLEventbus {
         );
       }
     } catch (e) {
-      console.error(
-        "Consume failed for the payload ",
-        JSON.stringify(
-          {
-            topic,
-            data: baggage.payload,
-          },
-          null,
-          2,
-        ),
-      );
       if (consumeErrorHooks.length) {
         await Promise.all(
           consumeErrorHooks.map((hook) => {
@@ -242,6 +232,7 @@ export class GraphQLEventbus {
           }),
         );
       }
+      throw e;
     } finally {
       if (consumeEndHooks.length) {
         await Promise.all(
@@ -251,6 +242,7 @@ export class GraphQLEventbus {
         );
       }
     }
+    return returnVal;
   };
 
   publish = async (props: {
