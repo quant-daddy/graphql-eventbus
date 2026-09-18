@@ -437,26 +437,24 @@ export class AWSEventBus {
       if (!response.Messages?.length) {
         return;
       }
-      return Promise.allSettled(
-        response.Messages.map(async (message) => {
-          const messageBody = JSON.parse(message.Body || "");
-          await cb(JSON.parse(messageBody.Message)).then((r) => {
-            if (r instanceof Error) {
-              console.log(
-                "skipping deleting the message because of returned error: ",
-                r.message,
-              );
-              return;
-            }
-            const deleteMessageCommand = new DeleteMessageCommand({
-              QueueUrl: queueUrl,
-              ReceiptHandle: message.ReceiptHandle, // Required to delete the message
-            });
-            // Delete the message from the queue to avoid reprocessing it
-            this.sqsClient.send(deleteMessageCommand);
+      for (const message of response.Messages) {
+        const messageBody = JSON.parse(message.Body || "");
+        await cb(JSON.parse(messageBody.Message)).then((r) => {
+          if (r instanceof Error) {
+            console.log(
+              "skipping deleting the message because of returned error: ",
+              r.message,
+            );
+            return;
+          }
+          const deleteMessageCommand = new DeleteMessageCommand({
+            QueueUrl: queueUrl,
+            ReceiptHandle: message.ReceiptHandle, // Required to delete the message
           });
-        }),
-      );
+          // Delete the message from the queue to avoid reprocessing it
+          this.sqsClient.send(deleteMessageCommand);
+        });
+      }
     } catch (error) {
       if (this.closeSignal) {
         return;
