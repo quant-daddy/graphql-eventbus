@@ -1,5 +1,11 @@
 # graphql-eventbus-aws-eventbus
 
+## 0.7.1
+
+### Patch Changes
+
+- dad15bf: processes events from a queue in sequence
+
 ## 0.7.0
 
 ### Minor Changes
